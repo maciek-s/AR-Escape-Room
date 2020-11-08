@@ -21,7 +21,8 @@ buildscript {
         ar_core_version = '1.20.0'
         sceneform_version = '1.15.0'
         gson_version = '2.8.6'
-        sceneform_version = '1.17.1'
+//        sceneform_version = '1.17.1'
+        filament_version ='1.6.0'
 
         // Test dependencies
         junit_version = '4.13.1'

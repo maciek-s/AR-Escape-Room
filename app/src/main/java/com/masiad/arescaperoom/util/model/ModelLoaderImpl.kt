@@ -18,6 +18,7 @@ class ModelLoaderImpl(
     override suspend fun load(resId: Int): ModelRenderable {
         return ModelRenderable.builder()
             .setSource(context, resId)
+            .setIsFilamentGltf(true)
             .build()
             .await()
     }

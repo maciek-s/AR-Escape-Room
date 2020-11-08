@@ -46,7 +46,7 @@ class GameFragment : Fragment(R.layout.game_fragment) {
 
     private val rootNode by lazy { AnchorNode() }
     private val placingNode by lazy { Node() }
-    private val roomNode by lazy { SkeletonNode() }
+    private val roomNode by lazy { Node() }
 
     private val hitPosition by lazy {
         Pair(arSceneView.width / 2f, arSceneView.height * 0.75f)
@@ -95,8 +95,8 @@ class GameFragment : Fragment(R.layout.game_fragment) {
         viewModel.level.observe(viewLifecycleOwner, { level ->
             lifecycleScope.launch {
                 placingNode.renderable = modelLoader.load(level.placingModelName)
-                roomNode.renderable = modelLoader.load(level.roomModelName)
-                prepareEscapeRoom()
+                //roomNode.renderable = modelLoader.load(level.roomModelName)
+                //prepareEscapeRoom()
                 viewModel.informPreparingEnded()
             }
         })
