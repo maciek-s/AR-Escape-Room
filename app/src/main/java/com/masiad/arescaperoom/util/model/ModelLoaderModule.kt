@@ -15,5 +15,5 @@ object ModelLoaderModule {
     @FragmentScoped
     @Provides
     fun provideModelLoader(@ActivityContext context: Context): ModelLoader =
-        ModelLoaderImlp(context)
+        ModelLoaderImpl(context)
 }

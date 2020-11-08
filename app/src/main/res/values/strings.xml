@@ -3,4 +3,8 @@
     <string name="start">Start</string>
     <string name="loading">Loading… %d%%</string>
     <string name="ok">OK</string>
+
+    <string name="instruction_placing">Move device to scan room. Then tap screen to place model in visible position and start game!</string>
+
+    <string name="instruction_level_1">TODO</string>
 </resources>

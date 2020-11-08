@@ -48,12 +48,15 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     implementation "com.google.ar:core:$ar_core_version"
-    implementation "com.google.ar.sceneform.ux:sceneform-ux:1.17.1"
+    implementation "com.google.ar.sceneform.ux:sceneform-ux:$sceneform_version"
+    implementation "com.google.ar.sceneform:animation:$sceneform_version"
     implementation "com.google.android.material:material:$material_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines_version"
     implementation "com.google.dagger:hilt-android:$hilt_version"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hilt_viewmodel_version"
+    implementation "com.google.code.gson:gson:$gson_version"
 
     // Testing dependencies
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"

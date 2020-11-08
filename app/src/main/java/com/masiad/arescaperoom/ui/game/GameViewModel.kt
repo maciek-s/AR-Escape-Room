@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.masiad.arescaperoom.gamelogic.GamePhase
+import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.LevelManager
-import com.masiad.arescaperoom.gamelogic.levels.Level
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -24,14 +24,20 @@ class GameViewModel @ViewModelInject constructor(
         loadingProgress.value = progress
     }
 
-    private lateinit var level: Level
+    private val _level by lazy { MutableLiveData<Level>() }
+    val level: LiveData<Level>
+        get() = _level
+
+    val instructionName: String
+        get() {
+            requireNotNull(level.value) { "getInstructionName() called but level not loaded" }
+            return level.value?.instructionName ?: ""
+        }
 
     fun loadLevel(levelNumber: Int) {
         viewModelScope.launch {
-            level = levelManager.loadLevel(levelNumber)
-            setLoadingProgress(100)
-            delay(250)
-            switchPhase(GamePhase.GAME_LOADED)
+            _level.value = levelManager.loadLevel(levelNumber)
+            setLoadingProgress(50)
         }
     }
 
@@ -41,5 +47,19 @@ class GameViewModel @ViewModelInject constructor(
 
     fun informInstructionAlertClosed() {
         switchPhase(GamePhase.PLACING)
+    }
+
+    fun informPreparingEnded() {
+        viewModelScope.launch {
+            setLoadingProgress(100)
+            delay(1000)
+            switchPhase(GamePhase.GAME_LOADED)
+        }
+    }
+
+    fun informOnSceneClicked(hasAnchor: Boolean) {
+        if (hasAnchor) {
+            switchPhase(GamePhase.PLACED)
+        }
     }
 }

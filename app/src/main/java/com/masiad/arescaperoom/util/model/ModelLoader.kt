@@ -4,5 +4,7 @@ import com.google.ar.sceneform.rendering.ModelRenderable
 
 interface ModelLoader {
 
-    fun load(resId: Int, completed: (modelRenderable: ModelRenderable) -> Unit)
+    suspend fun load(modelName: String): ModelRenderable
+
+    suspend fun load(resId: Int): ModelRenderable
 }

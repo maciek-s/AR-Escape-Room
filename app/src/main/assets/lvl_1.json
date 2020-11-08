@@ -1,0 +1,10 @@
+{
+  "number": 1,
+  "instructionName": "instruction_level_1",
+  "placingModelName": "door_transparent",
+  "roomModelName": "room",
+  "gameModelNames": [
+    "door_open",
+    "lamp"
+  ]
+}

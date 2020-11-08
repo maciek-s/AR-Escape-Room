@@ -12,17 +12,13 @@ import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
 import com.google.ar.sceneform.math.Vector3
-import com.google.ar.sceneform.rendering.Color
-import com.google.ar.sceneform.rendering.Material
-import com.google.ar.sceneform.rendering.MaterialFactory
-import com.google.ar.sceneform.rendering.ShapeFactory
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
+import com.masiad.arescaperoom.util.extenstion.hasAnchor
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,7 +26,7 @@ import javax.inject.Inject
  * Main AR game fragment
  */
 @AndroidEntryPoint
-class GameFragment : Fragment(R.layout.game_fragment), Scene.OnUpdateListener {
+class GameFragment : Fragment(R.layout.game_fragment) {
 
     private val args: GameFragmentArgs by navArgs()
 
@@ -50,10 +46,13 @@ class GameFragment : Fragment(R.layout.game_fragment), Scene.OnUpdateListener {
 
     private val rootNode by lazy { AnchorNode() }
     private val placingNode by lazy { Node() }
+    private val roomNode by lazy { SkeletonNode() }
 
     private val hitPosition by lazy {
-        Pair(arSceneView.width / 2f, arSceneView.height / 2f)
+        Pair(arSceneView.width / 2f, arSceneView.height * 0.75f)
     }
+
+    private var sceneUpdateListener: Scene.OnUpdateListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,33 +65,16 @@ class GameFragment : Fragment(R.layout.game_fragment), Scene.OnUpdateListener {
         return binding.root
     }
 
-    override fun onDestroy() {
-        arSceneView.scene.removeOnUpdateListener(this)
-        super.onDestroy()
-    }
-
-    override fun onUpdate(frameTime: FrameTime?) {
-        run {
-            arSceneView.arFrame
-                ?.hitTest(hitPosition.first, hitPosition.second)
-                ?.forEach { hitResult ->
-                    val trackable = hitResult.trackable
-                    if (trackable is Plane && trackable.trackingState == TrackingState.TRACKING) {
-                        val anchor = hitResult.createAnchor()
-                        rootNode.anchor?.detach()
-                            ?: rootNode.setParent(arSceneView.scene)
-                        rootNode.anchor = anchor
-                        return@run
-                    }
-                }
-            rootNode.anchor?.detach()
-        }
+    override fun onDestroyView() {
+        arSceneView.scene.removeOnUpdateListener(sceneUpdateListener)
+        super.onDestroyView()
     }
 
     // PRIVATE
     private fun bindData() {
         binding.viewModel = viewModel
         observeGamePhase()
+        observeLevel()
     }
 
     private fun observeGamePhase() {
@@ -101,10 +83,21 @@ class GameFragment : Fragment(R.layout.game_fragment), Scene.OnUpdateListener {
                 GamePhase.LOADING -> prepareGame()
                 GamePhase.GAME_LOADED -> showInstruction()
                 GamePhase.PLACING -> setupPlacing()
-                GamePhase.PLACED -> TODO()
+                GamePhase.PLACED -> showEscapeRoom()
                 GamePhase.GAME_STARTED -> TODO()
                 GamePhase.ESCAPING -> TODO()
                 GamePhase.ESCAPED -> TODO()
+            }
+        })
+    }
+
+    private fun observeLevel() {
+        viewModel.level.observe(viewLifecycleOwner, { level ->
+            lifecycleScope.launch {
+                placingNode.renderable = modelLoader.load(level.placingModelName)
+                roomNode.renderable = modelLoader.load(level.roomModelName)
+                prepareEscapeRoom()
+                viewModel.informPreparingEnded()
             }
         })
     }
@@ -114,26 +107,60 @@ class GameFragment : Fragment(R.layout.game_fragment), Scene.OnUpdateListener {
     }
 
     private fun showInstruction() {
-        binding.alert.infoText = "Test sdm flsd msd fmsdl fmlsd mlsd mklfmksd lmls"
+//        val instructionResId = resources.getIdentifier(viewModel.instructionName, "string", context?.packageName)
+        binding.alert.infoText = getString(R.string.instruction_placing)
         binding.alert.clickListener = View.OnClickListener {
-            lifecycleScope.launch {
-                delay(2000)
-                binding.alert.infoText = null
-                viewModel.informInstructionAlertClosed()
-            }
+            binding.alert.infoText = null
+            viewModel.informInstructionAlertClosed()
         }
     }
 
     private fun setupPlacing() {
         placingNode.setParent(rootNode)
-        // show doors preview and create portal on tap
-        MaterialFactory.makeOpaqueWithColor(context, Color(1f, 0f, 0f))
-            .thenAccept { material: Material? ->
-                placingNode.renderable =
-                    ShapeFactory.makeSphere(0.01f, Vector3.zero(), material)
+        arSceneView.setOnClickListener {
+            viewModel.informOnSceneClicked(rootNode.hasAnchor())
+        }
+        arSceneView.updateSceneOnUpdateListener {
+            run {
+                arSceneView.arFrame
+                    ?.hitTest(hitPosition.first, hitPosition.second)
+                    ?.forEach { hitResult ->
+                        val trackable = hitResult.trackable
+                        if (trackable is Plane && trackable.trackingState == TrackingState.TRACKING) {
+                            val anchor = hitResult.createAnchor()
+                            rootNode.anchor?.detach()
+                                ?: rootNode.setParent(arSceneView.scene)
+                            rootNode.anchor = anchor
+                            return@run
+                        }
+                    }
+                rootNode.anchor?.detach()
             }
+        }
+    }
 
+    private fun prepareEscapeRoom() {
+        // todo prepare room inside
+        // Half scale, future animate to full scale
+        roomNode.localScale = Vector3(0.5f, 0.5f, 0.5f)
+        // Total 3m, so from center to door 1.5 but half scale -> 0.75
+        roomNode.localPosition = Vector3(0f, 0f, -0.75f)
+    }
 
-        arSceneView.scene.addOnUpdateListener(this)
+    private fun showEscapeRoom() {
+        roomNode.setParent(rootNode)
+        arSceneView.setOnClickListener(null)
+        arSceneView.updateSceneOnUpdateListener {
+            // TODO close door when enter and start time out
+        }
+    }
+
+    private inline fun ArSceneView.updateSceneOnUpdateListener(crossinline updateAction: (frameTime: FrameTime?) -> Unit) {
+        sceneUpdateListener?.let {
+            scene.removeOnUpdateListener(it)
+        }
+        sceneUpdateListener = Scene.OnUpdateListener {
+            updateAction(it)
+        }.also { scene.addOnUpdateListener(it) }
     }
 }
