@@ -30,8 +30,16 @@ import java.util.ArrayList;
  * <p>To determine when an gesture is finished/updated, listen to the events on the gesture object.
  */
 public abstract class BaseGestureRecognizer<T extends BaseGesture<T>> {
+  /**
+   * Interface definition for a callbacks to be invoked when a {@link BaseGesture} starts.
+   */
+  public interface OnGestureStartedListener<T extends BaseGesture<T>> {
+    void onGestureStarted(T gesture);
+  }
+
   protected final GesturePointersUtility gesturePointersUtility;
   protected final ArrayList<T> gestures = new ArrayList<>();
+
   private final ArrayList<OnGestureStartedListener<T>> gestureStartedListeners;
 
   @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
@@ -86,12 +94,5 @@ public abstract class BaseGestureRecognizer<T extends BaseGesture<T>> {
         gestures.remove(i);
       }
     }
-  }
-
-  /**
-   * Interface definition for a callbacks to be invoked when a {@link BaseGesture} starts.
-   */
-  public interface OnGestureStartedListener<T extends BaseGesture<T>> {
-    void onGestureStarted(T gesture);
   }
 }

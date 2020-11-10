@@ -61,11 +61,6 @@ public final class MaterialDef extends Table {
     builder.startVector(4, numElems, 4);
   }
 
-  public static int endMaterialDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -87,12 +82,10 @@ public final class MaterialDef extends Table {
   }
 
   public ByteBuffer nameAsByteBuffer() {
-    return __vector_as_bytebuffer(4, 1);
-  }
+    return __vector_as_bytebuffer(4, 1); }
 
   public ByteBuffer nameInByteBuffer(ByteBuffer _bb) {
-    return __vector_in_bytebuffer(_bb, 4, 1);
-  }
+    return __vector_in_bytebuffer(_bb, 4, 1); }
 
   /**
    * A dictionary of all material properties extracted from the source file.
@@ -123,6 +116,11 @@ public final class MaterialDef extends Table {
   public int texturesLength() {
     int o = __offset(8);
     return o != 0 ? __vector_len(o) : 0;
+  }
+
+  public static int endMaterialDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

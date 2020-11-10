@@ -53,9 +53,7 @@ public abstract class BaseTransformableNode extends Node implements Node.OnTapLi
     return false;
   }
 
-  /**
-   * Returns true if this node is currently selected by the TransformationSystem.
-   */
+  /** Returns true if this node is currently selected by the TransformationSystem. */
   public boolean isSelected() {
     return transformationSystem.getSelectedNode() == this;
   }
@@ -64,8 +62,8 @@ public abstract class BaseTransformableNode extends Node implements Node.OnTapLi
    * Sets this as the selected node in the TransformationSystem if there is no currently selected
    * node or if the currently selected node is not actively being transformed.
    *
-   * @return true if the node was successfully selected
    * @see TransformableNode#isTransforming
+   * @return true if the node was successfully selected
    */
   public boolean select() {
     return transformationSystem.selectNode(this);

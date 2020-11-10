@@ -12,69 +12,69 @@ import androidx.annotation.VisibleForTesting;
  * @hide
  */
 public class AndroidPreconditions {
-    private static final boolean IS_ANDROID_API_AVAILABLE = checkAndroidApiAvailable();
-    private static final boolean IS_MIN_ANDROID_API_LEVEL = isMinAndroidApiLevelImpl();
-    private static boolean isUnderTesting = false;
+  private static final boolean IS_ANDROID_API_AVAILABLE = checkAndroidApiAvailable();
+  private static final boolean IS_MIN_ANDROID_API_LEVEL = isMinAndroidApiLevelImpl();
+  private static boolean isUnderTesting = false;
 
-    /**
-     * Ensure that the code is being executed on Android's UI thread. Null-Op if the Android API isn't
-     * available (i.e. for unit tests.
-     */
-    public static void checkUiThread() {
-        if (!isAndroidApiAvailable() || isUnderTesting()) {
-            return;
-        }
-
-        boolean isOnUIThread = Looper.getMainLooper().getThread() == Thread.currentThread();
-        Preconditions.checkState(isOnUIThread, "Must be called from the UI thread.");
+  /**
+   * Ensure that the code is being executed on Android's UI thread. Null-Op if the Android API isn't
+   * available (i.e. for unit tests.
+   */
+  public static void checkUiThread() {
+    if (!isAndroidApiAvailable() || isUnderTesting()) {
+      return;
     }
 
-    /**
-     * Enforce the minimum Android api level
-     *
-     * @throws IllegalStateException if the api level is not high enough
-     */
-    public static void checkMinAndroidApiLevel() {
-        Preconditions.checkState(isMinAndroidApiLevel(), "Sceneform requires Android N or later");
-    }
+    boolean isOnUIThread = Looper.getMainLooper().getThread() == Thread.currentThread();
+    Preconditions.checkState(isOnUIThread, "Must be called from the UI thread.");
+  }
 
-    /**
-     * Returns true if the Android API is currently available. Useful for branching functionality to
-     * make it testable via junit. The android API is available for Robolectric tests and android
-     * emulator tests.
-     */
-    public static boolean isAndroidApiAvailable() {
-        return IS_ANDROID_API_AVAILABLE;
-    }
+  /**
+   * Enforce the minimum Android api level
+   *
+   * @throws IllegalStateException if the api level is not high enough
+   */
+  public static void checkMinAndroidApiLevel() {
+    Preconditions.checkState(isMinAndroidApiLevel(), "Sceneform requires Android N or later");
+  }
 
-    public static boolean isUnderTesting() {
-        return isUnderTesting;
-    }
+  /**
+   * Returns true if the Android API is currently available. Useful for branching functionality to
+   * make it testable via junit. The android API is available for Robolectric tests and android
+   * emulator tests.
+   */
+  public static boolean isAndroidApiAvailable() {
+    return IS_ANDROID_API_AVAILABLE;
+  }
 
-    @VisibleForTesting
-    public static void setUnderTesting(boolean isUnderTesting) {
-        AndroidPreconditions.isUnderTesting = isUnderTesting;
-    }
+  public static boolean isUnderTesting() {
+    return isUnderTesting;
+  }
 
-    /**
-     * Returns true if the Android api level is above the minimum or if not on Android.
-     *
-     * <p>Also returns true if not on Android or in a test.
-     */
-    public static boolean isMinAndroidApiLevel() {
-        return isUnderTesting() || IS_MIN_ANDROID_API_LEVEL;
-    }
+  @VisibleForTesting
+  public static void setUnderTesting(boolean isUnderTesting) {
+    AndroidPreconditions.isUnderTesting = isUnderTesting;
+  }
 
-    private static boolean isMinAndroidApiLevelImpl() {
-        return !isAndroidApiAvailable() || (Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP);
-    }
+  /**
+   * Returns true if the Android api level is above the minimum or if not on Android.
+   *
+   * <p>Also returns true if not on Android or in a test.
+   */
+  public static boolean isMinAndroidApiLevel() {
+    return isUnderTesting() || IS_MIN_ANDROID_API_LEVEL;
+  }
 
-    private static boolean checkAndroidApiAvailable() {
-        try {
-            Class.forName("android.app.Activity");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
+  private static boolean isMinAndroidApiLevelImpl() {
+    return !isAndroidApiAvailable() || (Build.VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP);
+  }
+
+  private static boolean checkAndroidApiAvailable() {
+    try {
+      Class.forName("android.app.Activity");
+      return true;
+    } catch (ClassNotFoundException e) {
+      return false;
     }
+  }
 }

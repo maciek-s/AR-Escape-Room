@@ -56,12 +56,28 @@ import java.util.concurrent.CompletionException;
 @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
         // CompletableFuture
 class LoadRenderableFromSfbTask<T extends Renderable> {
-  private static final String TAG = LoadRenderableFromSfbTask.class.getSimpleName();
   private static final int BYTES_PER_FLOAT = Float.SIZE / 8;
-  private static final int BYTES_PER_SHORT = 2;
-  private static final int BYTES_PER_INT = 4;
+
+  private static final String TAG = LoadRenderableFromSfbTask.class.getSimpleName();
   private final T renderable;
   private final RenderableInternalData renderableData;
+  private static final int BYTES_PER_SHORT = 2;
+
+  private ModelDef modelDef;
+  private ModelInstanceDef modelInstanceDef;
+  private TransformDef transformDef;
+
+  private int meshCount;
+  private int textureCount;
+
+  private int vertexCount;
+  private int vertexStride;
+
+  private int indexCount;
+  private IndexBuffer.Builder.IndexType indexType;
+  private ByteBuffer vertexBufferData;
+  private ByteBuffer indexBufferData;
+  private static final int BYTES_PER_INT = 4;
   @Nullable
   private final Uri renderableUri;
   private final ArrayList<ModelTexture> textures = new ArrayList<>();
@@ -69,28 +85,6 @@ class LoadRenderableFromSfbTask<T extends Renderable> {
   private final ArrayList<Integer> compiledMaterialIndex = new ArrayList<>();
   private final ArrayList<MaterialParameters> materialParameters = new ArrayList<>();
   private final ArrayList<String> materialNames = new ArrayList<>();
-  private ModelDef modelDef;
-  private ModelInstanceDef modelInstanceDef;
-  private TransformDef transformDef;
-  private int meshCount;
-  private int textureCount;
-  private int vertexCount;
-  private int vertexStride;
-  private int indexCount;
-  private IndexBuffer.Builder.IndexType indexType;
-  private ByteBuffer vertexBufferData;
-  private ByteBuffer indexBufferData;
-
-  LoadRenderableFromSfbTask(T renderable, @Nullable Uri renderableUri) {
-    this.renderable = renderable;
-    IRenderableInternalData data = renderable.getRenderableData();
-    if (data instanceof RenderableInternalData) {
-      this.renderableData = (RenderableInternalData) data;
-    } else {
-      throw new IllegalStateException("Expected task type " + TAG);
-    }
-    this.renderableUri = renderableUri;
-  }
 
   private static Texture.Sampler samplerDefToSampler(SamplerDef samplerDef) {
     Texture.Sampler.WrapMode wrapModeR =
@@ -107,6 +101,17 @@ class LoadRenderableFromSfbTask<T extends Renderable> {
             .setWrapModeS(wrapModeS)
             .setWrapModeT(wrapModeT)
             .build();
+  }
+
+  LoadRenderableFromSfbTask(T renderable, @Nullable Uri renderableUri) {
+    this.renderable = renderable;
+    IRenderableInternalData data = renderable.getRenderableData();
+    if (data instanceof RenderableInternalData) {
+      this.renderableData = (RenderableInternalData) data;
+    } else {
+      throw new IllegalStateException("Expected task type " + TAG);
+    }
+    this.renderableUri = renderableUri;
   }
 
   private static int getVertexAttributeTypeSizeInBytes(int attributeType) {
@@ -169,6 +174,53 @@ class LoadRenderableFromSfbTask<T extends Renderable> {
         break;
     }
     return filamentAttribute;
+  }
+
+
+  private SceneformBundleDef byteBufferToSfb(ByteBuffer assetData) {
+    try {
+      SceneformBundleDef sfb;
+      sfb = SceneformBundle.tryLoadSceneformBundle(assetData);
+      if (sfb != null) {
+        return sfb;
+      }
+    } catch (VersionException e) {
+      throw new CompletionException(e);
+    }
+    throw new AssertionError("No RCB file at uri: " + renderableUri);
+  }
+
+  private SceneformBundleDef setCollisionShape(SceneformBundleDef sfb) {
+    try {
+      renderable.collisionShape = SceneformBundle.readCollisionGeometry(sfb);
+      return sfb;
+    } catch (IOException e) {
+      throw new CompletionException("Unable to get collision geometry from sfb", e);
+    }
+  }
+
+  private SceneformBundleDef loadModel(SceneformBundleDef sfb) {
+    // Prepare the flatbuffer data
+    transformDef = sfb.transform();
+    modelDef = sfb.model();
+    Preconditions.checkNotNull(modelDef, "Model error: ModelDef is invalid.");
+
+    modelInstanceDef = modelDef.lods(0);
+    Preconditions.checkNotNull(modelInstanceDef, "Lull Model error: ModelInstanceDef is invalid.");
+
+    // The data buffers for Geometry have to stick around anyway, so go ahead and load them
+    // now. The Filament buffers will be created in createAssetFromBuffer()
+    buildGeometry();
+    return sfb;
+  }
+
+  private T setupFilament(SceneformBundleDef sfb) {
+    Preconditions.checkNotNull(sfb);
+    setupFilamentGeometryBuffers();
+    setupFilamentMaterials(sfb);
+    setupRenderableData();
+    renderable.getId().update();
+    return renderable;
   }
 
   private static VertexBuffer.AttributeType getFilamentAttributeType(int attributeType) {
@@ -235,6 +287,47 @@ class LoadRenderableFromSfbTask<T extends Renderable> {
     throw new IllegalArgumentException("Invalid MinFilter");
   }
 
+  private void setupRenderableData() {
+    // Get the bounds.
+    final Vec3 modelMinAabb = modelDef.boundingBox().min();
+    final Vector3 minAabb = new Vector3(modelMinAabb.x(), modelMinAabb.y(), modelMinAabb.z());
+    final Vec3 modelMaxAabb = modelDef.boundingBox().max();
+    final Vector3 maxAabb = new Vector3(modelMaxAabb.x(), modelMaxAabb.y(), modelMaxAabb.z());
+    Vector3 extentsAabb = Vector3.subtract(maxAabb, minAabb).scaled(0.5f);
+    Vector3 centerAabb = Vector3.add(minAabb, extentsAabb);
+    renderableData.setExtentsAabb(extentsAabb);
+    renderableData.setCenterAabb(centerAabb);
+    // Finding a scale of 0 indicates a default-initialized (i.e. invalid) structure.
+    if (transformDef != null && transformDef.scale() != 0.0f) {
+      Vec3 modelOffset = transformDef.offset();
+      Vector3 offset = new Vector3(modelOffset.x(), modelOffset.y(), modelOffset.z());
+      renderableData.setTransformScale(transformDef.scale());
+      renderableData.setTransformOffset(offset);
+    }
+
+    ArrayList<Material> materialBindings = renderable.getMaterialBindings();
+    ArrayList<String> renderableMaterialNames = renderable.getMaterialNames();
+    materialBindings.clear();
+    renderableMaterialNames.clear();
+    for (int m = 0; m < meshCount; ++m) {
+      final ModelIndexRange range = modelInstanceDef.ranges(m);
+      final int start = (int) range.start();
+      final int end = (int) range.end();
+
+      int materialIndex = compiledMaterialIndex.get(m);
+      Material material = compiledMaterials.get(materialIndex).makeCopy();
+      MaterialParameters params = materialParameters.get(m);
+      material.copyMaterialParameters(params);
+
+      RenderableInternalData.MeshData meshData = new RenderableInternalData.MeshData();
+      materialBindings.add(material);
+      renderableMaterialNames.add(materialNames.get(m));
+      meshData.indexStart = start;
+      meshData.indexEnd = end;
+      renderableData.getMeshes().add(meshData);
+    }
+  }
+
   private static Texture.Sampler.WrapMode filamentWrapModeToWrapMode(
           TextureSampler.WrapMode wrapMode) {
     switch (wrapMode) {
@@ -296,55 +389,7 @@ class LoadRenderableFromSfbTask<T extends Renderable> {
     return result;
   }
 
-  private void loadAnimations(SceneformBundleDef sfb) {
-    return;
-  }
-
-  private SceneformBundleDef byteBufferToSfb(ByteBuffer assetData) {
-    try {
-      SceneformBundleDef sfb;
-      sfb = SceneformBundle.tryLoadSceneformBundle(assetData);
-      if (sfb != null) {
-        return sfb;
-      }
-    } catch (VersionException e) {
-      throw new CompletionException(e);
-    }
-    throw new AssertionError("No RCB file at uri: " + renderableUri);
-  }
-
-  private SceneformBundleDef setCollisionShape(SceneformBundleDef sfb) {
-    try {
-      renderable.collisionShape = SceneformBundle.readCollisionGeometry(sfb);
-      return sfb;
-    } catch (IOException e) {
-      throw new CompletionException("Unable to get collision geometry from sfb", e);
-    }
-  }
-
-  private SceneformBundleDef loadModel(SceneformBundleDef sfb) {
-    // Prepare the flatbuffer data
-    transformDef = sfb.transform();
-    modelDef = sfb.model();
-    Preconditions.checkNotNull(modelDef, "Model error: ModelDef is invalid.");
-
-    modelInstanceDef = modelDef.lods(0);
-    Preconditions.checkNotNull(modelInstanceDef, "Lull Model error: ModelInstanceDef is invalid.");
-
-    // The data buffers for Geometry have to stick around anyway, so go ahead and load them
-    // now. The Filament buffers will be created in createAssetFromBuffer()
-    buildGeometry();
-    return sfb;
-  }
-
-  private T setupFilament(SceneformBundleDef sfb) {
-    Preconditions.checkNotNull(sfb);
-    setupFilamentGeometryBuffers();
-    setupFilamentMaterials(sfb);
-    setupRenderableData();
-    renderable.getId().update();
-    return renderable;
-  }
+  private void loadAnimations(SceneformBundleDef sfb) {return ;}
 
   private void setupFilamentGeometryBuffers() {
     IEngine engine = EngineInstance.getEngine();
@@ -388,6 +433,16 @@ class LoadRenderableFromSfbTask<T extends Renderable> {
     setupAnimation();
   }
 
+  @Nullable
+  private Texture getTextureByName(String name) {
+    for (int t = 0; t < textureCount; ++t) {
+      if (Objects.equals(name, textures.get(t).name)) {
+        return textures.get(t).data;
+      }
+    }
+    return null;
+  }
+
   private void setupAnimation() {
     return;
   }
@@ -422,47 +477,6 @@ class LoadRenderableFromSfbTask<T extends Renderable> {
       }
 
       compiledMaterials.add(material);
-    }
-  }
-
-  private void setupRenderableData() {
-    // Get the bounds.
-    final Vec3 modelMinAabb = modelDef.boundingBox().min();
-    final Vector3 minAabb = new Vector3(modelMinAabb.x(), modelMinAabb.y(), modelMinAabb.z());
-    final Vec3 modelMaxAabb = modelDef.boundingBox().max();
-    final Vector3 maxAabb = new Vector3(modelMaxAabb.x(), modelMaxAabb.y(), modelMaxAabb.z());
-    Vector3 extentsAabb = Vector3.subtract(maxAabb, minAabb).scaled(0.5f);
-    Vector3 centerAabb = Vector3.add(minAabb, extentsAabb);
-    renderableData.setExtentsAabb(extentsAabb);
-    renderableData.setCenterAabb(centerAabb);
-    // Finding a scale of 0 indicates a default-initialized (i.e. invalid) structure.
-    if (transformDef != null && transformDef.scale() != 0.0f) {
-      Vec3 modelOffset = transformDef.offset();
-      Vector3 offset = new Vector3(modelOffset.x(), modelOffset.y(), modelOffset.z());
-      renderableData.setTransformScale(transformDef.scale());
-      renderableData.setTransformOffset(offset);
-    }
-
-    ArrayList<Material> materialBindings = renderable.getMaterialBindings();
-    ArrayList<String> renderableMaterialNames = renderable.getMaterialNames();
-    materialBindings.clear();
-    renderableMaterialNames.clear();
-    for (int m = 0; m < meshCount; ++m) {
-      final ModelIndexRange range = modelInstanceDef.ranges(m);
-      final int start = (int) range.start();
-      final int end = (int) range.end();
-
-      int materialIndex = compiledMaterialIndex.get(m);
-      Material material = compiledMaterials.get(materialIndex).makeCopy();
-      MaterialParameters params = materialParameters.get(m);
-      material.copyMaterialParameters(params);
-
-      RenderableInternalData.MeshData meshData = new RenderableInternalData.MeshData();
-      materialBindings.add(material);
-      renderableMaterialNames.add(materialNames.get(m));
-      meshData.indexStart = start;
-      meshData.indexEnd = end;
-      renderableData.getMeshes().add(meshData);
     }
   }
 
@@ -704,16 +718,6 @@ class LoadRenderableFromSfbTask<T extends Renderable> {
       this.materialNames.add(materialName != null ? materialName : "");
     }
     return sfb;
-  }
-
-  @Nullable
-  private Texture getTextureByName(String name) {
-    for (int t = 0; t < textureCount; ++t) {
-      if (Objects.equals(name, textures.get(t).name)) {
-        return textures.get(t).data;
-      }
-    }
-    return null;
   }
 
   private boolean isAttributeNormalized(int attributeUsage) {

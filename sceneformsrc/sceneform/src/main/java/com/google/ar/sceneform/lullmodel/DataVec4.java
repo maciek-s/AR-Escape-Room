@@ -30,11 +30,6 @@ public final class DataVec4 extends Table {
     builder.addStruct(0, valueOffset, 0);
   }
 
-  public static int endDataVec4(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -54,6 +49,11 @@ public final class DataVec4 extends Table {
   public Vec4 value(Vec4 obj) {
     int o = __offset(4);
     return o != 0 ? obj.__assign(o + bb_pos, bb) : null;
+  }
+
+  public static int endDataVec4(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

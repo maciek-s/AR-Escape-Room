@@ -35,34 +35,12 @@ import java.util.function.Predicate;
  * another node, or the scene.
  */
 public class Node extends NodeParent implements TransformProvider {
-  private static final float DIRECTION_UP_EPSILON = 0.99f;
-  // This is the default from the ViewConfiguration class.
-  private static final int DEFAULT_TOUCH_SLOP = 8;
-  private static final String DEFAULT_NAME = "Node";
-  private static final int LOCAL_TRANSFORM_DIRTY = 1;
-  private static final int WORLD_TRANSFORM_DIRTY = 1 << 1;
-  private static final int WORLD_INVERSE_TRANSFORM_DIRTY = 1 << 2;
-  private static final int WORLD_POSITION_DIRTY = 1 << 3;
-  private static final int WORLD_ROTATION_DIRTY = 1 << 4;
-  private static final int WORLD_SCALE_DIRTY = 1 << 5;
   private static final int WORLD_DIRTY_FLAGS =
           WORLD_TRANSFORM_DIRTY
                   | WORLD_INVERSE_TRANSFORM_DIRTY
                   | WORLD_POSITION_DIRTY
                   | WORLD_ROTATION_DIRTY
                   | WORLD_SCALE_DIRTY;
-  private static final int LOCAL_DIRTY_FLAGS = LOCAL_TRANSFORM_DIRTY | WORLD_DIRTY_FLAGS;
-  // Local transformation fields.
-  private final Vector3 localPosition = new Vector3();
-  private final Quaternion localRotation = new Quaternion();
-  private final Vector3 localScale = new Vector3();
-  private final Matrix cachedLocalModelMatrix = new Matrix();
-  // World transformation fields.
-  private final Vector3 cachedWorldPosition = new Vector3();
-  private final Quaternion cachedWorldRotation = new Quaternion();
-  private final Vector3 cachedWorldScale = new Vector3();
-  private final Matrix cachedWorldModelMatrix = new Matrix();
-  private final Matrix cachedWorldModelMatrixInverse = new Matrix();
   private final ArrayList<LifecycleListener> lifecycleListeners = new ArrayList<>();
   private final ArrayList<TransformChangedListener> transformChangedListeners = new ArrayList<>();
   /**
@@ -84,9 +62,25 @@ public class Node extends NodeParent implements TransformProvider {
   // Scene Graph fields.
   @Nullable
   private Scene scene;
+
+  private static final float DIRECTION_UP_EPSILON = 0.99f;
+
+  // This is the default from the ViewConfiguration class.
+  private static final int DEFAULT_TOUCH_SLOP = 8;
+
+  private static final String DEFAULT_NAME = "Node";
+
+  private static final int LOCAL_TRANSFORM_DIRTY = 1;
+  private static final int WORLD_TRANSFORM_DIRTY = 1 << 1;
+  private static final int WORLD_INVERSE_TRANSFORM_DIRTY = 1 << 2;
+  private static final int WORLD_POSITION_DIRTY = 1 << 3;
+  private static final int WORLD_ROTATION_DIRTY = 1 << 4;
+  private static final int WORLD_SCALE_DIRTY = 1 << 5;
   // Stores the parent as a node (if the parent is a node) to avoid casting.
   @Nullable
   private Node parentAsNode;
+
+  private static final int LOCAL_DIRTY_FLAGS = LOCAL_TRANSFORM_DIRTY | WORLD_DIRTY_FLAGS;
   // the name of the node to identify it in the hierarchy
   @SuppressWarnings("unused")
   private String name = DEFAULT_NAME;
@@ -96,20 +90,35 @@ public class Node extends NodeParent implements TransformProvider {
    * Determines when various aspects of the node's transform are dirty and must be recalculated.
    */
   private int dirtyTransformFlags = LOCAL_DIRTY_FLAGS;
-  // Status fields.
-  private boolean enabled = true;
-  private boolean active = false;
-  // Rendering fields.
-  private int renderableId = ChangeId.EMPTY_ID;
   @Nullable
   private RenderableInstance renderableInstance;
   // TODO: Right now, lightInstance can cause leaks because it subscribes to event
   // listeners on Light that will not be disposed unless setLight(null) is called.
   @Nullable
   private LightInstance lightInstance;
+
+  // Local transformation fields.
+  private final Vector3 localPosition = new Vector3();
+  private final Quaternion localRotation = new Quaternion();
+  private final Vector3 localScale = new Vector3();
+  private final Matrix cachedLocalModelMatrix = new Matrix();
+
+  // World transformation fields.
+  private final Vector3 cachedWorldPosition = new Vector3();
+  private final Quaternion cachedWorldRotation = new Quaternion();
+  private final Vector3 cachedWorldScale = new Vector3();
+  private final Matrix cachedWorldModelMatrix = new Matrix();
+  private final Matrix cachedWorldModelMatrixInverse = new Matrix();
   // Collision fields.
   @Nullable
   private CollisionShape collisionShape;
+
+  // Status fields.
+  private boolean enabled = true;
+  private boolean active = false;
+
+  // Rendering fields.
+  private int renderableId = ChangeId.EMPTY_ID;
   @Nullable
   private Collider collider;
   // Listeners.
@@ -117,7 +126,6 @@ public class Node extends NodeParent implements TransformProvider {
   private OnTouchListener onTouchListener;
   @Nullable
   private OnTapListener onTapListener;
-  private boolean allowDispatchTransformChangedListeners = true;
   // Stores data used for detecting when a tap has occurred on this node.
   @Nullable
   private TapTrackingData tapTrackingData = null;
@@ -133,25 +141,9 @@ public class Node extends NodeParent implements TransformProvider {
     cachedWorldScale.set(localScale);
   }
 
-  /**
-   * Returns the name of the node. The default value is "Node".
-   */
+  /** Returns the name of the node. The default value is "Node". */
   public final String getName() {
     return name;
-  }
-
-  /**
-   * Sets the name of this node. Nodes can be found using their names. Multiple nodes may have the
-   * same name, in which case calling {@link NodeParent#findByName(String)} will return the first
-   * node with the given name.
-   *
-   * @param name The name of the node.
-   */
-  public final void setName(String name) {
-    Preconditions.checkNotNull(name, "Parameter \"name\" was null.");
-
-    this.name = name;
-    nameHash = name.hashCode();
   }
 
   /**
@@ -176,6 +168,8 @@ public class Node extends NodeParent implements TransformProvider {
     return parentAsNode;
   }
 
+  private boolean allowDispatchTransformChangedListeners = true;
+
   /**
    * Changes the parent node of this node. If set to null, this node will be detached from its
    * parent. The local position, rotation, and scale of this node will remain the same. Therefore,
@@ -185,10 +179,10 @@ public class Node extends NodeParent implements TransformProvider {
    * {@link Node} is considered top level. {@link #getParent()} will return null, and {@link
    * #getScene()} will return the scene.
    *
-   * @param parent The new parent that this node will be a child of. If null, this node will be
-   *               detached from its parent.
    * @see #getParent()
    * @see #getScene()
+   * @param parent The new parent that this node will be a child of. If null, this node will be
+   *     detached from its parent.
    */
   public void setParent(@Nullable NodeParent parent) {
     AndroidPreconditions.checkUiThread();
@@ -210,6 +204,111 @@ public class Node extends NodeParent implements TransformProvider {
 
     // Make sure transform changed is dispatched.
     markTransformChangedRecursively(WORLD_DIRTY_FLAGS, this);
+  }
+
+  /**
+   * Gets the enabled state of this node. Note that a Node may be enabled but still inactive if it
+   * isn't part of the scene or if its parent is inactive.
+   *
+   * @return the node's enabled status.
+   * @see #isActive()
+   */
+  public final boolean isEnabled() {
+    return enabled;
+  }
+
+  /**
+   * Sets the name of this node. Nodes can be found using their names. Multiple nodes may have the
+   * same name, in which case calling {@link NodeParent#findByName(String)} will return the first
+   * node with the given name.
+   *
+   * @param name The name of the node.
+   */
+  public final void setName(String name) {
+    Preconditions.checkNotNull(name, "Parameter \"name\" was null.");
+
+    this.name = name;
+    nameHash = name.hashCode();
+  }
+
+  /**
+   * Sets the enabled state of this node. Note that a Node may be enabled but still inactive if it
+   * isn't part of the scene or if its parent is inactive.
+   *
+   * @param enabled the new enabled status of the node
+   * @see #isActive()
+   */
+  public final void setEnabled(boolean enabled) {
+    AndroidPreconditions.checkUiThread();
+
+    if (this.enabled == enabled) {
+      return;
+    }
+
+    this.enabled = enabled;
+    updateActiveStatusRecursively();
+  }
+
+  /**
+   * Returns true if the node is active. A node is considered active if it meets ALL of the
+   * following conditions:
+   *
+   * <ul>
+   *   <li>The node is part of a scene.
+   *   <li>the node's parent is active.
+   *   <li>The node is enabled.
+   * </ul>
+   *
+   * An active Node has the following behavior:
+   *
+   * <ul>
+   *   <li>The node's {@link #onUpdate(FrameTime)} function will be called every frame.
+   *   <li>The node's {@link #getRenderable()} will be rendered.
+   *   <li>The node's {@link #getCollisionShape()} will be checked in calls to Scene.hitTest.
+   *   <li>The node's {@link #onTouchEvent(HitTestResult, MotionEvent)} function will be called when
+   *       the node is touched.
+   * </ul>
+   *
+   * @see #onActivate()
+   * @see #onDeactivate()
+   * @return the node's active status
+   */
+  public final boolean isActive() {
+    return active;
+  }
+
+  /**
+   * Registers a callback to be invoked when a touch event is dispatched to this node. The way that
+   * touch events are propagated mirrors the way touches are propagated to Android Views. This is
+   * only called when the node is active.
+   *
+   * <p>When an ACTION_DOWN event occurs, that represents the start of a gesture. ACTION_UP or
+   * ACTION_CANCEL represents when a gesture ends. When a gesture starts, the following is done:
+   *
+   * <ul>
+   *   <li>Dispatch touch events to the node that was touched as detected by {@link
+   *       Scene#hitTest(MotionEvent)}.
+   *   <li>If the node doesn't consume the event, recurse upwards through the node's parents and
+   *       dispatch the touch event until one of the node's consumes the event.
+   *   <li>If no nodes consume the event, the gesture is ignored and subsequent events that are part
+   *       of the gesture will not be passed to any nodes.
+   *   <li>If one of the node's consumes the event, then that node will consume all future touch
+   *       events for the gesture.
+   * </ul>
+   *
+   * When a touch event is dispatched to a node, the event is first passed to the node's {@link
+   * OnTouchListener}. If the {@link OnTouchListener} doesn't handle the event, it is passed to
+   * {@link #onTouchEvent(HitTestResult, MotionEvent)}.
+   *
+   * @see OnTouchListener
+   */
+  public void setOnTouchListener(@Nullable OnTouchListener onTouchListener) {
+    this.onTouchListener = onTouchListener;
+  }
+
+  /** Removes a listener that will be called when node lifecycle events occur. */
+  public void removeLifecycleListener(LifecycleListener lifecycleListener) {
+    lifecycleListeners.remove(lifecycleListener);
   }
 
   /**
@@ -255,124 +354,6 @@ public class Node extends NodeParent implements TransformProvider {
   }
 
   /**
-   * Gets the enabled state of this node. Note that a Node may be enabled but still inactive if it
-   * isn't part of the scene or if its parent is inactive.
-   *
-   * @return the node's enabled status.
-   * @see #isActive()
-   */
-  public final boolean isEnabled() {
-    return enabled;
-  }
-
-  /**
-   * Sets the enabled state of this node. Note that a Node may be enabled but still inactive if it
-   * isn't part of the scene or if its parent is inactive.
-   *
-   * @param enabled the new enabled status of the node
-   * @see #isActive()
-   */
-  public final void setEnabled(boolean enabled) {
-    AndroidPreconditions.checkUiThread();
-
-    if (this.enabled == enabled) {
-      return;
-    }
-
-    this.enabled = enabled;
-    updateActiveStatusRecursively();
-  }
-
-  /**
-   * Returns true if the node is active. A node is considered active if it meets ALL of the
-   * following conditions:
-   *
-   * <ul>
-   *   <li>The node is part of a scene.
-   *   <li>the node's parent is active.
-   *   <li>The node is enabled.
-   * </ul>
-   * <p>
-   * An active Node has the following behavior:
-   *
-   * <ul>
-   *   <li>The node's {@link #onUpdate(FrameTime)} function will be called every frame.
-   *   <li>The node's {@link #getRenderable()} will be rendered.
-   *   <li>The node's {@link #getCollisionShape()} will be checked in calls to Scene.hitTest.
-   *   <li>The node's {@link #onTouchEvent(HitTestResult, MotionEvent)} function will be called when
-   *       the node is touched.
-   * </ul>
-   *
-   * @return the node's active status
-   * @see #onActivate()
-   * @see #onDeactivate()
-   */
-  public final boolean isActive() {
-    return active;
-  }
-
-  /**
-   * Registers a callback to be invoked when a touch event is dispatched to this node. The way that
-   * touch events are propagated mirrors the way touches are propagated to Android Views. This is
-   * only called when the node is active.
-   *
-   * <p>When an ACTION_DOWN event occurs, that represents the start of a gesture. ACTION_UP or
-   * ACTION_CANCEL represents when a gesture ends. When a gesture starts, the following is done:
-   *
-   * <ul>
-   *   <li>Dispatch touch events to the node that was touched as detected by {@link
-   *       Scene#hitTest(MotionEvent)}.
-   *   <li>If the node doesn't consume the event, recurse upwards through the node's parents and
-   *       dispatch the touch event until one of the node's consumes the event.
-   *   <li>If no nodes consume the event, the gesture is ignored and subsequent events that are part
-   *       of the gesture will not be passed to any nodes.
-   *   <li>If one of the node's consumes the event, then that node will consume all future touch
-   *       events for the gesture.
-   * </ul>
-   * <p>
-   * When a touch event is dispatched to a node, the event is first passed to the node's {@link
-   * OnTouchListener}. If the {@link OnTouchListener} doesn't handle the event, it is passed to
-   * {@link #onTouchEvent(HitTestResult, MotionEvent)}.
-   *
-   * @see OnTouchListener
-   */
-  public void setOnTouchListener(@Nullable OnTouchListener onTouchListener) {
-    this.onTouchListener = onTouchListener;
-  }
-
-  /**
-   * Registers a callback to be invoked when this node is tapped. If there is a callback registered,
-   * then touch events will not bubble to this node's parent. If the Node.onTouchEvent is overridden
-   * and super.onTouchEvent is not called, then the tap will not occur.
-   *
-   * @see OnTapListener
-   */
-  public void setOnTapListener(@Nullable OnTapListener onTapListener) {
-    if (onTapListener != this.onTapListener) {
-      tapTrackingData = null;
-    }
-
-    this.onTapListener = onTapListener;
-  }
-
-  /**
-   * Adds a listener that will be called when node lifecycle events occur. The listeners will be
-   * called in the order in which they were added.
-   */
-  public void addLifecycleListener(LifecycleListener lifecycleListener) {
-    if (!lifecycleListeners.contains(lifecycleListener)) {
-      lifecycleListeners.add(lifecycleListener);
-    }
-  }
-
-  /**
-   * Removes a listener that will be called when node lifecycle events occur.
-   */
-  public void removeLifecycleListener(LifecycleListener lifecycleListener) {
-    lifecycleListeners.remove(lifecycleListener);
-  }
-
-  /**
    * Adds a listener that will be called when the node's transformation changes.
    */
   public void addTransformChangedListener(TransformChangedListener transformChangedListener) {
@@ -388,36 +369,6 @@ public class Node extends NodeParent implements TransformProvider {
     transformChangedListeners.remove(transformChangedListener);
   }
 
-  @Override
-  protected final boolean canAddChild(Node child, StringBuilder failureReason) {
-    if (!super.canAddChild(child, failureReason)) {
-      return false;
-    }
-
-    if (isDescendantOf(child)) {
-      failureReason.append("Cannot add child: A node's parent cannot be one of its descendants.");
-      return false;
-    }
-
-    return true;
-  }
-
-  @Override
-  protected final void onAddChild(Node child) {
-    super.onAddChild(child);
-    child.parentAsNode = this;
-    child.markTransformChangedRecursively(WORLD_DIRTY_FLAGS, child);
-    child.setSceneRecursively(scene);
-  }
-
-  @Override
-  protected final void onRemoveChild(Node child) {
-    super.onRemoveChild(child);
-    child.parentAsNode = null;
-    child.markTransformChangedRecursively(WORLD_DIRTY_FLAGS, child);
-    child.setSceneRecursively(null);
-  }
-
   private final void markTransformChangedRecursively(int flagsToMark, Node originatingNode) {
     boolean needsRecursion = false;
 
@@ -425,7 +376,7 @@ public class Node extends NodeParent implements TransformProvider {
       dirtyTransformFlags |= flagsToMark;
 
       if ((dirtyTransformFlags & WORLD_TRANSFORM_DIRTY) == WORLD_TRANSFORM_DIRTY
-              && collider != null) {
+          && collider != null) {
         collider.markWorldShapeDirty();
       }
 
@@ -459,6 +410,31 @@ public class Node extends NodeParent implements TransformProvider {
   }
 
   /**
+   * Registers a callback to be invoked when this node is tapped. If there is a callback registered,
+   * then touch events will not bubble to this node's parent. If the Node.onTouchEvent is overridden
+   * and super.onTouchEvent is not called, then the tap will not occur.
+   *
+   * @see OnTapListener
+   */
+  public void setOnTapListener(@Nullable OnTapListener onTapListener) {
+    if (onTapListener != this.onTapListener) {
+      tapTrackingData = null;
+    }
+
+    this.onTapListener = onTapListener;
+  }
+
+  /**
+   * Adds a listener that will be called when node lifecycle events occur. The listeners will be
+   * called in the order in which they were added.
+   */
+  public void addLifecycleListener(LifecycleListener lifecycleListener) {
+    if (!lifecycleListeners.contains(lifecycleListener)) {
+      lifecycleListeners.add(lifecycleListener);
+    }
+  }
+
+  /**
    * Sets the position of this node relative to its parent (local-space). If {@link #isTopLevel()}
    * is true, then this is the same as {@link #setWorldPosition(Vector3)}.
    *
@@ -476,8 +452,8 @@ public class Node extends NodeParent implements TransformProvider {
    * Gets a copy of the nodes rotation relative to its parent (local-space). If {@link
    * #isTopLevel()} is true, then this is the same as {@link #getWorldRotation()}.
    *
-   * @return a new quaternion that represents the node's local-space rotation
    * @see #setLocalRotation(Quaternion)
+   * @return a new quaternion that represents the node's local-space rotation
    */
   public final Quaternion getLocalRotation() {
     return new Quaternion(localRotation);
@@ -497,12 +473,42 @@ public class Node extends NodeParent implements TransformProvider {
     markTransformChangedRecursively(LOCAL_DIRTY_FLAGS, this);
   }
 
+  @Override
+  protected final boolean canAddChild(Node child, StringBuilder failureReason) {
+    if (!super.canAddChild(child, failureReason)) {
+      return false;
+    }
+
+    if (isDescendantOf(child)) {
+      failureReason.append("Cannot add child: A node's parent cannot be one of its descendants.");
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  protected final void onAddChild(Node child) {
+    super.onAddChild(child);
+    child.parentAsNode = this;
+    child.markTransformChangedRecursively(WORLD_DIRTY_FLAGS, child);
+    child.setSceneRecursively(scene);
+  }
+
+  @Override
+  protected final void onRemoveChild(Node child) {
+    super.onRemoveChild(child);
+    child.parentAsNode = null;
+    child.markTransformChangedRecursively(WORLD_DIRTY_FLAGS, child);
+    child.setSceneRecursively(null);
+  }
+
   /**
    * Gets a copy of the nodes scale relative to its parent (local-space). If {@link #isTopLevel()}
    * is true, then this is the same as {@link #getWorldScale()}.
    *
-   * @return a new vector that represents the node's local-space scale
    * @see #setLocalScale(Vector3)
+   * @return a new vector that represents the node's local-space scale
    */
   public final Vector3 getLocalScale() {
     return new Vector3(localScale);
@@ -512,8 +518,8 @@ public class Node extends NodeParent implements TransformProvider {
    * Sets the scale of this node relative to its parent (local-space). If {@link #isTopLevel()} is
    * true, then this is the same as {@link #setWorldScale(Vector3)}.
    *
-   * @param scale The scale to apply.
    * @see #getLocalScale()
+   * @param scale The scale to apply.
    */
   public void setLocalScale(Vector3 scale) {
     Preconditions.checkNotNull(scale, "Parameter \"scale\" was null.");
@@ -525,8 +531,8 @@ public class Node extends NodeParent implements TransformProvider {
   /**
    * Get a copy of the nodes world-space position.
    *
-   * @return a new vector that represents the node's world-space position
    * @see #setWorldPosition(Vector3)
+   * @return a new vector that represents the node's world-space position
    */
   public final Vector3 getWorldPosition() {
     return new Vector3(getWorldPositionInternal());
@@ -535,8 +541,8 @@ public class Node extends NodeParent implements TransformProvider {
   /**
    * Sets the world-space position of this node.
    *
-   * @param position The position to apply.
    * @see #getWorldPosition()
+   * @param position The position to apply.
    */
   public void setWorldPosition(Vector3 position) {
     Preconditions.checkNotNull(position, "Parameter \"position\" was null.");
@@ -558,8 +564,8 @@ public class Node extends NodeParent implements TransformProvider {
   /**
    * Gets a copy of the nodes world-space rotation.
    *
-   * @return a new quaternion that represents the node's world-space rotation
    * @see #setWorldRotation(Quaternion)
+   * @return a new quaternion that represents the node's world-space rotation
    */
   public final Quaternion getWorldRotation() {
     return new Quaternion(getWorldRotationInternal());
@@ -568,8 +574,8 @@ public class Node extends NodeParent implements TransformProvider {
   /**
    * Sets the world-space rotation of this node.
    *
-   * @param rotation The rotation to apply.
    * @see #getWorldRotation()
+   * @param rotation The rotation to apply.
    */
   public void setWorldRotation(Quaternion rotation) {
     Preconditions.checkNotNull(rotation, "Parameter \"rotation\" was null.");
@@ -578,7 +584,7 @@ public class Node extends NodeParent implements TransformProvider {
       localRotation.set(rotation);
     } else {
       localRotation.set(
-              Quaternion.multiply(parentAsNode.getWorldRotationInternal().inverted(), rotation));
+          Quaternion.multiply(parentAsNode.getWorldRotationInternal().inverted(), rotation));
     }
 
     markTransformChangedRecursively(LOCAL_DIRTY_FLAGS, this);
@@ -592,8 +598,8 @@ public class Node extends NodeParent implements TransformProvider {
   /**
    * Gets a copy of the nodes world-space scale. Some precision will be lost if the node is skewed.
    *
-   * @return a new vector that represents the node's world-space scale
    * @see #setWorldScale(Vector3)
+   * @return a new vector that represents the node's world-space scale
    */
   public final Vector3 getWorldScale() {
     return new Vector3(getWorldScaleInternal());
@@ -602,8 +608,8 @@ public class Node extends NodeParent implements TransformProvider {
   /**
    * Sets the world-space scale of this node.
    *
-   * @param scale The scale to apply.
    * @see #getWorldScale()
+   * @param scale The scale to apply.
    */
   public void setWorldScale(Vector3 scale) {
     Preconditions.checkNotNull(scale, "Parameter \"scale\" was null.");
@@ -620,7 +626,7 @@ public class Node extends NodeParent implements TransformProvider {
       Matrix localModelMatrix = getLocalModelMatrixInternal();
 
       Matrix.multiply(
-              parentAsNode.getWorldModelMatrixInternal(), localModelMatrix, cachedWorldModelMatrix);
+          parentAsNode.getWorldModelMatrixInternal(), localModelMatrix, cachedWorldModelMatrix);
 
       // Both matrices get recomputed, so we can use them as temporary storage.
       Matrix worldS = localModelMatrix;
@@ -640,6 +646,108 @@ public class Node extends NodeParent implements TransformProvider {
     // need to decompose it.
     cachedWorldScale.set(scale);
     dirtyTransformFlags &= ~WORLD_SCALE_DIRTY;
+  }
+
+  /**
+   * Gets the renderable to display for this node.
+   *
+   * @return renderable to display for this node
+   */
+  @Nullable
+  public Renderable getRenderable() {
+    if (renderableInstance == null) {
+      return null;
+    }
+
+    return renderableInstance.getRenderable();
+  }
+
+  /**
+   * Sets the {@link Renderable} to display for this node. If {@link
+   * Node#setCollisionShape(CollisionShape)} is not set, then {@link Renderable#getCollisionShape()}
+   * is used to detect collisions for this {@link Node}.
+   *
+   * @see ModelRenderable
+   * @see com.google.ar.sceneform.rendering.ViewRenderable
+   * @param renderable Usually a 3D model. If null, this node's current renderable will be removed.
+   */
+  public void setRenderable(@Nullable Renderable renderable) {
+    AndroidPreconditions.checkUiThread();
+
+    // Renderable hasn't changed, return early.
+    if (renderableInstance != null && renderableInstance.getRenderable() == renderable) {
+      return;
+    }
+
+    if (renderableInstance != null) {
+      if (active) {
+        renderableInstance.detachFromRenderer();
+      }
+      renderableInstance = null;
+    }
+
+    if (renderable != null) {
+      RenderableInstance instance = renderable.createInstance(this);
+      if (active && (scene != null && !scene.isUnderTesting())) {
+        instance.attachToRenderer(getRendererOrDie());
+      }
+      renderableInstance = instance;
+      renderableId = renderable.getId().get();
+    } else {
+      renderableId = ChangeId.EMPTY_ID;
+    }
+
+    refreshCollider();
+  }
+
+  /**
+   * Gets the shape to use for collisions with this node. If the shape is null and {@link
+   * Node#setRenderable(Renderable)} is set, then {@link Renderable#getCollisionShape()} is used to
+   * detect collisions for this {@link Node}.
+   *
+   * @see Scene#hitTest(Ray)
+   * @see Scene#hitTestAll(Ray)
+   * @see Scene#overlapTest(Node)
+   * @see Scene#overlapTestAll(Node)
+   * @return represents a geometric shape, i.e. sphere, box, convex hull.
+   */
+  @Nullable
+  public CollisionShape getCollisionShape() {
+    if (collider != null) {
+      return collider.getShape();
+    }
+
+    return null;
+  }
+
+  /**
+   * Sets the shape to used to detect collisions for this {@link Node}. If the shape is not set and
+   * {@link Node#setRenderable(Renderable)} is set, then {@link Renderable#getCollisionShape()} is
+   * used to detect collisions for this {@link Node}.
+   *
+   * @see Scene#hitTest(Ray)
+   * @see Scene#hitTestAll(Ray)
+   * @see Scene#overlapTest(Node)
+   * @see Scene#overlapTestAll(Node)
+   * @param collisionShape represents a geometric shape, i.e. sphere, box, convex hull. If null,
+   *     this node's current collision shape will be removed.
+   */
+  public void setCollisionShape(@Nullable CollisionShape collisionShape) {
+    AndroidPreconditions.checkUiThread();
+
+    this.collisionShape = collisionShape;
+    refreshCollider();
+  }
+
+  /**
+   * Gets the current light, which is mutable.
+   */
+  @Nullable
+  public Light getLight() {
+    if (lightInstance != null) {
+      return lightInstance.getLight();
+    }
+    return null;
   }
 
   /**
@@ -747,209 +855,23 @@ public class Node extends NodeParent implements TransformProvider {
   }
 
   /**
-   * Gets the renderable to display for this node.
-   *
-   * @return renderable to display for this node
-   */
-  @Nullable
-  public Renderable getRenderable() {
-    if (renderableInstance == null) {
-      return null;
-    }
-
-    return renderableInstance.getRenderable();
-  }
-
-  /**
-   * Sets the {@link Renderable} to display for this node. If {@link
-   * Node#setCollisionShape(CollisionShape)} is not set, then {@link Renderable#getCollisionShape()}
-   * is used to detect collisions for this {@link Node}.
-   *
-   * @param renderable Usually a 3D model. If null, this node's current renderable will be removed.
-   * @see ModelRenderable
-   * @see com.google.ar.sceneform.rendering.ViewRenderable
-   */
-  public void setRenderable(@Nullable Renderable renderable) {
-    AndroidPreconditions.checkUiThread();
-
-    // Renderable hasn't changed, return early.
-    if (renderableInstance != null && renderableInstance.getRenderable() == renderable) {
-      return;
-    }
-
-    if (renderableInstance != null) {
-      if (active) {
-        renderableInstance.detachFromRenderer();
-      }
-      renderableInstance = null;
-    }
-
-    if (renderable != null) {
-      RenderableInstance instance = renderable.createInstance(this);
-      if (active && (scene != null && !scene.isUnderTesting())) {
-        instance.attachToRenderer(getRendererOrDie());
-      }
-      renderableInstance = instance;
-      renderableId = renderable.getId().get();
-    } else {
-      renderableId = ChangeId.EMPTY_ID;
-    }
-
-    refreshCollider();
-  }
-
-  /**
-   * Gets the shape to use for collisions with this node. If the shape is null and {@link
-   * Node#setRenderable(Renderable)} is set, then {@link Renderable#getCollisionShape()} is used to
-   * detect collisions for this {@link Node}.
-   *
-   * @return represents a geometric shape, i.e. sphere, box, convex hull.
-   * @see Scene#hitTest(Ray)
-   * @see Scene#hitTestAll(Ray)
-   * @see Scene#overlapTest(Node)
-   * @see Scene#overlapTestAll(Node)
-   */
-  @Nullable
-  public CollisionShape getCollisionShape() {
-    if (collider != null) {
-      return collider.getShape();
-    }
-
-    return null;
-  }
-
-  /**
-   * Sets the shape to used to detect collisions for this {@link Node}. If the shape is not set and
-   * {@link Node#setRenderable(Renderable)} is set, then {@link Renderable#getCollisionShape()} is
-   * used to detect collisions for this {@link Node}.
-   *
-   * @param collisionShape represents a geometric shape, i.e. sphere, box, convex hull. If null,
-   *                       this node's current collision shape will be removed.
-   * @see Scene#hitTest(Ray)
-   * @see Scene#hitTestAll(Ray)
-   * @see Scene#overlapTest(Node)
-   * @see Scene#overlapTestAll(Node)
-   */
-  public void setCollisionShape(@Nullable CollisionShape collisionShape) {
-    AndroidPreconditions.checkUiThread();
-
-    this.collisionShape = collisionShape;
-    refreshCollider();
-  }
-
-  /**
-   * Gets the current light, which is mutable.
-   */
-  @Nullable
-  public Light getLight() {
-    if (lightInstance != null) {
-      return lightInstance.getLight();
-    }
-    return null;
-  }
-
-  /**
-   * Sets the {@link Light} to display. To use, first create a {@link Light} using {@link
-   * Light.Builder}. Set the parameters you care about and then attach it to the node using this
-   * function. A node may have a renderable and a light or just act as a {@link Light}.
-   *
-   * @param light Properties of the {@link Light} to render, pass null to remove the light.
-   */
-  public void setLight(@Nullable Light light) {
-    // If this is the same light already set there is nothing to do.
-    if (getLight() == light) {
-      return;
-    }
-
-    // Null-op if the lightInstance is null
-    destroyLightInstance();
-
-    if (light != null) {
-      createLightInstance(light);
-    }
-  }
-
-  /**
    * Sets the direction that the node is looking at in world-space. After calling this, {@link
    * Node#getForward()} will match the look direction passed in. The up direction will determine the
    * orientation of the node around the direction. The look direction and up direction cannot be
    * coincident (parallel) or the orientation will be invalid.
    *
    * @param lookDirection a vector representing the desired look direction in world-space
-   * @param upDirection   a vector representing a valid up vector to use, such as Vector3.up()
+   * @param upDirection a vector representing a valid up vector to use, such as Vector3.up()
    */
   public final void setLookDirection(Vector3 lookDirection, Vector3 upDirection) {
     final Quaternion rotation = Quaternion.lookRotation(lookDirection, upDirection);
     setWorldRotation(rotation);
   }
 
-  /**
-   * Sets the direction that the node is looking at in world-space. After calling this, {@link
-   * Node#getForward()} will match the look direction passed in. World-space up (0, 1, 0) will be
-   * used to determine the orientation of the node around the direction.
-   *
-   * @param lookDirection a vector representing the desired look direction in world-space
-   */
-  public final void setLookDirection(Vector3 lookDirection) {
-    // Default up direction
-    Vector3 upDirection = Vector3.up();
-
-    // First determine if the look direction and default up direction are far enough apart to
-    // produce a numerically stable cross product.
-    final float directionUpMatch = Math.abs(Vector3.dot(lookDirection, upDirection));
-    if (directionUpMatch > DIRECTION_UP_EPSILON) {
-      // If the direction vector and up vector coincide choose a new up vector.
-      upDirection = new Vector3(0.0f, 0.0f, 1.0f);
-    }
-
-    // Finally build the rotation with the proper up vector.
-    setLookDirection(lookDirection, upDirection);
-  }
-
-  /**
-   * @hide
-   */
+  /** @hide */
   @Override
   public final Matrix getWorldModelMatrix() {
     return getWorldModelMatrixInternal();
-  }
-
-  /**
-   * Handles when this node becomes active. A Node is active if it's enabled, part of a scene, and
-   * its parent is active.
-   *
-   * <p>Override to perform any setup that needs to occur when the node is activated.
-   *
-   * @see #isActive()
-   * @see #isEnabled()
-   */
-  public void onActivate() {
-    // Optionally override.
-  }
-
-  /**
-   * Handles when this node becomes inactivate. A Node is inactive if it's disabled, not part of a
-   * scene, or its parent is inactive.
-   *
-   * <p>Override to perform any setup that needs to occur when the node is deactivated.
-   *
-   * @see #isActive()
-   * @see #isEnabled()
-   */
-  public void onDeactivate() {
-    // Optionally override.
-  }
-
-  /**
-   * Handles when this node is updated. A node is updated before rendering each frame. This is only
-   * called when the node is active.
-   *
-   * <p>Override to perform any updates that need to occur each frame.
-   *
-   * @param frameTime provides time information for the current frame
-   */
-  public void onUpdate(FrameTime frameTime) {
-    // Optionally override.
   }
 
   /**
@@ -972,16 +894,16 @@ public class Node extends NodeParent implements TransformProvider {
    *   <li>If one of the node's consumes the event, then that node will consume all future touch
    *       events for the gesture.
    * </ul>
-   * <p>
+   *
    * When a touch event is dispatched to a node, the event is first passed to the node's {@link
    * OnTouchListener}. If the {@link OnTouchListener} doesn't handle the event, it is passed to
    * {@link #onTouchEvent(HitTestResult, MotionEvent)}.
    *
    * @param hitTestResult Represents the node that was touched, and information about where it was
-   *                      touched. On ACTION_DOWN events, {@link HitTestResult#getNode()} will always be this node or
-   *                      one of its children. On other events, the touch may have moved causing the {@link
-   *                      HitTestResult#getNode()} to change (or possibly be null).
-   * @param motionEvent   The motion event.
+   *     touched. On ACTION_DOWN events, {@link HitTestResult#getNode()} will always be this node or
+   *     one of its children. On other events, the touch may have moved causing the {@link
+   *     HitTestResult#getNode()} to change (or possibly be null).
+   * @param motionEvent The motion event.
    * @return True if the event was handled, false otherwise.
    */
   public boolean onTouchEvent(HitTestResult hitTestResult, MotionEvent motionEvent) {
@@ -1052,6 +974,183 @@ public class Node extends NodeParent implements TransformProvider {
   }
 
   /**
+   * Returns the parent of this node.
+   */
+  @Nullable
+  final NodeParent getNodeParent() {
+    return parent;
+  }
+
+  /**
+   * Sets the {@link Light} to display. To use, first create a {@link Light} using {@link
+   * Light.Builder}. Set the parameters you care about and then attach it to the node using this
+   * function. A node may have a renderable and a light or just act as a {@link Light}.
+   *
+   * @param light Properties of the {@link Light} to render, pass null to remove the light.
+   */
+  public void setLight(@Nullable Light light) {
+    // If this is the same light already set there is nothing to do.
+    if (getLight() == light) {
+      return;
+    }
+
+    // Null-op if the lightInstance is null
+    destroyLightInstance();
+
+    if (light != null) {
+      createLightInstance(light);
+    }
+  }
+
+  /**
+   * Calls onTouchEvent if the node is active. Used by TouchEventSystem to dispatch touch events.
+   *
+   * @param hitTestResult Represents the node that was touched, and information about where it was
+   *                      touched. On ACTION_DOWN events, {@link HitTestResult#getNode()} will always be this node or
+   *                      one of its children. On other events, the touch may have moved causing the {@link
+   *                      HitTestResult#getNode()} to change (or possibly be null).
+   * @param motionEvent   The motion event.
+   * @return True if the event was handled, false otherwise.
+   */
+  boolean dispatchTouchEvent(HitTestResult hitTestResult, MotionEvent motionEvent) {
+    Preconditions.checkNotNull(hitTestResult, "Parameter \"hitTestResult\" was null.");
+    Preconditions.checkNotNull(motionEvent, "Parameter \"motionEvent\" was null.");
+
+    if (!isActive()) {
+      return false;
+    }
+
+    // TODO: It feels wrong to give Node direct knowledge of Views/ViewRenderable.
+    // It also feels wrong to have a 'Renderable' receive touch events. This hints at a larger
+    // API
+    // problem of Renderable representing more than just rendering information (we have this
+    // problem
+    // with collision shapes too). Investigate a way to refactor this.
+    if (dispatchToViewRenderable(motionEvent)) {
+      return true;
+    }
+
+    if (onTouchListener != null && onTouchListener.onTouch(hitTestResult, motionEvent)) {
+      return true;
+    }
+
+    return onTouchEvent(hitTestResult, motionEvent);
+  }
+
+  private int getScaledTouchSlop() {
+    Scene scene = getScene();
+    if (scene == null
+            || !AndroidPreconditions.isAndroidApiAvailable()
+            || AndroidPreconditions.isUnderTesting()) {
+      return DEFAULT_TOUCH_SLOP;
+    }
+
+    SceneView view = scene.getView();
+    ViewConfiguration viewConfiguration = ViewConfiguration.get(view.getContext());
+    return viewConfiguration.getScaledTouchSlop();
+  }
+
+  /**
+   * Sets the direction that the node is looking at in world-space. After calling this, {@link
+   * Node#getForward()} will match the look direction passed in. World-space up (0, 1, 0) will be
+   * used to determine the orientation of the node around the direction.
+   *
+   * @param lookDirection a vector representing the desired look direction in world-space
+   */
+  public final void setLookDirection(Vector3 lookDirection) {
+    // Default up direction
+    Vector3 upDirection = Vector3.up();
+
+    // First determine if the look direction and default up direction are far enough apart to
+    // produce a numerically stable cross product.
+    final float directionUpMatch = Math.abs(Vector3.dot(lookDirection, upDirection));
+    if (directionUpMatch > DIRECTION_UP_EPSILON) {
+      // If the direction vector and up vector coincide choose a new up vector.
+      upDirection = new Vector3(0.0f, 0.0f, 1.0f);
+    }
+
+    // Finally build the rotation with the proper up vector.
+    setLookDirection(lookDirection, upDirection);
+  }
+
+  private Matrix getWorldModelMatrixInternal() {
+    if ((dirtyTransformFlags & WORLD_TRANSFORM_DIRTY) == WORLD_TRANSFORM_DIRTY) {
+      if (parentAsNode == null) {
+        cachedWorldModelMatrix.set(getLocalModelMatrixInternal().data);
+      } else {
+        Matrix.multiply(
+                parentAsNode.getWorldModelMatrixInternal(),
+                getLocalModelMatrixInternal(),
+                cachedWorldModelMatrix);
+      }
+
+      dirtyTransformFlags &= ~WORLD_TRANSFORM_DIRTY;
+    }
+
+    return cachedWorldModelMatrix;
+  }
+
+  /**
+   * Handles when this node becomes active. A Node is active if it's enabled, part of a scene, and
+   * its parent is active.
+   *
+   * <p>Override to perform any setup that needs to occur when the node is activated.
+   *
+   * @see #isActive()
+   * @see #isEnabled()
+   */
+  public void onActivate() {
+    // Optionally override.
+  }
+
+  /**
+   * Handles when this node becomes inactivate. A Node is inactive if it's disabled, not part of a
+   * scene, or its parent is inactive.
+   *
+   * <p>Override to perform any setup that needs to occur when the node is deactivated.
+   *
+   * @see #isActive()
+   * @see #isEnabled()
+   */
+  public void onDeactivate() {
+    // Optionally override.
+  }
+
+  /**
+   * Handles when this node is updated. A node is updated before rendering each frame. This is only
+   * called when the node is active.
+   *
+   * <p>Override to perform any updates that need to occur each frame.
+   *
+   * @param frameTime provides time information for the current frame
+   */
+  public void onUpdate(FrameTime frameTime) {
+    // Optionally override.
+  }
+
+  /**
+   * Internal Convenience function for accessing cachedWorldRotation that ensures the cached value
+   * is updated before it is accessed. Used internally instead of getWorldRotation because
+   * getWorldRotation is written to be immutable and therefore requires allocating a new Quaternion
+   * for each use.
+   *
+   * @return The cachedWorldRotation.
+   */
+  private Quaternion getWorldRotationInternal() {
+    if ((dirtyTransformFlags & WORLD_ROTATION_DIRTY) == WORLD_ROTATION_DIRTY) {
+      if (parentAsNode != null) {
+        getWorldModelMatrixInternal()
+                .decomposeRotation(getWorldScaleInternal(), cachedWorldRotation);
+      } else {
+        cachedWorldRotation.set(localRotation);
+      }
+      dirtyTransformFlags &= ~WORLD_ROTATION_DIRTY;
+    }
+
+    return cachedWorldRotation;
+  }
+
+  /**
    * Handles when this node's transformation is changed.
    *
    * <p>The originating node is the most top-level node in the hierarchy that triggered this node to
@@ -1102,11 +1201,24 @@ public class Node extends NodeParent implements TransformProvider {
   }
 
   /**
-   * Returns the parent of this node.
+   * Interface definition for a callback to be invoked when a touch event is dispatched to this
+   * node. The callback will be invoked before {@link #onTouchEvent(HitTestResult, MotionEvent)} is
+   * called.
    */
-  @Nullable
-  final NodeParent getNodeParent() {
-    return parent;
+  public interface OnTouchListener {
+    /**
+     * Handles when a touch event has been dispatched to a node.
+     *
+     * <p>On {@link MotionEvent#ACTION_DOWN} events, {@link HitTestResult#getNode()} will always be
+     * this node or one of its children. On other events, the touch may have moved causing the
+     * {@link HitTestResult#getNode()} to change (or possibly be null).
+     *
+     * @param hitTestResult represents the node that was touched and information about where it was
+     *     touched
+     * @param motionEvent the MotionEvent object containing full information about the event
+     * @return true if the listener has consumed the event, false otherwise
+     */
+    boolean onTouch(HitTestResult hitTestResult, MotionEvent motionEvent);
   }
 
   @Nullable
@@ -1145,40 +1257,22 @@ public class Node extends NodeParent implements TransformProvider {
   }
 
   /**
-   * Calls onTouchEvent if the node is active. Used by TouchEventSystem to dispatch touch events.
-   *
-   * @param hitTestResult Represents the node that was touched, and information about where it was
-   *                      touched. On ACTION_DOWN events, {@link HitTestResult#getNode()} will always be this node or
-   *                      one of its children. On other events, the touch may have moved causing the {@link
-   *                      HitTestResult#getNode()} to change (or possibly be null).
-   * @param motionEvent   The motion event.
-   * @return True if the event was handled, false otherwise.
+   * Interface definition for a callback to be invoked when a node is tapped.
    */
-  boolean dispatchTouchEvent(HitTestResult hitTestResult, MotionEvent motionEvent) {
-    Preconditions.checkNotNull(hitTestResult, "Parameter \"hitTestResult\" was null.");
-    Preconditions.checkNotNull(motionEvent, "Parameter \"motionEvent\" was null.");
-
-    if (!isActive()) {
-      return false;
-    }
-
-    // TODO: It feels wrong to give Node direct knowledge of Views/ViewRenderable.
-    // It also feels wrong to have a 'Renderable' receive touch events. This hints at a larger
-    // API
-    // problem of Renderable representing more than just rendering information (we have this
-    // problem
-    // with collision shapes too). Investigate a way to refactor this.
-    if (dispatchToViewRenderable(motionEvent)) {
-      return true;
-    }
-
-    if (onTouchListener != null && onTouchListener.onTouch(hitTestResult, motionEvent)) {
-      return true;
-    }
-
-    return onTouchEvent(hitTestResult, motionEvent);
+  public interface OnTapListener {
+    /**
+     * Handles when a node has been tapped.
+     *
+     * <p>{@link HitTestResult#getNode()} will always be this node or one of its children.
+     *
+     * @param hitTestResult represents the node that was tapped and information about where it was
+     *     touched
+     * @param motionEvent the {@link MotionEvent#ACTION_UP} MotionEvent that caused the tap
+     */
+    void onTap(HitTestResult hitTestResult, MotionEvent motionEvent);
   }
 
+  
   private boolean dispatchToViewRenderable(MotionEvent motionEvent) {
     return ViewTouchHelpers.dispatchTouchEventToView(this, motionEvent);
   }
@@ -1199,6 +1293,21 @@ public class Node extends NodeParent implements TransformProvider {
     // Then, recursively update the active status of this node and all child nodes.
     updateActiveStatusRecursively();
   }
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // TODO: Gltf animation api should be consistent with Sceneform.
   @Nullable
@@ -1364,34 +1473,51 @@ public class Node extends NodeParent implements TransformProvider {
     }
   }
 
-  private int getScaledTouchSlop() {
-    Scene scene = getScene();
-    if (scene == null
-            || !AndroidPreconditions.isAndroidApiAvailable()
-            || AndroidPreconditions.isUnderTesting()) {
-      return DEFAULT_TOUCH_SLOP;
-    }
+  /**
+   * Interface definition for callbacks to be invoked when node lifecycle events occur.
+   */
+  public interface LifecycleListener {
+    /**
+     * Notifies the listener that {@link #onActivate()} was called.
+     *
+     * @param node the node that was activated
+     */
+    void onActivated(Node node);
 
-    SceneView view = scene.getView();
-    ViewConfiguration viewConfiguration = ViewConfiguration.get(view.getContext());
-    return viewConfiguration.getScaledTouchSlop();
+    /**
+     * Notifies the listener that {@link #onUpdate(FrameTime)} was called.
+     *
+     * @param node      the node that was updated
+     * @param frameTime provides time information for the current frame
+     */
+    void onUpdated(Node node, FrameTime frameTime);
+
+    /**
+     * Notifies the listener that {@link #onDeactivate()} was called.
+     *
+     * @param node the node that was deactivated
+     */
+    void onDeactivated(Node node);
   }
 
-  private Matrix getWorldModelMatrixInternal() {
-    if ((dirtyTransformFlags & WORLD_TRANSFORM_DIRTY) == WORLD_TRANSFORM_DIRTY) {
-      if (parentAsNode == null) {
-        cachedWorldModelMatrix.set(getLocalModelMatrixInternal().data);
-      } else {
-        Matrix.multiply(
-                parentAsNode.getWorldModelMatrixInternal(),
-                getLocalModelMatrixInternal(),
-                cachedWorldModelMatrix);
-      }
+  /**
+   * Interface definition for callbacks to be invoked when the transformation of the node changes.
+   */
+  public interface TransformChangedListener {
 
-      dirtyTransformFlags &= ~WORLD_TRANSFORM_DIRTY;
-    }
-
-    return cachedWorldModelMatrix;
+    /**
+     * Notifies the listener that the transformation of the {@link Node} has changed. Called right
+     * after {@link #onTransformChange(Node)}.
+     *
+     * <p>The originating node is the most top-level node in the hierarchy that triggered the node
+     * to change. It will always be either the same node or one of its' parents. i.e. if node A's
+     * position is changed, then that will trigger {@link #onTransformChanged(Node, Node)} to be
+     * called for all of it's descendants with the originatingNode being node A.
+     *
+     * @param node the node that changed
+     * @param originatingNode the node that triggered the transformation to change
+     */
+    void onTransformChanged(Node node, Node originatingNode);
   }
 
   /**
@@ -1416,25 +1542,19 @@ public class Node extends NodeParent implements TransformProvider {
   }
 
   /**
-   * Internal Convenience function for accessing cachedWorldRotation that ensures the cached value
-   * is updated before it is accessed. Used internally instead of getWorldRotation because
-   * getWorldRotation is written to be immutable and therefore requires allocating a new Quaternion
-   * for each use.
-   *
-   * @return The cachedWorldRotation.
+   * Used to keep track of data for detecting if a tap gesture has occurred on this node.
    */
-  private Quaternion getWorldRotationInternal() {
-    if ((dirtyTransformFlags & WORLD_ROTATION_DIRTY) == WORLD_ROTATION_DIRTY) {
-      if (parentAsNode != null) {
-        getWorldModelMatrixInternal()
-                .decomposeRotation(getWorldScaleInternal(), cachedWorldRotation);
-      } else {
-        cachedWorldRotation.set(localRotation);
-      }
-      dirtyTransformFlags &= ~WORLD_ROTATION_DIRTY;
-    }
+  private static class TapTrackingData {
+    // The node that was being touched when ACTION_DOWN occurred.
+    final Node downNode;
 
-    return cachedWorldRotation;
+    // The screen-space position that was being touched when ACTION_DOWN occurred.
+    final Vector3 downPosition;
+
+    TapTrackingData(Node downNode, Vector3 downPosition) {
+      this.downNode = downNode;
+      this.downPosition = new Vector3(downPosition);
+    }
   }
 
   /**
@@ -1486,105 +1606,5 @@ public class Node extends NodeParent implements TransformProvider {
     }
 
     return Preconditions.checkNotNull(scene.getView().getRenderer());
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when a touch event is dispatched to this
-   * node. The callback will be invoked before {@link #onTouchEvent(HitTestResult, MotionEvent)} is
-   * called.
-   */
-  public interface OnTouchListener {
-    /**
-     * Handles when a touch event has been dispatched to a node.
-     *
-     * <p>On {@link MotionEvent#ACTION_DOWN} events, {@link HitTestResult#getNode()} will always be
-     * this node or one of its children. On other events, the touch may have moved causing the
-     * {@link HitTestResult#getNode()} to change (or possibly be null).
-     *
-     * @param hitTestResult represents the node that was touched and information about where it was
-     *                      touched
-     * @param motionEvent   the MotionEvent object containing full information about the event
-     * @return true if the listener has consumed the event, false otherwise
-     */
-    boolean onTouch(HitTestResult hitTestResult, MotionEvent motionEvent);
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when a node is tapped.
-   */
-  public interface OnTapListener {
-    /**
-     * Handles when a node has been tapped.
-     *
-     * <p>{@link HitTestResult#getNode()} will always be this node or one of its children.
-     *
-     * @param hitTestResult represents the node that was tapped and information about where it was
-     *                      touched
-     * @param motionEvent   the {@link MotionEvent#ACTION_UP} MotionEvent that caused the tap
-     */
-    void onTap(HitTestResult hitTestResult, MotionEvent motionEvent);
-  }
-
-  /**
-   * Interface definition for callbacks to be invoked when node lifecycle events occur.
-   */
-  public interface LifecycleListener {
-    /**
-     * Notifies the listener that {@link #onActivate()} was called.
-     *
-     * @param node the node that was activated
-     */
-    void onActivated(Node node);
-
-    /**
-     * Notifies the listener that {@link #onUpdate(FrameTime)} was called.
-     *
-     * @param node      the node that was updated
-     * @param frameTime provides time information for the current frame
-     */
-    void onUpdated(Node node, FrameTime frameTime);
-
-    /**
-     * Notifies the listener that {@link #onDeactivate()} was called.
-     *
-     * @param node the node that was deactivated
-     */
-    void onDeactivated(Node node);
-  }
-
-  /**
-   * Interface definition for callbacks to be invoked when the transformation of the node changes.
-   */
-  public interface TransformChangedListener {
-
-    /**
-     * Notifies the listener that the transformation of the {@link Node} has changed. Called right
-     * after {@link #onTransformChange(Node)}.
-     *
-     * <p>The originating node is the most top-level node in the hierarchy that triggered the node
-     * to change. It will always be either the same node or one of its' parents. i.e. if node A's
-     * position is changed, then that will trigger {@link #onTransformChanged(Node, Node)} to be
-     * called for all of it's descendants with the originatingNode being node A.
-     *
-     * @param node            the node that changed
-     * @param originatingNode the node that triggered the transformation to change
-     */
-    void onTransformChanged(Node node, Node originatingNode);
-  }
-
-  /**
-   * Used to keep track of data for detecting if a tap gesture has occurred on this node.
-   */
-  private static class TapTrackingData {
-    // The node that was being touched when ACTION_DOWN occurred.
-    final Node downNode;
-
-    // The screen-space position that was being touched when ACTION_DOWN occurred.
-    final Vector3 downPosition;
-
-    TapTrackingData(Node downNode, Vector3 downPosition) {
-      this.downNode = downNode;
-      this.downPosition = new Vector3(downPosition);
-    }
   }
 }

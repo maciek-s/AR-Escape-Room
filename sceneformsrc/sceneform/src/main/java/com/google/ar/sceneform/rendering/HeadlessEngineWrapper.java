@@ -15,6 +15,8 @@ import java.lang.reflect.Method;
  */
 public class HeadlessEngineWrapper extends FilamentEngineWrapper {
   public static final String TAG = HeadlessEngineWrapper.class.getName();
+
+  long nativeHandle;
   private static final Constructor<SwapChain> swapChainInit;
   private static final Constructor<Engine> engineInit;
   private static final Method getNativeEngineMethod;
@@ -35,20 +37,9 @@ public class HeadlessEngineWrapper extends FilamentEngineWrapper {
     }
   }
 
-  long nativeHandle;
-
   public HeadlessEngineWrapper() throws ReflectiveOperationException {
     super(engineInit.newInstance(nCreateSwiftShaderEngine()));
   }
-
-  // LINT.IfChange(api)
-  private static native long nCreateSwiftShaderEngine();
-
-  private static native void nDestroySwiftShaderEngine(long nativeEngine);
-
-  private static native long nCreateSwiftShaderSwapChain(long nativeEngine, long flags);
-
-  private static native void nDestroySwiftShaderSwapChain(long nativeEngine, long nativeSwapChain);
 
   @Override
   public void destroy() {
@@ -59,6 +50,15 @@ public class HeadlessEngineWrapper extends FilamentEngineWrapper {
       throw new RuntimeException(e);
     }
   }
+
+  // LINT.IfChange(api)
+  private static native long nCreateSwiftShaderEngine();
+
+  private static native void nDestroySwiftShaderEngine(long nativeEngine);
+
+  private static native long nCreateSwiftShaderSwapChain(long nativeEngine, long flags);
+
+  private static native void nDestroySwiftShaderSwapChain(long nativeEngine, long nativeSwapChain);
 
   @Override
   public SwapChain createSwapChain(@NonNull Object surface) {

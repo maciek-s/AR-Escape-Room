@@ -50,17 +50,16 @@ public class Renderer implements UiHelper.RendererCallback {
 
   // Limit resolution to 1080p for the minor edge. This is enough for Filament.
   private static final int MAXIMUM_RESOLUTION = 1080;
+
+  private final double[] cameraProjectionMatrix = new double[16];
   private final SurfaceView surfaceView;
   private final ViewAttachmentManager viewAttachmentManager;
+
   private final ArrayList<RenderableInstance> renderableInstances = new ArrayList<>();
   private final ArrayList<LightInstance> lightInstances = new ArrayList<>();
-  private final double[] cameraProjectionMatrix = new double[16];
-  private final List<Mirror> mirrors = new ArrayList<>();
-  @Nullable
-  private CameraProvider cameraProvider;
+
   private Surface surface;
-  @Nullable
-  private SwapChain swapChain;
+  private final List<Mirror> mirrors = new ArrayList<>();
   private com.google.android.filament.View view;
   private com.google.android.filament.View emptyView;
   private com.google.android.filament.Renderer renderer;
@@ -68,10 +67,16 @@ public class Renderer implements UiHelper.RendererCallback {
   private Scene scene;
   private IndirectLight indirectLight;
   private boolean recreateSwapChain;
+
   private float cameraAperature;
   private float cameraShutterSpeed;
   private float cameraIso;
+
   private UiHelper filamentHelper;
+  @Nullable
+  private CameraProvider cameraProvider;
+  @Nullable
+  private SwapChain swapChain;
   private EnvironmentalHdrParameters environmentalHdrParameters =
           EnvironmentalHdrParameters.makeDefault();
   @Nullable
@@ -103,9 +108,7 @@ public class Renderer implements UiHelper.RendererCallback {
     return ResourceManager.getInstance().reclaimReleasedResources();
   }
 
-  /**
-   * Immediately releases all rendering resources, even if in use.
-   */
+  /** Immediately releases all rendering resources, even if in use. */
   public static void destroyAllResources() {
     ResourceManager.getInstance().destroyAllResources();
     EngineInstance.destroyEngine();
@@ -154,16 +157,17 @@ public class Renderer implements UiHelper.RendererCallback {
     return surfaceView;
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void setClearColor(Color color) {
-    view.setClearColor(color.r, color.g, color.b, color.a);
+    com.google.android.filament.Renderer.ClearOptions options = new com.google.android.filament.Renderer.ClearOptions();
+    options.clearColor[0] = color.r;
+    options.clearColor[1] = color.g;
+    options.clearColor[2] = color.b;
+    options.clearColor[3] = color.a;
+    renderer.setClearOptions(options);
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void setDefaultClearColor() {
     setClearColor(DEFAULT_CLEAR_COLOR);
   }
@@ -188,23 +192,17 @@ public class Renderer implements UiHelper.RendererCallback {
     view.setFrontFaceWindingInverted(inverted);
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void setCameraProvider(@Nullable CameraProvider cameraProvider) {
     this.cameraProvider = cameraProvider;
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void onPause() {
     viewAttachmentManager.onPause();
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void onResume() {
     viewAttachmentManager.onResume();
   }
@@ -232,16 +230,12 @@ public class Renderer implements UiHelper.RendererCallback {
     return new Viewport(left, bottom, width, height);
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void setPreRenderCallback(@Nullable PreRenderCallback preRenderCallback) {
     this.preRenderCallback = preRenderCallback;
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void render(boolean debugEnabled) {
     synchronized (this) {
       if (recreateSwapChain) {
@@ -291,7 +285,7 @@ public class Renderer implements UiHelper.RendererCallback {
           throw new AssertionError("Internal Error: Failed to get swap chain");
         }
 
-        if (renderer.beginFrame(swapChainLocal)) {
+        if (renderer.beginFrame(swapChainLocal, 0)) {
           if (preRenderCallback != null) {
             preRenderCallback.preRender(renderer, swapChainLocal, camera);
           }
@@ -331,9 +325,7 @@ public class Renderer implements UiHelper.RendererCallback {
     }
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void dispose() {
     filamentHelper.detach(); // call this before destroying the Engine (it could call back)
 
@@ -370,9 +362,7 @@ public class Renderer implements UiHelper.RendererCallback {
     }
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void setDesiredSize(int width, int height) {
     int minor = Math.min(width, height);
     int major = Math.max(width, height);
@@ -389,23 +379,17 @@ public class Renderer implements UiHelper.RendererCallback {
     filamentHelper.setDesiredSize(major, minor);
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public int getDesiredWidth() {
     return filamentHelper.getDesiredWidth();
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public int getDesiredHeight() {
     return filamentHelper.getDesiredHeight();
   }
 
-  /**
-   * @hide UiHelper.RendererCallback implementation
-   */
+  /** @hide UiHelper.RendererCallback implementation */
   @Override
   public void onNativeWindowChanged(Surface surface) {
     synchronized (this) {
@@ -414,9 +398,7 @@ public class Renderer implements UiHelper.RendererCallback {
     }
   }
 
-  /**
-   * @hide UiHelper.RendererCallback implementation
-   */
+  /** @hide UiHelper.RendererCallback implementation */
   @Override
   public void onDetachedFromSurface() {
     @Nullable SwapChain swapChainLocal = swapChain;
@@ -431,9 +413,7 @@ public class Renderer implements UiHelper.RendererCallback {
     }
   }
 
-  /**
-   * @hide Only used for scuba testing for now.
-   */
+  /** @hide Only used for scuba testing for now. */
   public void setDynamicResolutionEnabled(boolean isEnabled) {
     // Enable dynamic resolution. By default it will scale down to 25% of the screen area
     // (i.e.: 50% on each axis, e.g.: reducing a 1080p image down to 720p).
@@ -441,13 +421,10 @@ public class Renderer implements UiHelper.RendererCallback {
     // TODO: This functionality should probably be exposed to the developer eventually.
     DynamicResolutionOptions options = new DynamicResolutionOptions();
     options.enabled = isEnabled;
-    options.targetFrameTimeMilli = 1000.0f / 30.0f;
     view.setDynamicResolutionOptions(options);
   }
 
-  /**
-   * @hide Only used for scuba testing for now.
-   */
+  /** @hide Only used for scuba testing for now. */
   @VisibleForTesting
   public void setAntiAliasing(com.google.android.filament.View.AntiAliasing antiAliasing) {
     view.setAntiAliasing(antiAliasing);
@@ -509,18 +486,14 @@ public class Renderer implements UiHelper.RendererCallback {
     this.environmentalHdrParameters = environmentalHdrParameters;
   }
 
-  /**
-   * @hide UiHelper.RendererCallback implementation
-   */
+  /** @hide UiHelper.RendererCallback implementation */
   @Override
   public void onResized(int width, int height) {
     view.setViewport(new Viewport(0, 0, width, height));
     emptyView.setViewport(new Viewport(0, 0, width, height));
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   void addLight(LightInstance instance) {
     @Entity int entity = instance.getEntity();
     scene.addEntity(entity);
@@ -596,7 +569,6 @@ public class Renderer implements UiHelper.RendererCallback {
 
     setDynamicResolutionEnabled(true);
 
-    emptyView.setClearColor(0, 0, 0, 1);
     emptyView.setCamera(engine.createCamera());
     emptyView.setScene(engine.createScene());
   }
@@ -620,7 +592,7 @@ public class Renderer implements UiHelper.RendererCallback {
    *
    * @hide This is support deeplight API which is not stable yet.
    */
-
+  
   public float getExposure() {
     float e = (cameraAperature * cameraAperature) / cameraShutterSpeed * 100.0f / cameraIso;
     return 1.0f / (1.2f * e);
@@ -658,10 +630,8 @@ public class Renderer implements UiHelper.RendererCallback {
   }
 
   private static class Mirror {
-    @Nullable
-    SwapChain swapChain;
-    @Nullable
-    Surface surface;
+    @Nullable SwapChain swapChain;
+    @Nullable Surface surface;
     Viewport viewport;
   }
 }

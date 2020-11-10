@@ -33,16 +33,16 @@ public class FootprintSelectionVisualizer implements SelectionVisualizer {
     footprintNode = new Node();
   }
 
-  @Nullable
-  public ModelRenderable getFootprintRenderable() {
-    return footprintRenderable;
-  }
-
   public void setFootprintRenderable(ModelRenderable renderable) {
     ModelRenderable copyRenderable = renderable.makeCopy();
     footprintNode.setRenderable(copyRenderable);
     copyRenderable.setCollisionShape(null);
     footprintRenderable = copyRenderable;
+  }
+
+  @Nullable
+  public ModelRenderable getFootprintRenderable() {
+    return footprintRenderable;
   }
 
   @Override

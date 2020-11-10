@@ -74,9 +74,7 @@ public class ExternalTexture {
     initialize(stream);
   }
 
-  /**
-   * Gets the surface texture created for this ExternalTexture.
-   */
+  /** Gets the surface texture created for this ExternalTexture. */
   public SurfaceTexture getSurfaceTexture() {
     return Preconditions.checkNotNull(surfaceTexture);
   }

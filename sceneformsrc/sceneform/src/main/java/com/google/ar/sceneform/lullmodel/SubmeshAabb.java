@@ -34,11 +34,6 @@ public final class SubmeshAabb extends Table {
     builder.addStruct(1, maxPositionOffset, 0);
   }
 
-  public static int endSubmeshAabb(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -67,6 +62,11 @@ public final class SubmeshAabb extends Table {
   public Vec3 maxPosition(Vec3 obj) {
     int o = __offset(6);
     return o != 0 ? obj.__assign(o + bb_pos, bb) : null;
+  }
+
+  public static int endSubmeshAabb(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

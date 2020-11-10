@@ -37,11 +37,6 @@ public final class ModelPipelineCollidableDef extends Table {
     builder.addOffset(0, sourceOffset, 0);
   }
 
-  public static int endModelPipelineCollidableDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -68,6 +63,11 @@ public final class ModelPipelineCollidableDef extends Table {
 
   public ByteBuffer sourceInByteBuffer(ByteBuffer _bb) {
     return __vector_in_bytebuffer(_bb, 4, 1);
+  }
+
+  public static int endModelPipelineCollidableDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

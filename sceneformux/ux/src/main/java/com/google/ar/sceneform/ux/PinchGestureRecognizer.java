@@ -23,10 +23,6 @@ import com.google.ar.sceneform.HitTestResult;
  * Gesture Recognizer for when the user performs a two-finger pinch motion on the touch screen.
  */
 public class PinchGestureRecognizer extends BaseGestureRecognizer<PinchGesture> {
-  public PinchGestureRecognizer(GesturePointersUtility gesturePointersUtility) {
-    super(gesturePointersUtility);
-  }
-
   @Override
   protected void tryCreateGestures(HitTestResult hitTestResult, MotionEvent motionEvent) {
     // Pinch gestures require at least two fingers to be touching.
@@ -58,10 +54,13 @@ public class PinchGestureRecognizer extends BaseGestureRecognizer<PinchGesture> 
     }
   }
 
+  public PinchGestureRecognizer(GesturePointersUtility gesturePointersUtility) {
+    super(gesturePointersUtility);
+  }
+
   /**
    * Interface definition for a callbacks to be invoked when a {@link PinchGesture} starts.
    */
   public interface OnGestureStartedListener
-          extends BaseGestureRecognizer.OnGestureStartedListener<PinchGesture> {
-  }
+          extends BaseGestureRecognizer.OnGestureStartedListener<PinchGesture> {}
 }

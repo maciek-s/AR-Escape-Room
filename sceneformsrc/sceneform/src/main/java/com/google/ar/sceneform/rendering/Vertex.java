@@ -12,11 +12,12 @@ import com.google.ar.sceneform.math.Vector3;
  * @see ViewRenderable.Builder
  */
 public class Vertex {
-  // Required.
-  private final Vector3 position = Vector3.zero();
   // Optional.
   @Nullable
   private Vector3 normal;
+
+  // Required.
+  private final Vector3 position = Vector3.zero();
   @Nullable
   private UvCoordinate uvCoordinate;
   @Nullable
@@ -29,16 +30,16 @@ public class Vertex {
     color = builder.color;
   }
 
+  public void setPosition(Vector3 position) {
+    this.position.set(position);
+  }
+
   public static Builder builder() {
     return new Builder();
   }
 
   public Vector3 getPosition() {
     return position;
-  }
-
-  public void setPosition(Vector3 position) {
-    this.position.set(position);
   }
 
   @Nullable

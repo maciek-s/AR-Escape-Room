@@ -37,11 +37,6 @@ public final class DataString extends Table {
     builder.addOffset(0, valueOffset, 0);
   }
 
-  public static int endDataString(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -65,6 +60,11 @@ public final class DataString extends Table {
 
   public ByteBuffer valueInByteBuffer(ByteBuffer _bb) {
     return __vector_in_bytebuffer(_bb, 4, 1);
+  }
+
+  public static int endDataString(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

@@ -34,10 +34,10 @@ import java.util.concurrent.Callable;
  * @hide
  */
 public class LoadHelper {
+  private static final String TAG = LoadHelper.class.getName();
   // From https://developer.android.com/reference/android/content/res/Resources
   // The value 0 is an invalid identifier.
   public static final int INVALID_RESOURCE_IDENTIFIER = 0;
-  private static final String TAG = LoadHelper.class.getName();
   private static final String RAW_RESOURCE_TYPE = "raw";
   private static final String DRAWABLE_RESOURCE_TYPE = "drawable";
   private static final char SLASH_DELIMETER = '/';
@@ -148,16 +148,12 @@ public class LoadHelper {
             .build();
   }
 
-  /**
-   * Return the integer resource id for the specified resource name.
-   */
+  /** Return the integer resource id for the specified resource name. */
   public static int rawResourceNameToIdentifier(Context context, String name) {
     return context.getResources().getIdentifier(name, RAW_RESOURCE_TYPE, context.getPackageName());
   }
 
-  /**
-   * Return the integer resource id for the specified resource name.
-   */
+  /** Return the integer resource id for the specified resource name. */
   public static int drawableResourceNameToIdentifier(Context context, String name) {
     return context
             .getResources()
@@ -196,9 +192,7 @@ public class LoadHelper {
     }
   }
 
-  /**
-   * Creates an inputStream to read from asset file
-   */
+  /** Creates an inputStream to read from asset file */
   // TODO: Fix nullness violation: dereference of possibly-null reference
   // sourceUri.getPath()
   @SuppressWarnings("nullness:dereference.of.nullable")

@@ -44,9 +44,6 @@ import java.util.List;
  * when the {@link DragGesture} starts.
  */
 public class TranslationController extends BaseTransformationController<DragGesture> {
-  private static final float LERP_SPEED = 12.0f;
-  private static final float POSITION_LENGTH_THRESHOLD = 0.01f;
-  private static final float ROTATION_DOT_THRESHOLD = 0.99f;
   private final Vector3 initialForwardInLocal = new Vector3();
   @Nullable
   private HitResult lastArHitResult;
@@ -55,6 +52,10 @@ public class TranslationController extends BaseTransformationController<DragGest
   @Nullable
   private Quaternion desiredLocalRotation;
   private EnumSet<Plane.Type> allowedPlaneTypes = EnumSet.allOf(Plane.Type.class);
+
+  private static final float LERP_SPEED = 12.0f;
+  private static final float POSITION_LENGTH_THRESHOLD = 0.01f;
+  private static final float ROTATION_DOT_THRESHOLD = 0.99f;
 
   public TranslationController(
           BaseTransformableNode transformableNode, DragGestureRecognizer gestureRecognizer) {
@@ -71,13 +72,6 @@ public class TranslationController extends BaseTransformationController<DragGest
    */
   public EnumSet<Plane.Type> getAllowedPlaneTypes() {
     return allowedPlaneTypes;
-  }
-
-  /**
-   * Sets which types of ArCore Planes this TranslationController is allowed to translate on.
-   */
-  public void setAllowedPlaneTypes(EnumSet<Plane.Type> allowedPlaneTypes) {
-    this.allowedPlaneTypes = allowedPlaneTypes;
   }
 
   @Override
@@ -120,50 +114,11 @@ public class TranslationController extends BaseTransformationController<DragGest
     return true;
   }
 
-  @Override
-  public void onContinueTransformation(DragGesture gesture) {
-    Scene scene = getTransformableNode().getScene();
-    if (scene == null) {
-      return;
-    }
-
-    Frame frame = ((ArSceneView) scene.getView()).getArFrame();
-    if (frame == null) {
-      return;
-    }
-
-    Camera arCamera = frame.getCamera();
-    if (arCamera.getTrackingState() != TrackingState.TRACKING) {
-      return;
-    }
-
-    Vector3 position = gesture.getPosition();
-    List<HitResult> hitResultList = frame.hitTest(position.x, position.y);
-    for (int i = 0; i < hitResultList.size(); i++) {
-      HitResult hit = hitResultList.get(i);
-      Trackable trackable = hit.getTrackable();
-      Pose pose = hit.getHitPose();
-      if (trackable instanceof Plane) {
-        Plane plane = (Plane) trackable;
-        if (plane.isPoseInPolygon(pose) && allowedPlaneTypes.contains(plane.getType())) {
-          desiredLocalPosition = new Vector3(pose.tx(), pose.ty(), pose.tz());
-          desiredLocalRotation = new Quaternion(pose.qx(), pose.qy(), pose.qz(), pose.qw());
-          Node parent = getTransformableNode().getParent();
-          if (parent != null && desiredLocalPosition != null && desiredLocalRotation != null) {
-            desiredLocalPosition = parent.worldToLocalPoint(desiredLocalPosition);
-            desiredLocalRotation =
-                    Quaternion.multiply(
-                            parent.getWorldRotation().inverted(),
-                            Preconditions.checkNotNull(desiredLocalRotation));
-          }
-
-          desiredLocalRotation =
-                  calculateFinalDesiredLocalRotation(Preconditions.checkNotNull(desiredLocalRotation));
-          lastArHitResult = hit;
-          break;
-        }
-      }
-    }
+  /**
+   * Sets which types of ArCore Planes this TranslationController is allowed to translate on.
+   */
+  public void setAllowedPlaneTypes(EnumSet<Plane.Type> allowedPlaneTypes) {
+    this.allowedPlaneTypes = allowedPlaneTypes;
   }
 
   @Override
@@ -258,6 +213,52 @@ public class TranslationController extends BaseTransformationController<DragGest
     }
 
     getTransformableNode().setLocalRotation(localRotation);
+  }
+
+  @Override
+  public void onContinueTransformation(DragGesture gesture) {
+    Scene scene = getTransformableNode().getScene();
+    if (scene == null) {
+      return;
+    }
+
+    Frame frame = ((ArSceneView) scene.getView()).getArFrame();
+    if (frame == null) {
+      return;
+    }
+
+    Camera arCamera = frame.getCamera();
+    if (arCamera.getTrackingState() != TrackingState.TRACKING) {
+      return;
+    }
+
+    Vector3 position = gesture.getPosition();
+    List<HitResult> hitResultList = frame.hitTest(position.x, position.y);
+    for (int i = 0; i < hitResultList.size(); i++) {
+      HitResult hit = hitResultList.get(i);
+      Trackable trackable = hit.getTrackable();
+      Pose pose = hit.getHitPose();
+      if (trackable instanceof Plane) {
+        Plane plane = (Plane) trackable;
+        if (plane.isPoseInPolygon(pose) && allowedPlaneTypes.contains(plane.getType())) {
+          desiredLocalPosition = new Vector3(pose.tx(), pose.ty(), pose.tz());
+          desiredLocalRotation = new Quaternion(pose.qx(), pose.qy(), pose.qz(), pose.qw());
+          Node parent = getTransformableNode().getParent();
+          if (parent != null && desiredLocalPosition != null && desiredLocalRotation != null) {
+            desiredLocalPosition = parent.worldToLocalPoint(desiredLocalPosition);
+            desiredLocalRotation =
+                    Quaternion.multiply(
+                            parent.getWorldRotation().inverted(),
+                            Preconditions.checkNotNull(desiredLocalRotation));
+          }
+
+          desiredLocalRotation =
+                  calculateFinalDesiredLocalRotation(Preconditions.checkNotNull(desiredLocalRotation));
+          lastArHitResult = hit;
+          break;
+        }
+      }
+    }
   }
 
   /**

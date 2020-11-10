@@ -31,14 +31,15 @@ public class PlaneRenderer {
    */
   public static final String MATERIAL_TEXTURE = "texture";
   /**
+   * Float3 material parameter to control the RGB tint of the plane.
+   */
+  public static final String MATERIAL_COLOR = "color";
+
+  /**
    * Float2 material parameter to control the X/Y scaling of the texture's UV coordinates. Can be
    * used to adjust for the texture's aspect ratio and control the frequency of tiling.
    */
   public static final String MATERIAL_UV_SCALE = "uvScale";
-  /**
-   * Float3 material parameter to control the RGB tint of the plane.
-   */
-  public static final String MATERIAL_COLOR = "color";
   /**
    * Float material parameter to control the radius of the spotlight.
    */
@@ -49,9 +50,7 @@ public class PlaneRenderer {
    */
   private static final String MATERIAL_SPOTLIGHT_FOCUS_POINT = "focusPoint";
 
-  /**
-   * Used to control the UV Scale for the default texture.
-   */
+  /** Used to control the UV Scale for the default texture. */
   private static final float BASE_UV_SCALE = 8.0f;
 
   private static final float DEFAULT_TEXTURE_WIDTH = 293;
@@ -62,13 +61,17 @@ public class PlaneRenderer {
   private final Renderer renderer;
 
   private final Map<Plane, PlaneVisualizer> visualizerMap = new HashMap<>();
-  // Per-plane overrides
-  private final Map<Plane, Material> materialOverrides = new HashMap<>();
   private CompletableFuture<Material> planeMaterialFuture;
+
   private Material shadowMaterial;
+
   private boolean isEnabled = true;
   private boolean isVisible = true;
   private boolean isShadowReceiver = true;
+
+  // Per-plane overrides
+  private final Map<Plane, Material> materialOverrides = new HashMap<>();
+
   // Distance from the camera to last plane hit, default value is 4 meters (standing height).
   private float lastPlaneHitDistance = 4.0f;
 
@@ -83,31 +86,9 @@ public class PlaneRenderer {
     loadShadowMaterial();
   }
 
-  /**
-   * Check if the plane renderer is enabled.
-   */
+  /** Check if the plane renderer is enabled. */
   public boolean isEnabled() {
     return isEnabled;
-  }
-
-  /**
-   * Enable/disable the plane renderer.
-   */
-  public void setEnabled(boolean enabled) {
-    if (isEnabled != enabled) {
-      isEnabled = enabled;
-
-      for (PlaneVisualizer visualizer : visualizerMap.values()) {
-        visualizer.setEnabled(isEnabled);
-      }
-    }
-  }
-
-  /**
-   * Return true if Renderables in the scene cast shadows onto the planes.
-   */
-  public boolean isShadowReceiver() {
-    return isShadowReceiver;
   }
 
   /**
@@ -126,10 +107,16 @@ public class PlaneRenderer {
   }
 
   /**
-   * Return true if plane visualization is visible.
+   * Enable/disable the plane renderer.
    */
-  public boolean isVisible() {
-    return isVisible;
+  public void setEnabled(boolean enabled) {
+    if (isEnabled != enabled) {
+      isEnabled = enabled;
+
+      for (PlaneVisualizer visualizer : visualizerMap.values()) {
+        visualizer.setEnabled(isEnabled);
+      }
+    }
   }
 
   /**
@@ -146,6 +133,20 @@ public class PlaneRenderer {
         visualizer.setVisible(isVisible);
       }
     }
+  }
+
+  /**
+   * Return true if Renderables in the scene cast shadows onto the planes.
+   */
+  public boolean isShadowReceiver() {
+    return isShadowReceiver;
+  }
+
+  /**
+   * Return true if plane visualization is visible.
+   */
+  public boolean isVisible() {
+    return isVisible;
   }
 
   /**
@@ -233,8 +234,8 @@ public class PlaneRenderer {
                     })
             .exceptionally(
                     throwable -> {
-                      Log.e(TAG, "Unable to load plane shadow material.", throwable);
-                      return null;
+              Log.e(TAG, "Unable to load plane shadow material.", throwable);
+              return null;
                     });
   }
 
@@ -279,10 +280,10 @@ public class PlaneRenderer {
                               for (Map.Entry<Plane, PlaneVisualizer> entry : visualizerMap.entrySet()) {
                                 if (!materialOverrides.containsKey(entry.getKey())) {
                                   entry.getValue().setPlaneMaterial(material);
-                                }
-                              }
-                              return material;
-                            });
+                    }
+                  }
+                  return material;
+                });
   }
 
   private Vector3 getFocusPoint(Frame frame, int width, int height) {

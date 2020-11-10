@@ -9,15 +9,6 @@ import java.nio.ByteBuffer;
 
 @SuppressWarnings("unused")
 public final class Rect extends Struct {
-  public static int createRect(FlatBufferBuilder builder, float x, float y, float w, float h) {
-    builder.prep(4, 16);
-    builder.putFloat(h);
-    builder.putFloat(w);
-    builder.putFloat(y);
-    builder.putFloat(x);
-    return builder.offset();
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -42,6 +33,15 @@ public final class Rect extends Struct {
 
   public float h() {
     return bb.getFloat(bb_pos + 12);
+  }
+
+  public static int createRect(FlatBufferBuilder builder, float x, float y, float w, float h) {
+    builder.prep(4, 16);
+    builder.putFloat(h);
+    builder.putFloat(w);
+    builder.putFloat(y);
+    builder.putFloat(x);
+    return builder.offset();
   }
 }
 

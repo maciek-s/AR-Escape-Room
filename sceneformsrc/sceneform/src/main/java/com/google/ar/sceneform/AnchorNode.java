@@ -20,14 +20,17 @@ import java.util.List;
  */
 public class AnchorNode extends Node {
   private static final String TAG = AnchorNode.class.getSimpleName();
+
   private static final float SMOOTH_FACTOR = 12.0f;
-  // The anchor that the node is following.
-  @Nullable
-  private Anchor anchor;
+
   // Determines if the movement between the node's current position and the anchor position should
   // be smoothed over time or immediate.
   private boolean isSmoothed = true;
+
   private boolean wasTracking;
+  // The anchor that the node is following.
+  @Nullable
+  private Anchor anchor;
 
   /**
    * Create an AnchorNode with no anchor.
@@ -43,14 +46,6 @@ public class AnchorNode extends Node {
   @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
   public AnchorNode(Anchor anchor) {
     setAnchor(anchor);
-  }
-
-  /**
-   * Returns the ARCore anchor if it exists or null otherwise.
-   */
-  @Nullable
-  public Anchor getAnchor() {
-    return anchor;
   }
 
   /**
@@ -72,10 +67,11 @@ public class AnchorNode extends Node {
   }
 
   /**
-   * Returns true if the transformations are interpolated or false if they are applied immediately.
+   * Returns the ARCore anchor if it exists or null otherwise.
    */
-  public boolean isSmoothed() {
-    return isSmoothed;
+  @Nullable
+  public Anchor getAnchor() {
+    return anchor;
   }
 
   /**
@@ -86,6 +82,13 @@ public class AnchorNode extends Node {
    */
   public void setSmoothed(boolean smoothed) {
     this.isSmoothed = smoothed;
+  }
+
+  /**
+   * Returns true if the transformations are interpolated or false if they are applied immediately.
+   */
+  public boolean isSmoothed() {
+    return isSmoothed;
   }
 
   /**

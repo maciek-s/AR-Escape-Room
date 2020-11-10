@@ -26,9 +26,9 @@ import com.google.ar.sceneform.math.Vector3;
  */
 public class PinchGesture extends BaseGesture<PinchGesture> {
   private static final String TAG = PinchGesture.class.getSimpleName();
+
   private static final float SLOP_INCHES = 0.05f;
-  private static final float SLOP_MOTION_DIRECTION_DEGREES = 30.0f;
-  private static final boolean PINCH_GESTURE_DEBUG = false;
+
   private final int pointerId1;
   private final int pointerId2;
   private final Vector3 startPosition1;
@@ -37,6 +37,8 @@ public class PinchGesture extends BaseGesture<PinchGesture> {
   private final Vector3 previousPosition2;
   private float gap;
   private float gapDelta;
+  private static final float SLOP_MOTION_DIRECTION_DEGREES = 30.0f;
+  private static final boolean PINCH_GESTURE_DEBUG = false;
 
   public PinchGesture(
           GesturePointersUtility gesturePointersUtility, MotionEvent motionEvent, int pointerId2) {
@@ -73,9 +75,7 @@ public class PinchGesture extends BaseGesture<PinchGesture> {
     return gesturePointersUtility.pixelsToInches(getGapDelta());
   }
 
-  /**
-   * Cancels the gesture in progress.
-   */
+  /** Cancels the gesture in progress. */
   @Override
   public void cancel() {
     super.cancel();

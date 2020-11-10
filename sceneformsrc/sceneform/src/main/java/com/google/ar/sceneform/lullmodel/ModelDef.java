@@ -158,7 +158,6 @@ public final class ModelDef extends Table {
 
   public int texturesLength() {
     int o = __offset(12);
-    return o != 0 ? __vector_len(o) : 0;
-  }
+    return o != 0 ? __vector_len(o) : 0; }
 }
 

@@ -50,8 +50,8 @@ public class Sphere extends CollisionShape {
   /**
    * Get a copy of the sphere's center.
    *
-   * @return a new vector that represents the sphere's center
    * @see #setCenter(Vector3)
+   * @return a new vector that represents the sphere's center
    */
   public Vector3 getCenter() {
     return new Vector3(center);
@@ -60,8 +60,8 @@ public class Sphere extends CollisionShape {
   /**
    * Set the center of this sphere.
    *
-   * @param center the new center of the sphere
    * @see #getCenter()
+   * @param center the new center of the sphere
    */
   public void setCenter(Vector3 center) {
     Preconditions.checkNotNull(center, "Parameter \"center\" was null.");
@@ -72,8 +72,8 @@ public class Sphere extends CollisionShape {
   /**
    * Get the radius of the sphere.
    *
-   * @return the radius of the sphere
    * @see #setRadius(float)
+   * @return the radius of the sphere
    */
   public float getRadius() {
     return radius;
@@ -82,8 +82,8 @@ public class Sphere extends CollisionShape {
   /**
    * Set the radius of the sphere.
    *
-   * @param radius the new radius of the sphere
    * @see #getRadius()
+   * @param radius the new radius of the sphere
    */
   public void setRadius(float radius) {
     this.radius = radius;
@@ -95,9 +95,7 @@ public class Sphere extends CollisionShape {
     return new Sphere(getRadius(), getCenter());
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   @Override
   protected boolean rayIntersection(Ray ray, RayHit result) {
     Preconditions.checkNotNull(ray, "Parameter \"ray\" was null.");
@@ -133,26 +131,20 @@ public class Sphere extends CollisionShape {
     return true;
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   @Override
   protected boolean shapeIntersection(CollisionShape shape) {
     Preconditions.checkNotNull(shape, "Parameter \"shape\" was null.");
     return shape.sphereIntersection(this);
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   @Override
   protected boolean sphereIntersection(Sphere sphere) {
     return Intersections.sphereSphereIntersection(this, sphere);
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   @Override
   protected boolean boxIntersection(Box box) {
     return Intersections.sphereBoxIntersection(this, box);

@@ -45,7 +45,7 @@ public abstract class NodeParent {
    *
    * @param child the node to add as a child
    * @throws IllegalArgumentException if the child is the same object as the parent, or if the
-   *                                  parent is a descendant of the child
+   *     parent is a descendant of the child
    */
   public final void addChild(Node child) {
     Preconditions.checkNotNull(child, "Parameter \"child\" was null.");

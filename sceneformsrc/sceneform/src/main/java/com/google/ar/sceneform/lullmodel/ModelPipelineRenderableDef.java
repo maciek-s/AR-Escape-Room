@@ -69,11 +69,6 @@ public final class ModelPipelineRenderableDef extends Table {
     builder.startVector(4, numElems, 4);
   }
 
-  public static int endModelPipelineRenderableDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -95,12 +90,10 @@ public final class ModelPipelineRenderableDef extends Table {
   }
 
   public ByteBuffer sourceAsByteBuffer() {
-    return __vector_as_bytebuffer(4, 1);
-  }
+    return __vector_as_bytebuffer(4, 1); }
 
   public ByteBuffer sourceInByteBuffer(ByteBuffer _bb) {
-    return __vector_in_bytebuffer(_bb, 4, 1);
-  }
+    return __vector_in_bytebuffer(_bb, 4, 1); }
 
   /**
    * The material properties for the model. Each index in the array corresponds
@@ -141,6 +134,11 @@ public final class ModelPipelineRenderableDef extends Table {
 
   public ByteBuffer attributesInByteBuffer(ByteBuffer _bb) {
     return __vector_in_bytebuffer(_bb, 8, 4);
+  }
+
+  public static int endModelPipelineRenderableDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

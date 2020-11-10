@@ -36,11 +36,6 @@ public class GesturePointersUtility {
     retainedPointerIds = new HashSet<>();
   }
 
-  public static Vector3 motionEventToPosition(MotionEvent me, int pointerId) {
-    int index = me.findPointerIndex(pointerId);
-    return new Vector3(me.getX(index), me.getY(index), 0.0f);
-  }
-
   public void retainPointerId(int pointerId) {
     if (!isPointerIdRetained(pointerId)) {
       retainedPointerIds.add(pointerId);
@@ -57,6 +52,11 @@ public class GesturePointersUtility {
 
   public float inchesToPixels(float inches) {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_IN, inches, displayMetrics);
+  }
+
+  public static Vector3 motionEventToPosition(MotionEvent me, int pointerId) {
+    int index = me.findPointerIndex(pointerId);
+    return new Vector3(me.getX(index), me.getY(index), 0.0f);
   }
 
   public float pixelsToInches(float pixels) {

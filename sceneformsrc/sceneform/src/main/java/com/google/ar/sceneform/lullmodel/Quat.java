@@ -9,15 +9,6 @@ import java.nio.ByteBuffer;
 
 @SuppressWarnings("unused")
 public final class Quat extends Struct {
-  public static int createQuat(FlatBufferBuilder builder, float x, float y, float z, float w) {
-    builder.prep(4, 16);
-    builder.putFloat(w);
-    builder.putFloat(z);
-    builder.putFloat(y);
-    builder.putFloat(x);
-    return builder.offset();
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -42,6 +33,15 @@ public final class Quat extends Struct {
 
   public float w() {
     return bb.getFloat(bb_pos + 12);
+  }
+
+  public static int createQuat(FlatBufferBuilder builder, float x, float y, float z, float w) {
+    builder.prep(4, 16);
+    builder.putFloat(w);
+    builder.putFloat(z);
+    builder.putFloat(y);
+    builder.putFloat(x);
+    return builder.offset();
   }
 }
 

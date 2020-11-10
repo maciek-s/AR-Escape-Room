@@ -35,12 +35,12 @@ import java.util.ArrayList;
  */
 
 class RenderViewToExternalTexture extends LinearLayout {
+  private final ArrayList<OnViewSizeChangedListener> onViewSizeChangedListeners = new ArrayList<>();
+
   private final View view;
   private final ExternalTexture externalTexture;
   private final Picture picture = new Picture();
-  private final ArrayList<OnViewSizeChangedListener> onViewSizeChangedListeners = new ArrayList<>();
   private boolean hasDrawnToSurfaceTexture = false;
-
   @Nullable
   private ViewAttachmentManager viewAttachmentManager;
 
@@ -54,6 +54,20 @@ class RenderViewToExternalTexture extends LinearLayout {
 
     this.view = view;
     addView(view);
+  }
+
+  void attachView(ViewAttachmentManager viewAttachmentManager) {
+    if (this.viewAttachmentManager != null) {
+      if (this.viewAttachmentManager != viewAttachmentManager) {
+        throw new IllegalStateException(
+                "Cannot use the same ViewRenderable with multiple SceneViews.");
+      }
+
+      return;
+    }
+
+    this.viewAttachmentManager = viewAttachmentManager;
+    viewAttachmentManager.addView(this);
   }
 
   /**
@@ -126,18 +140,11 @@ class RenderViewToExternalTexture extends LinearLayout {
     invalidate();
   }
 
-  void attachView(ViewAttachmentManager viewAttachmentManager) {
-    if (this.viewAttachmentManager != null) {
-      if (this.viewAttachmentManager != viewAttachmentManager) {
-        throw new IllegalStateException(
-                "Cannot use the same ViewRenderable with multiple SceneViews.");
-      }
-
-      return;
-    }
-
-    this.viewAttachmentManager = viewAttachmentManager;
-    viewAttachmentManager.addView(this);
+  /**
+   * Interface definition for a callback to be invoked when the size of the view changes.
+   */
+  public interface OnViewSizeChangedListener {
+    void onViewSizeChanged(int width, int height);
   }
 
   void detachView() {
@@ -152,12 +159,5 @@ class RenderViewToExternalTexture extends LinearLayout {
 
     // Let Surface and SurfaceTexture be released
     // automatically by their finalizers.
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the size of the view changes.
-   */
-  public interface OnViewSizeChangedListener {
-    void onViewSizeChanged(int width, int height);
   }
 }

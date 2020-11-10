@@ -37,11 +37,6 @@ public final class DataBool extends Table {
     builder.addBoolean(0, value, false);
   }
 
-  public static int endDataBool(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -57,6 +52,11 @@ public final class DataBool extends Table {
   public boolean value() {
     int o = __offset(4);
     return o != 0 ? 0 != bb.get(o + bb_pos) : false;
+  }
+
+  public static int endDataBool(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

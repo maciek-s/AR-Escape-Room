@@ -56,11 +56,6 @@ public final class MaterialTextureDef extends Table {
     builder.startVector(4, numElems, 4);
   }
 
-  public static int endMaterialTextureDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -111,6 +106,11 @@ public final class MaterialTextureDef extends Table {
 
   public ByteBuffer usagePerChannelInByteBuffer(ByteBuffer _bb) {
     return __vector_in_bytebuffer(_bb, 8, 4);
+  }
+
+  public static int endMaterialTextureDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

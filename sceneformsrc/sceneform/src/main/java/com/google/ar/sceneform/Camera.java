@@ -33,25 +33,30 @@ import com.google.ar.sceneform.utilities.Preconditions;
  *   <li>{@link #setWorldRotation(Quaternion)} - Camera's rotation cannot be changed, it is
  *       controlled by the ARCore camera pose.
  * </ul>
- * <p>
+ *
  * All other functionality in Node is supported. You can access the position and rotation of the
  * camera, assign a collision shape to the camera, or add children to the camera. Disabling the
  * camera turns off rendering.
  */
 public class Camera extends Node implements CameraProvider {
+  private final Matrix viewMatrix = new Matrix();
+  private final Matrix projectionMatrix = new Matrix();
+
   private static final float DEFAULT_NEAR_PLANE = 0.01f;
   private static final float DEFAULT_FAR_PLANE = 30.0f;
   private static final int FALLBACK_VIEW_WIDTH = 1920;
   private static final int FALLBACK_VIEW_HEIGHT = 1080;
+
   // Default vertical field of view for non-ar camera.
   private static final float DEFAULT_VERTICAL_FOV_DEGREES = 90.0f;
-  private final Matrix viewMatrix = new Matrix();
-  private final Matrix projectionMatrix = new Matrix();
-  // isArCamera will be true if the Camera is part of an ArSceneView, false otherwise.
-  private final boolean isArCamera;
+
   private float nearPlane = DEFAULT_NEAR_PLANE;
   private float farPlane = DEFAULT_FAR_PLANE;
+
   private float verticalFov = DEFAULT_VERTICAL_FOV_DEGREES;
+
+  // isArCamera will be true if the Camera is part of an ArSceneView, false otherwise.
+  private final boolean isArCamera;
   private boolean areMatricesInitialized;
 
   /**
@@ -81,6 +86,19 @@ public class Camera extends Node implements CameraProvider {
     }
   }
 
+  /**
+   * @hide
+   */
+  public void setNearClipPlane(float nearPlane) {
+    this.nearPlane = nearPlane;
+
+    // If this is an ArCamera, the projection matrix gets re-created when updateTrackedPose is
+    // called every frame. Otherwise, update it now.
+    if (!isArCamera) {
+      refreshProjectionMatrix();
+    }
+  }
+
   @Override
   public float getNearClipPlane() {
     return nearPlane;
@@ -89,8 +107,8 @@ public class Camera extends Node implements CameraProvider {
   /**
    * @hide
    */
-  public void setNearClipPlane(float nearPlane) {
-    this.nearPlane = nearPlane;
+  public void setFarClipPlane(float farPlane) {
+    this.farPlane = farPlane;
 
     // If this is an ArCamera, the projection matrix gets re-created when updateTrackedPose is
     // called every frame. Otherwise, update it now.
@@ -150,41 +168,16 @@ public class Camera extends Node implements CameraProvider {
     return farPlane;
   }
 
-  /**
-   * @hide
-   */
-  public void setFarClipPlane(float farPlane) {
-    this.farPlane = farPlane;
-
-    // If this is an ArCamera, the projection matrix gets re-created when updateTrackedPose is
-    // called every frame. Otherwise, update it now.
-    if (!isArCamera) {
-      refreshProjectionMatrix();
-    }
-  }
-
-  /**
-   * @hide Used internally (b/113516741)
-   */
+  /** @hide Used internally (b/113516741) */
   @Override
   public Matrix getViewMatrix() {
     return viewMatrix;
   }
 
-  /**
-   * @hide Used internally (b/113516741) and within rendering package
-   */
+  /** @hide Used internally (b/113516741) and within rendering package */
   @Override
   public Matrix getProjectionMatrix() {
     return projectionMatrix;
-  }
-
-  /**
-   * @hide Used to explicitly set the projection matrix for testing.
-   */
-  @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-  public void setProjectionMatrix(Matrix matrix) {
-    projectionMatrix.set(matrix.data);
   }
 
   /**
@@ -284,6 +277,14 @@ public class Camera extends Node implements CameraProvider {
     screenPoint.y = viewHeight - screenPoint.y;
 
     return screenPoint;
+  }
+
+  /**
+   * @hide Used to explicitly set the projection matrix for testing.
+   */
+  @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+  public void setProjectionMatrix(Matrix matrix) {
+    projectionMatrix.set(matrix.data);
   }
 
   /**
@@ -442,16 +443,16 @@ public class Camera extends Node implements CameraProvider {
    * greater than zero. aspect must be greater than zero. near and far must be greater than zero.
    *
    * @param verticalFovInDegrees vertical field of view in degrees.
-   * @param aspect               aspect ratio of the viewport, which is widthInPixels / heightInPixels.
-   * @param near                 distance in world units from the camera to the near plane, default is 0.1f
-   * @param far                  distance in world units from the camera to the far plane, default is 100.0f
+   * @param aspect aspect ratio of the viewport, which is widthInPixels / heightInPixels.
+   * @param near distance in world units from the camera to the near plane, default is 0.1f
+   * @param far distance in world units from the camera to the far plane, default is 100.0f
    * @throws IllegalArgumentException if any of the following preconditions are not met:
-   *                                  <ul>
-   *                                    <li>0 < verticalFovInDegrees < 180
-   *                                    <li>aspect > 0
-   *                                    <li>near > 0
-   *                                    <li>far > near
-   *                                  </ul>
+   *     <ul>
+   *       <li>0 < verticalFovInDegrees < 180
+   *       <li>aspect > 0
+   *       <li>near > 0
+   *       <li>far > near
+   *     </ul>
    */
   private void setPerspective(float verticalFovInDegrees, float aspect, float near, float far) {
     if (verticalFovInDegrees <= 0.0f || verticalFovInDegrees >= 180.0f) {

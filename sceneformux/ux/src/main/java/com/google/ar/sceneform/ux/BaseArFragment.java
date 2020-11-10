@@ -72,10 +72,14 @@ import java.util.Set;
 public abstract class BaseArFragment extends Fragment
         implements Scene.OnPeekTouchListener, Scene.OnUpdateListener {
   private static final String TAG = BaseArFragment.class.getSimpleName();
-  private static final int RC_PERMISSIONS = 1010;
+
   @SuppressWarnings({"initialization"})
   private final OnWindowFocusChangeListener onFocusListener =
           (hasFocus -> onWindowFocusChanged(hasFocus));
+  @Nullable
+  private OnSessionInitializationListener onSessionInitializationListener;
+
+  private static final int RC_PERMISSIONS = 1010;
   private boolean installRequested;
   private boolean sessionInitializationFailed = false;
   private ArSceneView arSceneView;
@@ -86,30 +90,11 @@ public abstract class BaseArFragment extends Fragment
   private boolean isStarted;
   private boolean canRequestDangerousPermissions = true;
   @Nullable
-  private OnSessionInitializationListener onSessionInitializationListener;
-  @Nullable
   private OnTapArPlaneListener onTapArPlaneListener;
 
-  /**
-   * Gets the ArSceneView for this fragment.
-   */
+  /** Gets the ArSceneView for this fragment. */
   public ArSceneView getArSceneView() {
     return arSceneView;
-  }
-
-  /**
-   * Gets the plane discovery controller, which displays instructions for how to scan for planes.
-   */
-  public PlaneDiscoveryController getPlaneDiscoveryController() {
-    return planeDiscoveryController;
-  }
-
-  /**
-   * Gets the transformation system, which is used by {@link TransformableNode} for detecting
-   * gestures and coordinating which node is selected.
-   */
-  public TransformationSystem getTransformationSystem() {
-    return transformationSystem;
   }
 
   /**
@@ -121,16 +106,6 @@ public abstract class BaseArFragment extends Fragment
   public void setOnSessionInitializationListener(
           @Nullable OnSessionInitializationListener onSessionInitializationListener) {
     this.onSessionInitializationListener = onSessionInitializationListener;
-  }
-
-  /**
-   * Registers a callback to be invoked when an ARCore Plane is tapped. The callback will only be
-   * invoked if no {@link com.google.ar.sceneform.Node} was tapped.
-   *
-   * @param onTapArPlaneListener the {@link OnTapArPlaneListener} to attach
-   */
-  public void setOnTapArPlaneListener(@Nullable OnTapArPlaneListener onTapArPlaneListener) {
-    this.onTapArPlaneListener = onTapArPlaneListener;
   }
 
   @Override
@@ -185,24 +160,20 @@ public abstract class BaseArFragment extends Fragment
     return frameLayout;
   }
 
-  @Override
-  public void onDestroyView() {
-    super.onDestroyView();
-    arSceneView.getViewTreeObserver().removeOnWindowFocusChangeListener(onFocusListener);
+  /**
+   * Gets the plane discovery controller, which displays instructions for how to scan for planes.
+   */
+  public PlaneDiscoveryController getPlaneDiscoveryController() {
+    return planeDiscoveryController;
   }
 
   /**
-   * Returns true if this application is AR Required, false if AR Optional. This is called when
-   * initializing the application and the session.
+   * Gets the transformation system, which is used by {@link TransformableNode} for detecting
+   * gestures and coordinating which node is selected.
    */
-  public abstract boolean isArRequired();
-
-  /**
-   * Returns an array of dangerous permissions that are required by the app in addition to
-   * Manifest.permission.CAMERA, which is needed by ARCore. If no additional permissions are needed,
-   * an empty array should be returned.
-   */
-  public abstract String[] getAdditionalPermissions();
+  public TransformationSystem getTransformationSystem() {
+    return transformationSystem;
+  }
 
   /**
    * Starts the process of requesting dangerous permissions. This combines the CAMERA permission
@@ -240,6 +211,16 @@ public abstract class BaseArFragment extends Fragment
       // Request the permissions
       requestPermissions(permissions.toArray(new String[permissions.size()]), RC_PERMISSIONS);
     }
+  }
+
+  /**
+   * Registers a callback to be invoked when an ARCore Plane is tapped. The callback will only be
+   * invoked if no {@link com.google.ar.sceneform.Node} was tapped.
+   *
+   * @param onTapArPlaneListener the {@link OnTapArPlaneListener} to attach
+   */
+  public void setOnTapArPlaneListener(@Nullable OnTapArPlaneListener onTapArPlaneListener) {
+    this.onTapArPlaneListener = onTapArPlaneListener;
   }
 
   /**
@@ -295,41 +276,24 @@ public abstract class BaseArFragment extends Fragment
             .show();
   }
 
-  /**
-   * If true, {@link #requestDangerousPermissions()} returns without doing anything, if false
-   * permissions will be requested
-   */
-  protected Boolean getCanRequestDangerousPermissions() {
-    return canRequestDangerousPermissions;
-  }
-
-  /**
-   * If true, {@link #requestDangerousPermissions()} returns without doing anything, if false
-   * permissions will be requested
-   */
-  protected void setCanRequestDangerousPermissions(Boolean canRequestDangerousPermissions) {
-    this.canRequestDangerousPermissions = canRequestDangerousPermissions;
-  }
-
   @Override
-  public void onResume() {
-    super.onResume();
-    if (isArRequired() && arSceneView.getSession() == null) {
-      initializeSession();
-    }
-    start();
+  public void onDestroyView() {
+    super.onDestroyView();
+    arSceneView.getViewTreeObserver().removeOnWindowFocusChangeListener(onFocusListener);
   }
 
-  protected final boolean requestInstall() throws UnavailableException {
-    switch (ArCoreApk.getInstance().requestInstall(requireActivity(), !installRequested)) {
-      case INSTALL_REQUESTED:
-        installRequested = true;
-        return true;
-      case INSTALLED:
-        break;
-    }
-    return false;
-  }
+  /**
+   * Returns true if this application is AR Required, false if AR Optional. This is called when
+   * initializing the application and the session.
+   */
+  public abstract boolean isArRequired();
+
+  /**
+   * Returns an array of dangerous permissions that are required by the app in addition to
+   * Manifest.permission.CAMERA, which is needed by ARCore. If no additional permissions are needed,
+   * an empty array should be returned.
+   */
+  public abstract String[] getAdditionalPermissions();
 
   /**
    * Initializes the ARCore session. The CAMERA permission is checked before checking the
@@ -393,6 +357,43 @@ public abstract class BaseArFragment extends Fragment
   }
 
   /**
+   * If true, {@link #requestDangerousPermissions()} returns without doing anything, if false
+   * permissions will be requested
+   */
+  protected Boolean getCanRequestDangerousPermissions() {
+    return canRequestDangerousPermissions;
+  }
+
+  /**
+   * If true, {@link #requestDangerousPermissions()} returns without doing anything, if false
+   * permissions will be requested
+   */
+  protected void setCanRequestDangerousPermissions(Boolean canRequestDangerousPermissions) {
+    this.canRequestDangerousPermissions = canRequestDangerousPermissions;
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    if (isArRequired() && arSceneView.getSession() == null) {
+      initializeSession();
+    }
+    start();
+  }
+
+
+  protected final boolean requestInstall() throws UnavailableException {
+    switch (ArCoreApk.getInstance().requestInstall(requireActivity(), !installRequested)) {
+      case INSTALL_REQUESTED:
+        installRequested = true;
+        return true;
+      case INSTALLED:
+        break;
+    }
+    return false;
+  }
+
+  /**
    * Creates the ARCore Session with the with features defined in #getSessionFeatures. If this
    * returns null, the Session will be created with the default features.
    */
@@ -440,14 +441,10 @@ public abstract class BaseArFragment extends Fragment
                               Toast.makeText(
                                       getContext(), "Unable to load footprint renderable", Toast.LENGTH_LONG);
                       toast.setGravity(Gravity.CENTER, 0, 0);
-                      toast.show();
-                      return null;
-                    });
+              toast.show();
+              return null;
+            });
   }
-
-  protected abstract void handleSessionException(UnavailableException sessionException);
-
-  protected abstract Config getSessionConfiguration(Session session);
 
   /**
    * Specifies additional features for creating an ARCore {@link com.google.ar.core.Session}. See
@@ -472,6 +469,31 @@ public abstract class BaseArFragment extends Fragment
                               | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
       activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
+  }
+
+  protected abstract void handleSessionException(UnavailableException sessionException);
+
+  protected abstract Config getSessionConfiguration(Session session);
+
+  // Load the default view we use for the plane discovery instructions.
+  @Nullable
+
+  private View loadPlaneDiscoveryView(LayoutInflater inflater, @Nullable ViewGroup container) {
+    return inflater.inflate(R.layout.sceneform_plane_discovery_layout, container, false);
+  }
+
+  /**
+   * Invoked when the ARCore Session is initialized.
+   */
+  public interface OnSessionInitializationListener {
+    /**
+     * The callback will only be invoked once after a Session is initialized and before it is
+     * resumed for the first time.
+     *
+     * @param session The ARCore Session.
+     * @see #setOnSessionInitializationListener(OnTapArPlaneListener)
+     */
+    void onSessionInitialization(Session session);
   }
 
   @Override
@@ -538,11 +560,20 @@ public abstract class BaseArFragment extends Fragment
     arSceneView.pause();
   }
 
-  // Load the default view we use for the plane discovery instructions.
-  @Nullable
-
-  private View loadPlaneDiscoveryView(LayoutInflater inflater, @Nullable ViewGroup container) {
-    return inflater.inflate(R.layout.sceneform_plane_discovery_layout, container, false);
+  /**
+   * Invoked when an ARCore plane is tapped.
+   */
+  public interface OnTapArPlaneListener {
+    /**
+     * Called when an ARCore plane is tapped. The callback will only be invoked if no {@link
+     * com.google.ar.sceneform.Node} was tapped.
+     *
+     * @param hitResult   The ARCore hit result that occurred when tapping the plane
+     * @param plane       The ARCore Plane that was tapped
+     * @param motionEvent the motion event that triggered the tap
+     * @see #setOnTapArPlaneListener(OnTapArPlaneListener)
+     */
+    void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent);
   }
 
   private void onSingleTap(MotionEvent motionEvent) {
@@ -565,35 +596,5 @@ public abstract class BaseArFragment extends Fragment
         }
       }
     }
-  }
-
-  /**
-   * Invoked when the ARCore Session is initialized.
-   */
-  public interface OnSessionInitializationListener {
-    /**
-     * The callback will only be invoked once after a Session is initialized and before it is
-     * resumed for the first time.
-     *
-     * @param session The ARCore Session.
-     * @see #setOnSessionInitializationListener(OnTapArPlaneListener)
-     */
-    void onSessionInitialization(Session session);
-  }
-
-  /**
-   * Invoked when an ARCore plane is tapped.
-   */
-  public interface OnTapArPlaneListener {
-    /**
-     * Called when an ARCore plane is tapped. The callback will only be invoked if no {@link
-     * com.google.ar.sceneform.Node} was tapped.
-     *
-     * @param hitResult   The ARCore hit result that occurred when tapping the plane
-     * @param plane       The ARCore Plane that was tapped
-     * @param motionEvent the motion event that triggered the tap
-     * @see #setOnTapArPlaneListener(OnTapArPlaneListener)
-     */
-    void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent);
   }
 }

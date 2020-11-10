@@ -21,73 +21,67 @@ import com.google.ar.sceneform.utilities.AndroidPreconditions;
 public class ModelRenderable extends Renderable {
 
 
-  private ModelRenderable(Builder builder) {
-    super(builder);
-  }
+    private ModelRenderable(Builder builder) {
+        super(builder);
+    }
 
-  @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
-  private ModelRenderable(ModelRenderable other) {
-    super(other);
+    @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
+    private ModelRenderable(ModelRenderable other) {
+        super(other);
 
-    copyAnimationFrom(other);
-  }
+        copyAnimationFrom(other);
+    }
 
-  /**
-   * Constructs a {@link ModelRenderable}.
-   */
-  public static Builder builder() {
-    AndroidPreconditions.checkMinAndroidApiLevel();
-    return new Builder();
-  }
-
-  private void copyAnimationFrom(ModelRenderable other) {
-    return;
-  }
-
-  /**
-   * Creates a new instance of this ModelRenderable.
-   *
-   * <p>The new renderable will have unique copy of all mutable state. All materials referenced by
-   * the ModelRenderable will also be instanced. Immutable data will be shared between the
-   * instances.
-   */
-  @Override
-  public ModelRenderable makeCopy() {
-    return new ModelRenderable(this);
-  }
-
-  /**
-   * Factory class for {@link ModelRenderable}.
-   */
-  public static final class Builder extends Renderable.Builder<ModelRenderable, Builder> {
 
     /**
-     * @hide
+     * Constructs a {@link ModelRenderable}.
+     */
+    public static Builder builder() {
+        AndroidPreconditions.checkMinAndroidApiLevel();
+        return new Builder();
+    }
+
+
+    /**
+   * Creates a new instance of this ModelRenderable.
+     *
+     * <p>The new renderable will have unique copy of all mutable state. All materials referenced by
+     * the ModelRenderable will also be instanced. Immutable data will be shared between the
+     * instances.
      */
     @Override
-    protected ModelRenderable makeRenderable() {
-      return new ModelRenderable(this);
+    public ModelRenderable makeCopy() {
+        return new ModelRenderable(this);
+    }
+
+    private void copyAnimationFrom(ModelRenderable other) {
+        return;
     }
 
     /**
-     * @hide
+     * Factory class for {@link ModelRenderable}.
      */
-    @Override
+    public static final class Builder extends Renderable.Builder<ModelRenderable, Builder> {
+
+        /** @hide */
+        @Override
+        protected ModelRenderable makeRenderable() {
+            return new ModelRenderable(this);
+        }
+
+        /** @hide */
+        @Override
     protected Class<ModelRenderable> getRenderableClass() {
       return ModelRenderable.class;
     }
 
-    /**
-     * @hide
-     */
+    /** @hide */
     @Override
     protected ResourceRegistry<ModelRenderable> getRenderableRegistry() {
       return ResourceManager.getInstance().getModelRenderableRegistry();
     }
 
-    /**
-     * @hide
-     */
+    /** @hide */
     @Override
     protected Builder getSelf() {
       return this;

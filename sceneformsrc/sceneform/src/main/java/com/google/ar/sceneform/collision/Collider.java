@@ -36,16 +36,12 @@ public class Collider {
     setShape(localCollisionShape);
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public CollisionShape getShape() {
     return localShape;
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void setShape(CollisionShape localCollisionShape) {
     Preconditions.checkNotNull(localCollisionShape, "Parameter \"localCollisionShape\" was null.");
 
@@ -57,18 +53,14 @@ public class Collider {
     return transformProvider;
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   @Nullable
   public CollisionShape getTransformedShape() {
     updateCachedWorldShape();
     return cachedWorldShape;
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void setAttachedCollisionSystem(@Nullable CollisionSystem collisionSystem) {
     if (attachedCollisionSystem != null) {
       attachedCollisionSystem.removeCollider(this);
@@ -81,9 +73,7 @@ public class Collider {
     }
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public void markWorldShapeDirty() {
     isWorldShapeDirty = true;
   }

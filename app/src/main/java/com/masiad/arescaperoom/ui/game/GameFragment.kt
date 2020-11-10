@@ -48,6 +48,8 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     private val placingNode by lazy { Node() }
     private val roomNode by lazy { Node() }
 
+    private val doorNode by lazy { Node() }
+
     private val hitPosition by lazy {
         Pair(arSceneView.width / 2f, arSceneView.height * 0.75f)
     }
@@ -95,8 +97,9 @@ class GameFragment : Fragment(R.layout.game_fragment) {
         viewModel.level.observe(viewLifecycleOwner, { level ->
             lifecycleScope.launch {
                 placingNode.renderable = modelLoader.load(level.placingModelName)
-                //roomNode.renderable = modelLoader.load(level.roomModelName)
-                //prepareEscapeRoom()
+                roomNode.renderable = modelLoader.load(level.roomModelName)
+                doorNode.renderable = modelLoader.load(level.doorModelName)
+                prepareEscapeRoom()
                 viewModel.informPreparingEnded()
             }
         })
@@ -140,14 +143,23 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     }
 
     private fun prepareEscapeRoom() {
-        // todo prepare room inside
+        // TODO: store position in json
+        // ROOM
         // Half scale, future animate to full scale
         roomNode.localScale = Vector3(0.5f, 0.5f, 0.5f)
         // Total 3m, so from center to door 1.5 but half scale -> 0.75
         roomNode.localPosition = Vector3(0f, 0f, -0.75f)
+
+        // DOOR
+        doorNode.setParent(roomNode)
+//        doorNode.localScale = Vector3(0.5f, 0.5f, 0.5f)
+        doorNode.localPosition = Vector3(0f, 0f, 1.5f)
+
+        // TODO INSIDE
     }
 
     private fun showEscapeRoom() {
+        placingNode.setParent(null)
         roomNode.setParent(rootNode)
         arSceneView.setOnClickListener(null)
         arSceneView.updateSceneOnUpdateListener {

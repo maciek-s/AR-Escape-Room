@@ -16,6 +16,27 @@ import java.util.HashMap;
 final class MaterialParameters {
   private final HashMap<String, MaterialParameters.Parameter> namedParameters = new HashMap<>();
 
+
+  @UsedByNative("material_java_wrappers.h")
+  void setBoolean(String name, boolean x) {
+    namedParameters.put(name, new MaterialParameters.BooleanParameter(name, x));
+  }
+
+  boolean getBoolean(String name) {
+    Parameter param = namedParameters.get(name);
+    if (param instanceof BooleanParameter) {
+      BooleanParameter booleanParam = (BooleanParameter) param;
+      return booleanParam.x;
+    }
+
+    return false;
+  }
+
+  @UsedByNative("material_java_wrappers.h")
+  void setBoolean2(String name, boolean x, boolean y) {
+    namedParameters.put(name, new MaterialParameters.Boolean2Parameter(name, x, y));
+  }
+
   private static com.google.android.filament.TextureSampler convertTextureSampler(
           Texture.Sampler sampler) {
     com.google.android.filament.TextureSampler convertedSampler =
@@ -66,6 +87,11 @@ final class MaterialParameters {
     return convertedSampler;
   }
 
+  @UsedByNative("material_java_wrappers.h")
+  void setBoolean3(String name, boolean x, boolean y, boolean z) {
+    namedParameters.put(name, new MaterialParameters.Boolean3Parameter(name, x, y, z));
+  }
+
   private static com.google.android.filament.TextureSampler.WrapMode convertWrapMode(
           Texture.Sampler.WrapMode wrapMode) {
     switch (wrapMode) {
@@ -81,23 +107,8 @@ final class MaterialParameters {
   }
 
   @UsedByNative("material_java_wrappers.h")
-  void setBoolean(String name, boolean x) {
-    namedParameters.put(name, new MaterialParameters.BooleanParameter(name, x));
-  }
-
-  boolean getBoolean(String name) {
-    Parameter param = namedParameters.get(name);
-    if (param instanceof BooleanParameter) {
-      BooleanParameter booleanParam = (BooleanParameter) param;
-      return booleanParam.x;
-    }
-
-    return false;
-  }
-
-  @UsedByNative("material_java_wrappers.h")
-  void setBoolean2(String name, boolean x, boolean y) {
-    namedParameters.put(name, new MaterialParameters.Boolean2Parameter(name, x, y));
+  void setBoolean4(String name, boolean x, boolean y, boolean z, boolean w) {
+    namedParameters.put(name, new MaterialParameters.Boolean4Parameter(name, x, y, z, w));
   }
 
   @Nullable
@@ -106,38 +117,6 @@ final class MaterialParameters {
     if (param instanceof Boolean2Parameter) {
       Boolean2Parameter boolean2 = (Boolean2Parameter) param;
       return new boolean[]{boolean2.x, boolean2.y};
-    }
-
-    return null;
-  }
-
-  @UsedByNative("material_java_wrappers.h")
-  void setBoolean3(String name, boolean x, boolean y, boolean z) {
-    namedParameters.put(name, new MaterialParameters.Boolean3Parameter(name, x, y, z));
-  }
-
-  @Nullable
-  boolean[] getBoolean3(String name) {
-    Parameter param = namedParameters.get(name);
-    if (param instanceof Boolean3Parameter) {
-      Boolean3Parameter boolean3 = (Boolean3Parameter) param;
-      return new boolean[]{boolean3.x, boolean3.y, boolean3.z};
-    }
-
-    return null;
-  }
-
-  @UsedByNative("material_java_wrappers.h")
-  void setBoolean4(String name, boolean x, boolean y, boolean z, boolean w) {
-    namedParameters.put(name, new MaterialParameters.Boolean4Parameter(name, x, y, z, w));
-  }
-
-  @Nullable
-  boolean[] getBoolean4(String name) {
-    Parameter param = namedParameters.get(name);
-    if (param instanceof Boolean4Parameter) {
-      Boolean4Parameter boolean4 = (Boolean4Parameter) param;
-      return new boolean[]{boolean4.x, boolean4.y, boolean4.z, boolean4.w};
     }
 
     return null;
@@ -164,6 +143,33 @@ final class MaterialParameters {
   }
 
   @Nullable
+  boolean[] getBoolean3(String name) {
+    Parameter param = namedParameters.get(name);
+    if (param instanceof Boolean3Parameter) {
+      Boolean3Parameter boolean3 = (Boolean3Parameter) param;
+      return new boolean[]{boolean3.x, boolean3.y, boolean3.z};
+    }
+
+    return null;
+  }
+
+  @UsedByNative("material_java_wrappers.h")
+  void setFloat3(String name, float x, float y, float z) {
+    namedParameters.put(name, new MaterialParameters.Float3Parameter(name, x, y, z));
+  }
+
+  @Nullable
+  boolean[] getBoolean4(String name) {
+    Parameter param = namedParameters.get(name);
+    if (param instanceof Boolean4Parameter) {
+      Boolean4Parameter boolean4 = (Boolean4Parameter) param;
+      return new boolean[]{boolean4.x, boolean4.y, boolean4.z, boolean4.w};
+    }
+
+    return null;
+  }
+
+  @Nullable
   float[] getFloat2(String name) {
     Parameter param = namedParameters.get(name);
     if (param instanceof Float2Parameter) {
@@ -175,40 +181,13 @@ final class MaterialParameters {
   }
 
   @UsedByNative("material_java_wrappers.h")
-  void setFloat3(String name, float x, float y, float z) {
-    namedParameters.put(name, new MaterialParameters.Float3Parameter(name, x, y, z));
+  void setFloat4(String name, float x, float y, float z, float w) {
+    namedParameters.put(name, new MaterialParameters.Float4Parameter(name, x, y, z, w));
   }
 
   void setFloat3(String name, Vector3 value) {
     namedParameters.put(
             name, new MaterialParameters.Float3Parameter(name, value.x, value.y, value.z));
-  }
-
-  @Nullable
-  float[] getFloat3(String name) {
-    Parameter param = namedParameters.get(name);
-    if (param instanceof Float3Parameter) {
-      Float3Parameter float3 = (Float3Parameter) param;
-      return new float[]{float3.x, float3.y, float3.z};
-    }
-
-    return null;
-  }
-
-  @UsedByNative("material_java_wrappers.h")
-  void setFloat4(String name, float x, float y, float z, float w) {
-    namedParameters.put(name, new MaterialParameters.Float4Parameter(name, x, y, z, w));
-  }
-
-  @Nullable
-  float[] getFloat4(String name) {
-    Parameter param = namedParameters.get(name);
-    if (param instanceof Float4Parameter) {
-      Float4Parameter float4 = (Float4Parameter) param;
-      return new float[]{float4.x, float4.y, float4.z, float4.w};
-    }
-
-    return null;
   }
 
   @UsedByNative("material_java_wrappers.h")
@@ -232,11 +211,11 @@ final class MaterialParameters {
   }
 
   @Nullable
-  int[] getInt2(String name) {
+  float[] getFloat3(String name) {
     Parameter param = namedParameters.get(name);
-    if (param instanceof Int2Parameter) {
-      Int2Parameter int2 = (Int2Parameter) param;
-      return new int[]{int2.x, int2.y};
+    if (param instanceof Float3Parameter) {
+      Float3Parameter float3 = (Float3Parameter) param;
+      return new float[]{float3.x, float3.y, float3.z};
     }
 
     return null;
@@ -248,11 +227,11 @@ final class MaterialParameters {
   }
 
   @Nullable
-  int[] getInt3(String name) {
+  float[] getFloat4(String name) {
     Parameter param = namedParameters.get(name);
-    if (param instanceof Int3Parameter) {
-      Int3Parameter int3 = (Int3Parameter) param;
-      return new int[]{int3.x, int3.y, int3.z};
+    if (param instanceof Float4Parameter) {
+      Float4Parameter float4 = (Float4Parameter) param;
+      return new float[]{float4.x, float4.y, float4.z, float4.w};
     }
 
     return null;
@@ -264,11 +243,11 @@ final class MaterialParameters {
   }
 
   @Nullable
-  int[] getInt4(String name) {
+  int[] getInt2(String name) {
     Parameter param = namedParameters.get(name);
-    if (param instanceof Int4Parameter) {
-      Int4Parameter int4 = (Int4Parameter) param;
-      return new int[]{int4.x, int4.y, int4.z, int4.w};
+    if (param instanceof Int2Parameter) {
+      Int2Parameter int2 = (Int2Parameter) param;
+      return new int[]{int2.x, int2.y};
     }
 
     return null;
@@ -289,9 +268,15 @@ final class MaterialParameters {
     return null;
   }
 
-  void setExternalTexture(String name, ExternalTexture externalTexture) {
-    namedParameters.put(
-            name, new MaterialParameters.ExternalTextureParameter(name, externalTexture));
+  @Nullable
+  int[] getInt3(String name) {
+    Parameter param = namedParameters.get(name);
+    if (param instanceof Int3Parameter) {
+      Int3Parameter int3 = (Int3Parameter) param;
+      return new int[]{int3.x, int3.y, int3.z};
+    }
+
+    return null;
   }
 
   @Nullable
@@ -552,6 +537,22 @@ final class MaterialParameters {
     void applyTo(MaterialInstance materialInstance) {
       materialInstance.setParameter(name, x, y, z, w);
     }
+  }
+
+  @Nullable
+  int[] getInt4(String name) {
+    Parameter param = namedParameters.get(name);
+    if (param instanceof Int4Parameter) {
+      Int4Parameter int4 = (Int4Parameter) param;
+      return new int[]{int4.x, int4.y, int4.z, int4.w};
+    }
+
+    return null;
+  }
+
+  void setExternalTexture(String name, ExternalTexture externalTexture) {
+    namedParameters.put(
+            name, new MaterialParameters.ExternalTextureParameter(name, externalTexture));
   }
 
   static class TextureParameter extends MaterialParameters.Parameter {

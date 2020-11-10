@@ -26,12 +26,14 @@ import com.google.ar.sceneform.math.Vector3;
  */
 public class DragGesture extends BaseGesture<DragGesture> {
   private static final String TAG = DragGesture.class.getSimpleName();
+
   private static final float SLOP_INCHES = 0.1f;
-  private static final boolean DRAG_GESTURE_DEBUG = false;
+
   private final Vector3 startPosition;
   private final Vector3 position;
   private final Vector3 delta;
   private final int pointerId;
+  private static final boolean DRAG_GESTURE_DEBUG = false;
 
   public DragGesture(
           GesturePointersUtility gesturePointersUtility,

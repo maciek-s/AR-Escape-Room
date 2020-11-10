@@ -26,8 +26,8 @@ public final class ShapeFactory {
   /**
    * Creates a {@link ModelRenderable} in the shape of a cube with the give specifications.
    *
-   * @param size     the size of the constructed cube
-   * @param center   the center of the constructed cube
+   * @param size the size of the constructed cube
+   * @param center the center of the constructed cube
    * @param material the material to use for rendering the cube
    * @return renderable representing a cube with the given parameters
    */
@@ -140,8 +140,8 @@ public final class ShapeFactory {
   /**
    * Creates a {@link ModelRenderable} in the shape of a sphere with the give specifications.
    *
-   * @param radius   the radius of the constructed sphere
-   * @param center   the center of the constructed sphere
+   * @param radius the radius of the constructed sphere
+   * @param center the center of the constructed sphere
    * @param material the material to use for rendering the sphere
    * @return renderable representing a sphere with the given parameters
    */
@@ -284,7 +284,7 @@ public final class ShapeFactory {
                       .setPosition(lowerPosition)
                       .setNormal(normal)
                       .setUvCoordinate(uvCoordinate)
-                      .build();
+              .build();
       vertices.add(vertex);
 
       // Create a copy of lower vertex with bottom-facing normals for cap.

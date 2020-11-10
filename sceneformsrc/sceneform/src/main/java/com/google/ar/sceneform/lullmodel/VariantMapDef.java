@@ -47,11 +47,6 @@ public final class VariantMapDef extends Table {
     builder.startVector(4, numElems, 4);
   }
 
-  public static int endVariantMapDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -76,6 +71,11 @@ public final class VariantMapDef extends Table {
   public int valuesLength() {
     int o = __offset(4);
     return o != 0 ? __vector_len(o) : 0;
+  }
+
+  public static int endVariantMapDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

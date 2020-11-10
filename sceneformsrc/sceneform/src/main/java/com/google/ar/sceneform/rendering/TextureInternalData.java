@@ -14,9 +14,10 @@ import com.google.ar.sceneform.utilities.AndroidPreconditions;
  */
 @UsedByNative("material_java_wrappers.h")
 public class TextureInternalData extends SharedReference {
-  private final Texture.Sampler sampler;
   @Nullable
   private com.google.android.filament.Texture filamentTexture;
+
+  private final Texture.Sampler sampler;
 
   @UsedByNative("material_java_wrappers.h")
   public TextureInternalData(

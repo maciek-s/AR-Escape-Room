@@ -14,7 +14,6 @@ import com.google.android.filament.RenderableManager;
 import com.google.android.filament.TransformManager;
 import com.google.android.filament.gltfio.AssetLoader;
 import com.google.android.filament.gltfio.FilamentAsset;
-import com.google.android.filament.gltfio.ResourceLoader;
 import com.google.ar.sceneform.collision.Box;
 import com.google.ar.sceneform.common.TransformProvider;
 import com.google.ar.sceneform.math.Matrix;
@@ -40,50 +39,54 @@ import java.util.function.Function;
 @SuppressWarnings("AndroidJdkLibsChecker")
 public class RenderableInstance {
 
-  private static final String TAG = RenderableInstance.class.getSimpleName();
-  private final TransformProvider transformProvider;
-  private final Renderable renderable;
-  int renderableId = ChangeId.EMPTY_ID;
-  @Nullable
-  FilamentAsset filamentAsset;
-  @Nullable
-  private Renderer attachedRenderer;
-  @Entity
-  private int entity = 0;
-  @Entity
-  private int childEntity = 0;
-  @Nullable
-  private SkinningModifier skinningModifier;
-  @Nullable
-  private Matrix cachedRelativeTransform;
-  @Nullable
-  private Matrix cachedRelativeTransformInverse;
+    @Nullable
+    private Renderer attachedRenderer;
 
-  @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
-  public RenderableInstance(TransformProvider transformProvider, Renderable renderable) {
-    Preconditions.checkNotNull(transformProvider, "Parameter \"transformProvider\" was null.");
-    Preconditions.checkNotNull(renderable, "Parameter \"renderable\" was null.");
-    this.transformProvider = transformProvider;
-    this.renderable = renderable;
-    entity = createFilamentEntity(EngineInstance.getEngine());
+    private static final String TAG = RenderableInstance.class.getSimpleName();
 
-    // SFB's can be imported with re-centering or scaling; rather than perform those operations to
-    // the vertices (and bones, &c) at import time, we keep vertex data in the same unit as the
+    private final TransformProvider transformProvider;
+    private final Renderable renderable;
+    @Entity
+    private int entity = 0;
+    @Entity
+    private int childEntity = 0;
+    @Nullable
+    private SkinningModifier skinningModifier;
+    int renderableId = ChangeId.EMPTY_ID;
+
+
+    @Nullable
+    FilamentAsset filamentAsset;
+    @Nullable
+    private Matrix cachedRelativeTransform;
+    @Nullable
+    private Matrix cachedRelativeTransformInverse;
+
+    @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
+    public RenderableInstance(TransformProvider transformProvider, Renderable renderable) {
+        Preconditions.checkNotNull(transformProvider, "Parameter \"transformProvider\" was null.");
+        Preconditions.checkNotNull(renderable, "Parameter \"renderable\" was null.");
+        this.transformProvider = transformProvider;
+        this.renderable = renderable;
+        entity = createFilamentEntity(EngineInstance.getEngine());
+
+        // SFB's can be imported with re-centering or scaling; rather than perform those operations to
+        // the vertices (and bones, &c) at import time, we keep vertex data in the same unit as the
     // source asset and apply at runtime to a child entity via this relative transform.  If we get
     // back null, the relative transform is identity and the child entity path can be skipped.
     @Nullable Matrix relativeTransform = getRelativeTransform();
     if (relativeTransform != null) {
-      childEntity =
-              createFilamentChildEntity(EngineInstance.getEngine(), entity, relativeTransform);
+        childEntity =
+                createFilamentChildEntity(EngineInstance.getEngine(), entity, relativeTransform);
     }
 
     createGltfModelInstance();
 
     createFilamentAssetModelInstance();
 
-    ResourceManager.getInstance()
-            .getRenderableInstanceCleanupRegistry()
-            .register(this, new CleanupCallback(entity, childEntity));
+        ResourceManager.getInstance()
+                .getRenderableInstanceCleanupRegistry()
+                .register(this, new CleanupCallback(entity, childEntity));
   }
 
   @Entity
@@ -95,48 +98,47 @@ public class RenderableInstance {
     return entity;
   }
 
-  @Entity
-  private static int createFilamentChildEntity(
-          IEngine engine, @Entity int entity, Matrix relativeTransform) {
-    EntityManager entityManager = EntityManager.get();
-    @Entity int childEntity = entityManager.create();
-    TransformManager transformManager = engine.getTransformManager();
-    transformManager.create(
-            childEntity, transformManager.getInstance(entity), relativeTransform.data);
-    return childEntity;
-  }
+    @Entity
+    private static int createFilamentChildEntity(
+            IEngine engine, @Entity int entity, Matrix relativeTransform) {
+        EntityManager entityManager = EntityManager.get();
+        @Entity int childEntity = entityManager.create();
+        TransformManager transformManager = engine.getTransformManager();
+        transformManager.create(
+                childEntity, transformManager.getInstance(entity), relativeTransform.data);
+        return childEntity;
+    }
 
   void createFilamentAssetModelInstance() {
     if (renderable.getRenderableData() instanceof RenderableInternalFilamentAssetData) {
-      RenderableInternalFilamentAssetData renderableData =
-              (RenderableInternalFilamentAssetData) renderable.getRenderableData();
+        RenderableInternalFilamentAssetData renderableData =
+                (RenderableInternalFilamentAssetData) renderable.getRenderableData();
 
-      Engine engine = EngineInstance.getEngine().getFilamentEngine();
+        Engine engine = EngineInstance.getEngine().getFilamentEngine();
 
-      AssetLoader loader =
-              new AssetLoader(
-                      engine,
-                      RenderableInternalFilamentAssetData.getMaterialProvider(),
-                      EntityManager.get());
+        AssetLoader loader =
+                new AssetLoader(
+                        engine,
+                        RenderableInternalFilamentAssetData.getMaterialProvider(),
+                        EntityManager.get());
 
-      FilamentAsset createdAsset = loader.createAssetFromBinary(renderableData.gltfByteBuffer);
+        FilamentAsset createdAsset = renderableData.isGltfBinary ? loader.createAssetFromBinary(renderableData.gltfByteBuffer)
+                : loader.createAssetFromJson(renderableData.gltfByteBuffer);
 
-      if (createdAsset == null) {
-        throw new IllegalStateException("Failed to load gltf");
+        if (createdAsset == null) {
+            throw new IllegalStateException("Failed to load gltf");
+        }
+
+        if (renderable.collisionShape == null) {
+            com.google.android.filament.Box box = createdAsset.getBoundingBox();
+            float[] halfExtent = box.getHalfExtent();
+            float[] center = box.getCenter();
+            renderable.collisionShape =
+                    new Box(
+                            new Vector3(halfExtent[0], halfExtent[1], halfExtent[2]).scaled(2.0f),
+                            new Vector3(center[0], center[1], center[2]));
       }
 
-      if (renderable.collisionShape == null) {
-        com.google.android.filament.Box box = createdAsset.getBoundingBox();
-        float[] halfExtent = box.getHalfExtent();
-        float[] center = box.getCenter();
-        renderable.collisionShape =
-                new Box(
-                        new Vector3(halfExtent[0], halfExtent[1], halfExtent[2]).scaled(2.0f),
-                        new Vector3(center[0], center[1], center[2]));
-      }
-
-      ResourceLoader resourceLoader = new ResourceLoader(engine);
-      Preconditions.checkState(createdAsset.getResourceUris().length == 0);
       Function<String, Uri> urlResolver = renderableData.urlResolver;
       for (String uri : createdAsset.getResourceUris()) {
         if (urlResolver == null) {
@@ -145,9 +147,9 @@ public class RenderableInstance {
         }
         Uri dataUri = urlResolver.apply(uri);
         try {
-          Callable<InputStream> callable = LoadHelper.fromUri(renderableData.context, dataUri);
-          resourceLoader.addResourceData(
-                  uri, ByteBuffer.wrap(SceneformBufferUtils.inputStreamCallableToByteArray(callable)));
+            Callable<InputStream> callable = LoadHelper.fromUri(renderableData.context, dataUri);
+            renderableData.resourceLoader.addResourceData(
+                    uri, ByteBuffer.wrap(SceneformBufferUtils.inputStreamCallableToByteArray(callable)));
         } catch (Exception e) {
           Log.e(TAG, "Failed to download data uri " + dataUri, e);
         }
@@ -166,62 +168,62 @@ public class RenderableInstance {
     }
   }
 
-  void createGltfModelInstance() {
-    return;
-  }
+    void createGltfModelInstance() {
+        return;
+    }
 
-  @Nullable
+    /**
+     * Get the {@link Renderable} to display for this {@link RenderableInstance}.
+     *
+     * @return {@link Renderable} asset, usually a 3D model.
+     */
+    public Renderable getRenderable() {
+        return renderable;
+    }
 
-  public FilamentAsset getFilamentAsset() {
-    return filamentAsset;
-  }
+    @Nullable
 
-  /**
-   * Get the {@link Renderable} to display for this {@link RenderableInstance}.
-   *
-   * @return {@link Renderable} asset, usually a 3D model.
-   */
-  public Renderable getRenderable() {
-    return renderable;
-  }
+    public FilamentAsset getFilamentAsset() {
+        return filamentAsset;
+    }
 
-  public @Entity
-  int getEntity() {
-    return entity;
-  }
+    public @Entity
+    int getEntity() {
+        return entity;
+    }
 
-  public @Entity
-  int getRenderedEntity() {
-    return (childEntity == 0) ? entity : childEntity;
-  }
+    void setModelMatrix(TransformManager transformManager, @Size(min = 16) float[] transform) {
+        // Use entity, rather than childEntity; setting the latter would slam the local transform which
+        // corrects for scaling and offset.
+        @EntityInstance int instance = transformManager.getInstance(entity);
+        transformManager.setTransform(instance, transform);
+    }
 
-  void setModelMatrix(TransformManager transformManager, @Size(min = 16) float[] transform) {
-    // Use entity, rather than childEntity; setting the latter would slam the local transform which
-    // corrects for scaling and offset.
-    @EntityInstance int instance = transformManager.getInstance(entity);
-    transformManager.setTransform(instance, transform);
-  }
+    public @Entity
+    int getRenderedEntity() {
+        return (childEntity == 0) ? entity : childEntity;
+    }
 
-  /**
-   * @hide
-   */
-  public Matrix getWorldModelMatrix() {
-    return renderable.getFinalModelMatrix(transformProvider.getWorldModelMatrix());
-  }
+    public void setSkinningModifier(@Nullable SkinningModifier skinningModifier) {
+        this.skinningModifier = skinningModifier;
+    }
 
-  public void setSkinningModifier(@Nullable SkinningModifier skinningModifier) {
-    this.skinningModifier = skinningModifier;
-  }
+    /**
+     * @hide
+     */
+    public Matrix getWorldModelMatrix() {
+        return renderable.getFinalModelMatrix(transformProvider.getWorldModelMatrix());
+    }
 
-  private void setupSkeleton(IRenderableInternalData renderableInternalData) {
-    return;
-  }
+    private void setupSkeleton(IRenderableInternalData renderableInternalData) {
+        return;
+    }
 
-  /**
-   * @hide
-   */
-  public void prepareForDraw() {
-    renderable.prepareForDraw();
+    /**
+     * @hide
+     */
+    public void prepareForDraw() {
+        renderable.prepareForDraw();
 
     ChangeId changeId = renderable.getId();
     if (changeId.checkChanged(renderableId)) {
@@ -243,55 +245,44 @@ public class RenderableInstance {
     FilamentAsset currentFilamentAsset = filamentAsset;
     if (currentFilamentAsset != null) {
       int[] entities = currentFilamentAsset.getEntities();
-      Preconditions.checkNotNull(attachedRenderer)
-              .getFilamentScene()
-              .addEntity(currentFilamentAsset.getRoot());
-      Preconditions.checkNotNull(attachedRenderer).getFilamentScene().addEntities(entities);
+        Preconditions.checkNotNull(attachedRenderer)
+                .getFilamentScene()
+                .addEntity(currentFilamentAsset.getRoot());
+        Preconditions.checkNotNull(attachedRenderer).getFilamentScene().addEntities(entities);
     }
   }
 
-  /**
-   * @hide
-   */
-  public void attachToRenderer(Renderer renderer) {
-    renderer.addInstance(this);
-    attachedRenderer = renderer;
-    renderable.attachToRenderer(renderer);
-    attachFilamentAssetToRenderer();
-  }
-
+  
   void detachFilamentAssetFromRenderer() {
     FilamentAsset currentFilamentAsset = filamentAsset;
-    if (currentFilamentAsset != null) {
-      int[] entities = currentFilamentAsset.getEntities();
-      for (int entity : entities) {
-        Preconditions.checkNotNull(attachedRenderer).getFilamentScene().removeEntity(entity);
+      if (currentFilamentAsset != null) {
+          int[] entities = currentFilamentAsset.getEntities();
+          for (int entity : entities) {
+              Preconditions.checkNotNull(attachedRenderer).getFilamentScene().removeEntity(entity);
+          }
+          int root = currentFilamentAsset.getRoot();
+          Preconditions.checkNotNull(attachedRenderer).getFilamentScene().removeEntity(root);
       }
-      int root = currentFilamentAsset.getRoot();
-      Preconditions.checkNotNull(attachedRenderer).getFilamentScene().removeEntity(root);
-    }
   }
 
-  /**
-   * @hide
-   */
-  public void detachFromRenderer() {
-    Renderer rendererToDetach = attachedRenderer;
-    if (rendererToDetach != null) {
-      detachFilamentAssetFromRenderer();
-      rendererToDetach.removeInstance(this);
-      renderable.detatchFromRenderer();
+    /**
+     * @hide
+     */
+    public void attachToRenderer(Renderer renderer) {
+        renderer.addInstance(this);
+        attachedRenderer = renderer;
+        renderable.attachToRenderer(renderer);
+        attachFilamentAssetToRenderer();
     }
-  }
 
-  /**
-   * Returns the transform of this renderable relative to it's node. This will be non-null if the
-   * .sfa file includes a scale other than 1 or has recentering turned on.
-   *
-   * @hide
-   */
-  @Nullable
-  public Matrix getRelativeTransform() {
+    /**
+     * Returns the transform of this renderable relative to it's node. This will be non-null if the
+     * .sfa file includes a scale other than 1 or has recentering turned on.
+     *
+     * @hide
+     */
+    @Nullable
+    public Matrix getRelativeTransform() {
     if (cachedRelativeTransform != null) {
       return cachedRelativeTransform;
     }
@@ -318,50 +309,61 @@ public class RenderableInstance {
   @Nullable
   public Matrix getRelativeTransformInverse() {
     if (cachedRelativeTransformInverse != null) {
+        return cachedRelativeTransformInverse;
+    }
+
+      Matrix relativeTransform = getRelativeTransform();
+      if (relativeTransform == null) {
+          return null;
+      }
+
+      cachedRelativeTransformInverse = new Matrix();
+      Matrix.invert(relativeTransform, cachedRelativeTransformInverse);
       return cachedRelativeTransformInverse;
-    }
-
-    Matrix relativeTransform = getRelativeTransform();
-    if (relativeTransform == null) {
-      return null;
-    }
-
-    cachedRelativeTransformInverse = new Matrix();
-    Matrix.invert(relativeTransform, cachedRelativeTransformInverse);
-    return cachedRelativeTransformInverse;
   }
-
-  private void updateSkinning(boolean force) {
-    return;
-  }
-
-  void setBlendOrderAt(int index, int blendOrder) {
-    RenderableManager renderableManager = EngineInstance.getEngine().getRenderableManager();
-    @EntityInstance int renderableInstance = renderableManager.getInstance(getRenderedEntity());
-    renderableManager.setBlendOrderAt(renderableInstance, index, blendOrder);
-  }
-
-  /**
-   * Interface for modifying the bone transforms for this specific RenderableInstance. Used by
-   * {@link com.google.ar.sceneform.SkeletonNode} to make it possible to control a bone by moving a
-   * node.
-   */
-  public interface SkinningModifier {
 
     /**
-     * Takes the original boneTransforms and output new boneTransforms used to render the mesh.
-     *
-     * @param originalBuffer contains the bone transforms from the current animation state of the
-     *                       skeleton, buffer is read only
+     * @hide
+     */
+    public void detachFromRenderer() {
+        Renderer rendererToDetach = attachedRenderer;
+        if (rendererToDetach != null) {
+            detachFilamentAssetFromRenderer();
+            rendererToDetach.removeInstance(this);
+            renderable.detatchFromRenderer();
+        }
+    }
+
+
+    void setBlendOrderAt(int index, int blendOrder) {
+        RenderableManager renderableManager = EngineInstance.getEngine().getRenderableManager();
+        @EntityInstance int renderableInstance = renderableManager.getInstance(getRenderedEntity());
+        renderableManager.setBlendOrderAt(renderableInstance, index, blendOrder);
+    }
+
+    private void updateSkinning(boolean force) {
+        return;
+    }
+
+    /**
+     * Interface for modifying the bone transforms for this specific RenderableInstance. Used by
+     * {@link com.google.ar.sceneform.SkeletonNode} to make it possible to control a bone by moving a
+     * node.
+     */
+    public interface SkinningModifier {
+
+        /**
+         * Takes the original boneTransforms and output new boneTransforms used to render the mesh.
+         *
+         * @param originalBuffer contains the bone transforms from the current animation state of the
+     *     skeleton, buffer is read only
      */
     FloatBuffer modifyMaterialBoneTransformsBuffer(FloatBuffer originalBuffer);
 
-    boolean isModifiedSinceLastRender();
+        boolean isModifiedSinceLastRender();
   }
 
-  /**
-   * Releases resources held by a {@link RenderableInstance}
-   */
+  /** Releases resources held by a {@link RenderableInstance} */
   private static final class CleanupCallback implements Runnable {
     private final int childEntity;
     private final int entity;

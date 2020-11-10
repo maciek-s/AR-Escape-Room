@@ -55,9 +55,7 @@ public class CleanupRegistry<T> implements ResourceHolder {
     return cleanupItemHashSet.size();
   }
 
-  /**
-   * Ignores reference count and releases any associated resources
-   */
+  /** Ignores reference count and releases any associated resources */
   @Override
   public void destroyAllResources() {
     Iterator<CleanupItem<T>> iterator = cleanupItemHashSet.iterator();

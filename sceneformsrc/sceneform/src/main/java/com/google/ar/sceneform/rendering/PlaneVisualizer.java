@@ -19,21 +19,25 @@ import java.util.concurrent.ExecutionException;
  */
 class PlaneVisualizer implements TransformProvider {
   private static final String TAG = PlaneVisualizer.class.getSimpleName();
+
+  private final Plane plane;
+  private final Renderer renderer;
+
+  private final Matrix planeMatrix = new Matrix();
+
+  private boolean isPlaneAddedToScene = false;
+  private boolean isEnabled = false;
+  private boolean isShadowReceiver = false;
+  private boolean isVisible = false;
+
   private static final int VERTS_PER_BOUNDARY_VERT = 2;
   // Feather distance 0.2 meters.
   private static final float FEATHER_LENGTH = 0.2f;
   // Feather scale over the distance between plane center and vertices.
   private static final float FEATHER_SCALE = 0.2f;
-  private final Plane plane;
-  private final Renderer renderer;
-  private final Matrix planeMatrix = new Matrix();
   private final ArrayList<Vertex> vertices = new ArrayList<>();
   private final ArrayList<Integer> triangleIndices = new ArrayList<>();
   private final RenderableDefinition renderableDefinition;
-  private boolean isPlaneAddedToScene = false;
-  private boolean isEnabled = false;
-  private boolean isShadowReceiver = false;
-  private boolean isVisible = false;
   @Nullable
   private ModelRenderable planeRenderable = null;
   @Nullable
@@ -42,13 +46,6 @@ class PlaneVisualizer implements TransformProvider {
   private Submesh planeSubmesh;
   @Nullable
   private Submesh shadowSubmesh;
-
-  PlaneVisualizer(Plane plane, Renderer renderer) {
-    this.plane = plane;
-    this.renderer = renderer;
-
-    renderableDefinition = RenderableDefinition.builder().setVertices(vertices).build();
-  }
 
   public void setEnabled(boolean enabled) {
     if (isEnabled != enabled) {
@@ -69,6 +66,13 @@ class PlaneVisualizer implements TransformProvider {
       isVisible = visible;
       updatePlane();
     }
+  }
+
+  PlaneVisualizer(Plane plane, Renderer renderer) {
+    this.plane = plane;
+    this.renderer = renderer;
+
+    renderableDefinition = RenderableDefinition.builder().setVertices(vertices).build();
   }
 
   Plane getPlane() {

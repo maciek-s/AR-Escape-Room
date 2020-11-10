@@ -101,11 +101,12 @@ public class LightProbe {
   private static final int[] ENVIRONMENTAL_HDR_TO_FILAMENT_SH_INDEX_MAP = {
           0, 1, 2, 3, 4, 5, 7, 6, 8
   };
-  private final Color colorCorrection = new Color(1f, 1f, 1f);
-  private final Color ambientColor = new Color();
+
   private ByteBuffer cubemapBuffer = ByteBuffer.allocate(10000);
   @Nullable
   private Texture reflectCubemap = null;
+  private final Color colorCorrection = new Color(1f, 1f, 1f);
+  private final Color ambientColor = new Color();
   private float[] irradianceData;
   @Nullable
   private String name = null;
@@ -124,10 +125,28 @@ public class LightProbe {
   }
 
   /**
+   * Set the overall intensity of the indirect light.
+   *
+   * @param intensity the intensity of indirect lighting, the default is 220.0
+   */
+  public void setIntensity(float intensity) {
+    this.intensity = intensity;
+  }
+
+  /**
    * Constructs a default LightProbe, if nothing else is set
    */
   public static Builder builder() {
     return new Builder();
+  }
+
+  /**
+   * Sets the rotation of the indirect light.
+   *
+   * @param rotation the rotation of the indirect light, identity when null
+   */
+  public void setRotation(@Nullable Quaternion rotation) {
+    this.rotation = rotation;
   }
 
   private static Texture loadReflectCubemapFromLightingDef(LightingDef lightingDef) {
@@ -219,6 +238,10 @@ public class LightProbe {
     return filamentTexture;
   }
 
+  int getId() {
+    return changeId.get();
+  }
+
   private static float[] quaternionToRotationMatrix(Quaternion quaternion) {
     Matrix matrix = new Matrix();
     matrix.makeRotation(quaternion);
@@ -240,41 +263,15 @@ public class LightProbe {
     return floatArray;
   }
 
-  /**
-   * Get the overall intensity of the indirect light.
-   */
+  /** Get the overall intensity of the indirect light. */
   public float getIntensity() {
     return intensity;
   }
 
-  /**
-   * Set the overall intensity of the indirect light.
-   *
-   * @param intensity the intensity of indirect lighting, the default is 220.0
-   */
-  public void setIntensity(float intensity) {
-    this.intensity = intensity;
-  }
-
-  /**
-   * Gets the rotation of the indirect light, identity if null.
-   */
+  /** Gets the rotation of the indirect light, identity if null. */
   @Nullable
   public Quaternion getRotation() {
     return rotation;
-  }
-
-  /**
-   * Sets the rotation of the indirect light.
-   *
-   * @param rotation the rotation of the indirect light, identity when null
-   */
-  public void setRotation(@Nullable Quaternion rotation) {
-    this.rotation = rotation;
-  }
-
-  int getId() {
-    return changeId.get();
   }
 
   /**
@@ -282,6 +279,17 @@ public class LightProbe {
    */
   public boolean isReady() {
     return !changeId.isEmpty();
+  }
+
+  @Override
+  protected void finalize() throws Throwable {
+    try {
+      ThreadPools.getMainExecutor().execute(() -> dispose());
+    } catch (Exception e) {
+      Log.e(TAG, "Error while Finalizing Light Probe.", e);
+    } finally {
+      super.finalize();
+    }
   }
 
   /**
@@ -321,6 +329,15 @@ public class LightProbe {
       throw new IllegalStateException("Light Probe is invalid.");
     }
     return indirectLight;
+  }
+
+  private void setCubeMapFromTexture(com.google.android.filament.Texture nextCubemap) {
+    com.google.android.filament.Texture prevTexture = reflectCubemap;
+    IEngine engine = EngineInstance.getEngine();
+    if (prevTexture != null && engine != null && engine.isValid()) {
+      engine.destroyTexture(prevTexture);
+    }
+    reflectCubemap = nextCubemap;
   }
 
   private void buildFilamentResource(LightingDef lightingDef) {
@@ -367,15 +384,16 @@ public class LightProbe {
     ambientColor.set(irradianceData[0], irradianceData[1], irradianceData[2]);
   }
 
-  @Override
-  protected void finalize() throws Throwable {
-    try {
-      ThreadPools.getMainExecutor().execute(() -> dispose());
-    } catch (Exception e) {
-      Log.e(TAG, "Error while Finalizing Light Probe.", e);
-    } finally {
-      super.finalize();
-    }
+  /**
+   * Modify light intensity using ArCore light estimation. ArCore light estimation is not compatible
+   * with Environmental HDR, only one may be used.
+   *
+   * @hide
+   */
+  public void setLightEstimate(Color colorCorrection, float estimate) {
+    // Scale and bias the estimate to avoid over darkening.
+    lightEstimate = Math.min(estimate * LIGHT_ESTIMATE_SCALE + LIGHT_ESTIMATE_OFFSET, 1.0f);
+    this.colorCorrection.set(colorCorrection);
   }
 
   /**
@@ -388,15 +406,6 @@ public class LightProbe {
     setCubeMapFromTexture(null);
 
     changeId = new ChangeId();
-  }
-
-  private void setCubeMapFromTexture(com.google.android.filament.Texture nextCubemap) {
-    com.google.android.filament.Texture prevTexture = reflectCubemap;
-    IEngine engine = EngineInstance.getEngine();
-    if (prevTexture != null && engine != null && engine.isValid()) {
-      engine.destroyTexture(prevTexture);
-    }
-    reflectCubemap = nextCubemap;
   }
 
   /**
@@ -435,24 +444,12 @@ public class LightProbe {
       irradianceData[destIndex * 3 + 2] =
               sphericalHarmonics[srcIndex * 3 + 2]
                       * ENVIRONMENTAL_HDR_TO_FILAMENT_SH_COEFFIECIENTS[destIndex]
-                      * scaleFactor;
+              * scaleFactor;
     }
     ambientColor.set(irradianceData[0], irradianceData[1], irradianceData[2]);
     this.colorCorrection.set(new Color(1, 1, 1));
     this.lightEstimate = environmentalHdrParameters.getReflectionScaleForFilament();
     this.intensity = 1.0f;
-  }
-
-  /**
-   * Modify light intensity using ArCore light estimation. ArCore light estimation is not compatible
-   * with Environmental HDR, only one may be used.
-   *
-   * @hide
-   */
-  public void setLightEstimate(Color colorCorrection, float estimate) {
-    // Scale and bias the estimate to avoid over darkening.
-    lightEstimate = Math.min(estimate * LIGHT_ESTIMATE_SCALE + LIGHT_ESTIMATE_OFFSET, 1.0f);
-    this.colorCorrection.set(colorCorrection);
   }
 
   /**
@@ -525,21 +522,21 @@ public class LightProbe {
               }
 
               return lightingDef;
-            },
-            ThreadPools.getThreadPoolExecutor());
+        },
+        ThreadPools.getThreadPoolExecutor());
   }
 
   public void setCubeMap(Image[] cubemapImageArray) {
     // TODO: Update once Filament updates past v1.3.0.
     if (cubemapImageArray.length != CUBEMAP_FACE_COUNT) {
       throw new IllegalArgumentException(
-              "Unexpected cubemap array length: " + cubemapImageArray.length);
+          "Unexpected cubemap array length: " + cubemapImageArray.length);
     }
 
     int width = cubemapImageArray[0].getWidth();
     int height = cubemapImageArray[0].getHeight();
     int bufferCapacity =
-            width * height * CUBEMAP_FACE_COUNT * RGB_CHANNEL_COUNT * BYTES_PER_FLOAT16;
+        width * height * CUBEMAP_FACE_COUNT * RGB_CHANNEL_COUNT * BYTES_PER_FLOAT16;
     if (cubemapBuffer.capacity() < bufferCapacity) {
       cubemapBuffer = ByteBuffer.allocate(bufferCapacity);
     } else {
@@ -552,22 +549,22 @@ public class LightProbe {
       Image.Plane[] planes = cubemapImageArray[i].getPlanes();
       if (planes.length != 1) {
         throw new IllegalArgumentException(
-                "Unexpected number of Planes in cubemap Image array: " + planes.length);
+            "Unexpected number of Planes in cubemap Image array: " + planes.length);
       }
       Image.Plane currentPlane = planes[0];
       if (currentPlane.getPixelStride() != RGBA_BYTES_PER_PIXEL) {
         throw new IllegalArgumentException(
                 "Unexpected pixel stride in cubemap data: expected "
                         + RGBA_BYTES_PER_PIXEL
-                        + ", got "
-                        + currentPlane.getPixelStride());
+                + ", got "
+                + currentPlane.getPixelStride());
       }
       if (currentPlane.getRowStride() != width * RGBA_BYTES_PER_PIXEL) {
         throw new IllegalArgumentException(
                 "Unexpected row stride in cubemap data: expected "
                         + (width * RGBA_BYTES_PER_PIXEL)
-                        + ", got "
-                        + currentPlane.getRowStride());
+                + ", got "
+                + currentPlane.getRowStride());
       }
       ByteBuffer rgbaBuffer = currentPlane.getBuffer();
       while (rgbaBuffer.hasRemaining()) {
@@ -609,15 +606,11 @@ public class LightProbe {
    */
   @SuppressWarnings("AndroidApiChecker") // java.util.concurrent.CompletableFuture
   public static final class Builder {
-    /**
-     * The {@link LightProbe} will be constructed from the contents of this callable
-     */
+    /** The {@link LightProbe} will be constructed from the contents of this callable */
     @Nullable
     private Callable<InputStream> inputStreamCreator = null;
 
-    /**
-     * intensity of the indirect lighting
-     */
+    /** intensity of the indirect lighting */
     private float intensity = 220.0f;
 
     @Nullable
@@ -630,9 +623,7 @@ public class LightProbe {
     @Nullable
     private String name = null;
 
-    /**
-     * Constructor for asynchronous building.
-     */
+    /** Constructor for asynchronous building. */
     private Builder() {
     }
 
@@ -670,7 +661,7 @@ public class LightProbe {
      * Allows a {@link LightProbe} to be constructed from {@link Uri}. Construction will be
      * asynchronous.
      *
-     * @param context   a context used for loading the resource
+     * @param context a context used for loading the resource
      * @param sourceUri a remote Uri or android resource Uri.
      * @hide Hide until we have a documented way to build custom light probes.
      */
@@ -685,7 +676,7 @@ public class LightProbe {
      * Allows a {@link LightProbe} to be constructed from resource. Construction will be
      * asynchronous.
      *
-     * @param context  a context used for loading the resource
+     * @param context a context used for loading the resource
      * @param resource an android resource with raw type.
      */
     public Builder setSource(Context context, int resource) {
@@ -700,15 +691,13 @@ public class LightProbe {
      */
     public Builder setSource(Callable<InputStream> inputStreamCreator) {
       Preconditions.checkNotNull(
-              inputStreamCreator, "Parameter \"sourceInputStreamCallable\" was null.");
+          inputStreamCreator, "Parameter \"sourceInputStreamCallable\" was null.");
 
       this.inputStreamCreator = inputStreamCreator;
       return this;
     }
 
-    /**
-     * Creates a new {@link LightProbe} based on the parameters set previously
-     */
+    /** Creates a new {@link LightProbe} based on the parameters set previously */
     @SuppressWarnings("FutureReturnValueIgnored") // CompletableFuture
     public CompletableFuture<LightProbe> build() {
       // At this point sourceInputStreamCallable should never be null.
@@ -725,15 +714,15 @@ public class LightProbe {
                                 // Call to buildFilamentResource on the Filament thread
                                 lightProbe.buildFilamentResource(lightingDef);
                                 return lightProbe;
-                              },
-                              ThreadPools.getMainExecutor());
+                  },
+                  ThreadPools.getMainExecutor());
 
       if (result == null) {
         throw new IllegalStateException("CompletableFuture result is null.");
       }
 
       return FutureHelper.logOnException(
-              TAG, result, "Unable to load LightProbe: name='" + name + "'");
+          TAG, result, "Unable to load LightProbe: name='" + name + "'");
     }
   }
 }

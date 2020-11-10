@@ -49,11 +49,6 @@ public final class DataBytes extends Table {
     builder.startVector(1, numElems, 1);
   }
 
-  public static int endDataBytes(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -82,6 +77,11 @@ public final class DataBytes extends Table {
 
   public ByteBuffer valueInByteBuffer(ByteBuffer _bb) {
     return __vector_in_bytebuffer(_bb, 4, 1);
+  }
+
+  public static int endDataBytes(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

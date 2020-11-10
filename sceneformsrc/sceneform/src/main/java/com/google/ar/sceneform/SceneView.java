@@ -26,10 +26,11 @@ import com.google.ar.sceneform.utilities.Preconditions;
  */
 public class SceneView extends SurfaceView implements Choreographer.FrameCallback {
   private static final String TAG = SceneView.class.getSimpleName();
-  private final FrameTime frameTime = new FrameTime();
+
   // Used to track high-level performance metrics for Sceneform
   private final MovingAverageMillisecondsTracker frameTotalTracker =
           new MovingAverageMillisecondsTracker();
+  private final FrameTime frameTime = new FrameTime();
   private final MovingAverageMillisecondsTracker frameUpdateTracker =
           new MovingAverageMillisecondsTracker();
   private final MovingAverageMillisecondsTracker frameRenderTracker =
@@ -41,13 +42,12 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
   private boolean isInitialized = false;
   @Nullable
   private Color backgroundColor;
-  private AnimationTimeTransformer animationTimeTransformer = frameTime -> frameTime;
 
   /**
    * Constructs a SceneView object and binds it to an Android Context.
    *
-   * @param context the Android Context to use
    * @see #SceneView(Context, AttributeSet)
+   * @param context the Android Context to use
    */
   @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
   public SceneView(Context context) {
@@ -55,11 +55,13 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
     initialize();
   }
 
+  private AnimationTimeTransformer animationTimeTransformer = frameTime -> frameTime;
+
   /**
    * Constructs a SceneView object and binds it to an Android Context.
    *
    * @param context the Android Context to use
-   * @param attrs   the Android AttributeSet to associate with
+   * @param attrs the Android AttributeSet to associate with
    */
   @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
   public SceneView(Context context, AttributeSet attrs) {
@@ -76,19 +78,6 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
 
   public static void destroyAllResources() {
     Renderer.destroyAllResources();
-  }
-
-  /**
-   * Releases rendering resources ready for garbage collection
-   *
-   * <p>Called every frame to collect unused resources. May be called manually to release resources
-   * after rendering has stopped.
-   *
-   * @return Count of resources currently in use
-   */
-
-  public static long reclaimReleasedResources() {
-    return Renderer.reclaimReleasedResources();
   }
 
   @SuppressLint("ClickableViewAccessibility")
@@ -129,15 +118,16 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
   }
 
   /**
-   * @hide
+   * Releases rendering resources ready for garbage collection
+   *
+   * <p>Called every frame to collect unused resources. May be called manually to release resources
+   * after rendering has stopped.
+   *
+   * @return Count of resources currently in use
    */
-  @Override
-  public void onLayout(boolean changed, int left, int top, int right, int bottom) {
-    super.onLayout(changed, left, top, right, bottom);
 
-    int width = right - left;
-    int height = bottom - top;
-    Preconditions.checkNotNull(renderer).setDesiredSize(width, height);
+  public static long reclaimReleasedResources() {
+    return Renderer.reclaimReleasedResources();
   }
 
   /**
@@ -182,12 +172,15 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
   }
 
   /**
-   * If enabled, provides various visualizations for debugging.
-   *
-   * @param enable True to enable debugging visualizations, false to disable it.
+   * @hide
    */
-  public void enableDebug(boolean enable) {
-    debugEnabled = enable;
+  @Override
+  public void onLayout(boolean changed, int left, int top, int right, int bottom) {
+    super.onLayout(changed, left, top, right, bottom);
+
+    int width = right - left;
+    int height = bottom - top;
+    Preconditions.checkNotNull(renderer).setDesiredSize(width, height);
   }
 
   /**
@@ -198,13 +191,12 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
   }
 
   /**
-   * Returns the renderer used for this view, or null if the renderer is not setup.
+   * If enabled, provides various visualizations for debugging.
    *
-   * @hide Not a public facing API for version 1.0
+   * @param enable True to enable debugging visualizations, false to disable it.
    */
-  @Nullable
-  public Renderer getRenderer() {
-    return renderer;
+  public void enableDebug(boolean enable) {
+    debugEnabled = enable;
   }
 
   /**
@@ -212,6 +204,16 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
    */
   public Scene getScene() {
     return scene;
+  }
+
+  /**
+   * Returns the renderer used for this view, or null if the renderer is not setup.
+   *
+   * @hide Not a public facing API for version 1.0
+   */
+  @Nullable
+  public Renderer getRenderer() {
+    return renderer;
   }
 
   /**
@@ -235,6 +237,10 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
     if (renderer != null) {
       renderer.startMirroring(surface, left, bottom, width, height);
     }
+  }
+
+  private void updateAnimation(long frameTimeNanos) {
+    return;
   }
 
   /**
@@ -346,9 +352,10 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
     }
   }
 
-  private void updateAnimation(long frameTimeNanos) {
+  private void initializeAnimation() {
     return;
   }
+
 
   private void doRender() {
     Renderer renderer = this.renderer;
@@ -367,11 +374,7 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
     }
   }
 
-  private void initializeAnimation() {
-    return;
-  }
-
-
+  
   /**
    * Defines a transform from {@link Choreographer} time to animation time. Used to control the
    * playback of animations in a {@link SceneView}.
@@ -382,11 +385,23 @@ public class SceneView extends SurfaceView implements Choreographer.FrameCallbac
      * animation update time. The input nano time can be used to ensure that returned times never
      * decrease.
      *
-     * @param choreographerTime the current frame time returned from the {@link Choreographer}.
      * @see {@link SceneView#setAnimationTimeTransformer(AnimationTimeTransformer)}
+     * @param choreographerTime the current frame time returned from the {@link Choreographer}.
      */
     long getAnimationTime(long choreographerTime);
   }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

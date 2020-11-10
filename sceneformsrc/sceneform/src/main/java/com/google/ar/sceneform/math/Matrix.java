@@ -20,6 +20,7 @@ public class Matrix {
                   0.0f, 0.0f, 0.0f, 1.0f
           };
   private static final String TAG = Matrix.class.getSimpleName();
+
   public float[] data = new float[16];
 
   @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
@@ -30,239 +31,6 @@ public class Matrix {
   @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
   public Matrix(float[] data) {
     set(data);
-  }
-
-  public static void multiply(Matrix lhs, Matrix rhs, Matrix dest) {
-    Preconditions.checkNotNull(lhs, "Parameter \"lhs\" was null.");
-    Preconditions.checkNotNull(rhs, "Parameter \"rhs\" was null.");
-
-    float m00 = 0f;
-    float m01 = 0f;
-    float m02 = 0f;
-    float m03 = 0f;
-    float m10 = 0f;
-    float m11 = 0f;
-    float m12 = 0f;
-    float m13 = 0f;
-    float m20 = 0f;
-    float m21 = 0f;
-    float m22 = 0f;
-    float m23 = 0f;
-    float m30 = 0f;
-    float m31 = 0f;
-    float m32 = 0f;
-    float m33 = 0f;
-
-    for (int i = 0; i < 4; i++) {
-      float lhs0 = lhs.data[0 + (i * 4)];
-      float lhs1 = lhs.data[1 + (i * 4)];
-      float lhs2 = lhs.data[2 + (i * 4)];
-      float lhs3 = lhs.data[3 + (i * 4)];
-      float rhs0 = rhs.data[(0 * 4) + i];
-      float rhs1 = rhs.data[(1 * 4) + i];
-      float rhs2 = rhs.data[(2 * 4) + i];
-      float rhs3 = rhs.data[(3 * 4) + i];
-
-      m00 += lhs0 * rhs0;
-      m01 += lhs1 * rhs0;
-      m02 += lhs2 * rhs0;
-      m03 += lhs3 * rhs0;
-
-      m10 += lhs0 * rhs1;
-      m11 += lhs1 * rhs1;
-      m12 += lhs2 * rhs1;
-      m13 += lhs3 * rhs1;
-
-      m20 += lhs0 * rhs2;
-      m21 += lhs1 * rhs2;
-      m22 += lhs2 * rhs2;
-      m23 += lhs3 * rhs2;
-
-      m30 += lhs0 * rhs3;
-      m31 += lhs1 * rhs3;
-      m32 += lhs2 * rhs3;
-      m33 += lhs3 * rhs3;
-    }
-
-    dest.data[0] = m00;
-    dest.data[1] = m01;
-    dest.data[2] = m02;
-    dest.data[3] = m03;
-    dest.data[4] = m10;
-    dest.data[5] = m11;
-    dest.data[6] = m12;
-    dest.data[7] = m13;
-    dest.data[8] = m20;
-    dest.data[9] = m21;
-    dest.data[10] = m22;
-    dest.data[11] = m23;
-    dest.data[12] = m30;
-    dest.data[13] = m31;
-    dest.data[14] = m32;
-    dest.data[15] = m33;
-  }
-
-  public static boolean invert(Matrix matrix, Matrix dest) {
-    Preconditions.checkNotNull(matrix, "Parameter \"matrix\" was null.");
-    Preconditions.checkNotNull(dest, "Parameter \"dest\" was null.");
-
-    float m0 = matrix.data[0];
-    float m1 = matrix.data[1];
-    float m2 = matrix.data[2];
-    float m3 = matrix.data[3];
-    float m4 = matrix.data[4];
-    float m5 = matrix.data[5];
-    float m6 = matrix.data[6];
-    float m7 = matrix.data[7];
-    float m8 = matrix.data[8];
-    float m9 = matrix.data[9];
-    float m10 = matrix.data[10];
-    float m11 = matrix.data[11];
-    float m12 = matrix.data[12];
-    float m13 = matrix.data[13];
-    float m14 = matrix.data[14];
-    float m15 = matrix.data[15];
-
-    dest.data[0] =
-            m5 * m10 * m15
-                    - m5 * m11 * m14
-                    - m9 * m6 * m15
-                    + m9 * m7 * m14
-                    + m13 * m6 * m11
-                    - m13 * m7 * m10;
-
-    dest.data[4] =
-            -m4 * m10 * m15
-                    + m4 * m11 * m14
-                    + m8 * m6 * m15
-                    - m8 * m7 * m14
-                    - m12 * m6 * m11
-                    + m12 * m7 * m10;
-
-    dest.data[8] =
-            m4 * m9 * m15
-                    - m4 * m11 * m13
-                    - m8 * m5 * m15
-                    + m8 * m7 * m13
-                    + m12 * m5 * m11
-                    - m12 * m7 * m9;
-
-    dest.data[12] =
-            -m4 * m9 * m14
-                    + m4 * m10 * m13
-                    + m8 * m5 * m14
-                    - m8 * m6 * m13
-                    - m12 * m5 * m10
-                    + m12 * m6 * m9;
-
-    dest.data[1] =
-            -m1 * m10 * m15
-                    + m1 * m11 * m14
-                    + m9 * m2 * m15
-                    - m9 * m3 * m14
-                    - m13 * m2 * m11
-                    + m13 * m3 * m10;
-
-    dest.data[5] =
-            m0 * m10 * m15
-                    - m0 * m11 * m14
-                    - m8 * m2 * m15
-                    + m8 * m3 * m14
-                    + m12 * m2 * m11
-                    - m12 * m3 * m10;
-
-    dest.data[9] =
-            -m0 * m9 * m15
-                    + m0 * m11 * m13
-                    + m8 * m1 * m15
-                    - m8 * m3 * m13
-                    - m12 * m1 * m11
-                    + m12 * m3 * m9;
-
-    dest.data[13] =
-            m0 * m9 * m14
-                    - m0 * m10 * m13
-                    - m8 * m1 * m14
-                    + m8 * m2 * m13
-                    + m12 * m1 * m10
-                    - m12 * m2 * m9;
-
-    dest.data[2] =
-            m1 * m6 * m15
-                    - m1 * m7 * m14
-                    - m5 * m2 * m15
-                    + m5 * m3 * m14
-                    + m13 * m2 * m7
-                    - m13 * m3 * m6;
-
-    dest.data[6] =
-            -m0 * m6 * m15
-                    + m0 * m7 * m14
-                    + m4 * m2 * m15
-                    - m4 * m3 * m14
-                    - m12 * m2 * m7
-                    + m12 * m3 * m6;
-
-    dest.data[10] =
-            m0 * m5 * m15
-                    - m0 * m7 * m13
-                    - m4 * m1 * m15
-                    + m4 * m3 * m13
-                    + m12 * m1 * m7
-                    - m12 * m3 * m5;
-
-    dest.data[14] =
-            -m0 * m5 * m14
-                    + m0 * m6 * m13
-                    + m4 * m1 * m14
-                    - m4 * m2 * m13
-                    - m12 * m1 * m6
-                    + m12 * m2 * m5;
-
-    dest.data[3] =
-            -m1 * m6 * m11
-                    + m1 * m7 * m10
-                    + m5 * m2 * m11
-                    - m5 * m3 * m10
-                    - m9 * m2 * m7
-                    + m9 * m3 * m6;
-
-    dest.data[7] =
-            m0 * m6 * m11 - m0 * m7 * m10 - m4 * m2 * m11 + m4 * m3 * m10 + m8 * m2 * m7 - m8 * m3 * m6;
-
-    dest.data[11] =
-            -m0 * m5 * m11 + m0 * m7 * m9 + m4 * m1 * m11 - m4 * m3 * m9 - m8 * m1 * m7 + m8 * m3 * m5;
-
-    dest.data[15] =
-            m0 * m5 * m10 - m0 * m6 * m9 - m4 * m1 * m10 + m4 * m2 * m9 + m8 * m1 * m6 - m8 * m2 * m5;
-
-    float det = m0 * dest.data[0] + m1 * dest.data[4] + m2 * dest.data[8] + m3 * dest.data[12];
-
-    if (det == 0) {
-      return false;
-    }
-
-    det = 1.0f / det;
-
-    for (int i = 0; i < 16; i++) {
-      dest.data[i] *= det;
-    }
-
-    return true;
-  }
-
-  /**
-   * Compares Matrix values
-   */
-  public static boolean equals(Matrix lhs, Matrix rhs) {
-    Preconditions.checkNotNull(lhs, "Parameter \"lhs\" was null.");
-    Preconditions.checkNotNull(rhs, "Parameter \"rhs\" was null.");
-
-    boolean result = true;
-    for (int i = 0; i < 16; i++) {
-      result &= MathHelper.almostEqualRelativeAndAbs(lhs.data[i], rhs.data[i]);
-    }
-    return result;
   }
 
   public void set(float[] data) {
@@ -499,6 +267,76 @@ public class Matrix {
     data[15] = 1.0f;
   }
 
+  public static void multiply(Matrix lhs, Matrix rhs, Matrix dest) {
+    Preconditions.checkNotNull(lhs, "Parameter \"lhs\" was null.");
+    Preconditions.checkNotNull(rhs, "Parameter \"rhs\" was null.");
+
+    float m00 = 0f;
+    float m01 = 0f;
+    float m02 = 0f;
+    float m03 = 0f;
+    float m10 = 0f;
+    float m11 = 0f;
+    float m12 = 0f;
+    float m13 = 0f;
+    float m20 = 0f;
+    float m21 = 0f;
+    float m22 = 0f;
+    float m23 = 0f;
+    float m30 = 0f;
+    float m31 = 0f;
+    float m32 = 0f;
+    float m33 = 0f;
+
+    for (int i = 0; i < 4; i++) {
+      float lhs0 = lhs.data[0 + (i * 4)];
+      float lhs1 = lhs.data[1 + (i * 4)];
+      float lhs2 = lhs.data[2 + (i * 4)];
+      float lhs3 = lhs.data[3 + (i * 4)];
+      float rhs0 = rhs.data[(0 * 4) + i];
+      float rhs1 = rhs.data[(1 * 4) + i];
+      float rhs2 = rhs.data[(2 * 4) + i];
+      float rhs3 = rhs.data[(3 * 4) + i];
+
+      m00 += lhs0 * rhs0;
+      m01 += lhs1 * rhs0;
+      m02 += lhs2 * rhs0;
+      m03 += lhs3 * rhs0;
+
+      m10 += lhs0 * rhs1;
+      m11 += lhs1 * rhs1;
+      m12 += lhs2 * rhs1;
+      m13 += lhs3 * rhs1;
+
+      m20 += lhs0 * rhs2;
+      m21 += lhs1 * rhs2;
+      m22 += lhs2 * rhs2;
+      m23 += lhs3 * rhs2;
+
+      m30 += lhs0 * rhs3;
+      m31 += lhs1 * rhs3;
+      m32 += lhs2 * rhs3;
+      m33 += lhs3 * rhs3;
+    }
+
+    dest.data[0] = m00;
+    dest.data[1] = m01;
+    dest.data[2] = m02;
+    dest.data[3] = m03;
+    dest.data[4] = m10;
+    dest.data[5] = m11;
+    dest.data[6] = m12;
+    dest.data[7] = m13;
+    dest.data[8] = m20;
+    dest.data[9] = m21;
+    dest.data[10] = m22;
+    dest.data[11] = m23;
+    dest.data[12] = m30;
+    dest.data[13] = m31;
+    dest.data[14] = m32;
+    dest.data[15] = m33;
+  }
+
   public Vector3 transformPoint(Vector3 vector) {
     Preconditions.checkNotNull(vector, "Parameter \"vector\" was null.");
 
@@ -551,6 +389,169 @@ public class Matrix {
     result.z = data[2] * vx;
     result.z += data[6] * vy;
     result.z += data[10] * vz;
+    return result;
+  }
+
+  public static boolean invert(Matrix matrix, Matrix dest) {
+    Preconditions.checkNotNull(matrix, "Parameter \"matrix\" was null.");
+    Preconditions.checkNotNull(dest, "Parameter \"dest\" was null.");
+
+    float m0 = matrix.data[0];
+    float m1 = matrix.data[1];
+    float m2 = matrix.data[2];
+    float m3 = matrix.data[3];
+    float m4 = matrix.data[4];
+    float m5 = matrix.data[5];
+    float m6 = matrix.data[6];
+    float m7 = matrix.data[7];
+    float m8 = matrix.data[8];
+    float m9 = matrix.data[9];
+    float m10 = matrix.data[10];
+    float m11 = matrix.data[11];
+    float m12 = matrix.data[12];
+    float m13 = matrix.data[13];
+    float m14 = matrix.data[14];
+    float m15 = matrix.data[15];
+
+    dest.data[0] =
+            m5 * m10 * m15
+                    - m5 * m11 * m14
+                    - m9 * m6 * m15
+                    + m9 * m7 * m14
+                    + m13 * m6 * m11
+                    - m13 * m7 * m10;
+
+    dest.data[4] =
+            -m4 * m10 * m15
+                    + m4 * m11 * m14
+                    + m8 * m6 * m15
+                    - m8 * m7 * m14
+                    - m12 * m6 * m11
+                    + m12 * m7 * m10;
+
+    dest.data[8] =
+            m4 * m9 * m15
+                    - m4 * m11 * m13
+                    - m8 * m5 * m15
+                    + m8 * m7 * m13
+                    + m12 * m5 * m11
+                    - m12 * m7 * m9;
+
+    dest.data[12] =
+            -m4 * m9 * m14
+                    + m4 * m10 * m13
+                    + m8 * m5 * m14
+                    - m8 * m6 * m13
+                    - m12 * m5 * m10
+                    + m12 * m6 * m9;
+
+    dest.data[1] =
+            -m1 * m10 * m15
+                    + m1 * m11 * m14
+                    + m9 * m2 * m15
+                    - m9 * m3 * m14
+                    - m13 * m2 * m11
+                    + m13 * m3 * m10;
+
+    dest.data[5] =
+            m0 * m10 * m15
+                    - m0 * m11 * m14
+                    - m8 * m2 * m15
+                    + m8 * m3 * m14
+                    + m12 * m2 * m11
+                    - m12 * m3 * m10;
+
+    dest.data[9] =
+            -m0 * m9 * m15
+                    + m0 * m11 * m13
+                    + m8 * m1 * m15
+                    - m8 * m3 * m13
+                    - m12 * m1 * m11
+                    + m12 * m3 * m9;
+
+    dest.data[13] =
+            m0 * m9 * m14
+                    - m0 * m10 * m13
+                    - m8 * m1 * m14
+                    + m8 * m2 * m13
+                    + m12 * m1 * m10
+                    - m12 * m2 * m9;
+
+    dest.data[2] =
+            m1 * m6 * m15
+                    - m1 * m7 * m14
+                    - m5 * m2 * m15
+                    + m5 * m3 * m14
+                    + m13 * m2 * m7
+                    - m13 * m3 * m6;
+
+    dest.data[6] =
+            -m0 * m6 * m15
+                    + m0 * m7 * m14
+                    + m4 * m2 * m15
+                    - m4 * m3 * m14
+                    - m12 * m2 * m7
+                    + m12 * m3 * m6;
+
+    dest.data[10] =
+            m0 * m5 * m15
+                    - m0 * m7 * m13
+                    - m4 * m1 * m15
+                    + m4 * m3 * m13
+                    + m12 * m1 * m7
+                    - m12 * m3 * m5;
+
+    dest.data[14] =
+            -m0 * m5 * m14
+                    + m0 * m6 * m13
+                    + m4 * m1 * m14
+                    - m4 * m2 * m13
+                    - m12 * m1 * m6
+                    + m12 * m2 * m5;
+
+    dest.data[3] =
+            -m1 * m6 * m11
+                    + m1 * m7 * m10
+                    + m5 * m2 * m11
+                    - m5 * m3 * m10
+                    - m9 * m2 * m7
+                    + m9 * m3 * m6;
+
+    dest.data[7] =
+            m0 * m6 * m11 - m0 * m7 * m10 - m4 * m2 * m11 + m4 * m3 * m10 + m8 * m2 * m7 - m8 * m3 * m6;
+
+    dest.data[11] =
+            -m0 * m5 * m11 + m0 * m7 * m9 + m4 * m1 * m11 - m4 * m3 * m9 - m8 * m1 * m7 + m8 * m3 * m5;
+
+    dest.data[15] =
+            m0 * m5 * m10 - m0 * m6 * m9 - m4 * m1 * m10 + m4 * m2 * m9 + m8 * m1 * m6 - m8 * m2 * m5;
+
+    float det = m0 * dest.data[0] + m1 * dest.data[4] + m2 * dest.data[8] + m3 * dest.data[12];
+
+    if (det == 0) {
+      return false;
+    }
+
+    det = 1.0f / det;
+
+    for (int i = 0; i < 16; i++) {
+      dest.data[i] *= det;
+    }
+
+    return true;
+  }
+
+  /**
+   * Compares Matrix values
+   */
+  public static boolean equals(Matrix lhs, Matrix rhs) {
+    Preconditions.checkNotNull(lhs, "Parameter \"lhs\" was null.");
+    Preconditions.checkNotNull(rhs, "Parameter \"rhs\" was null.");
+
+    boolean result = true;
+    for (int i = 0; i < 16; i++) {
+      result &= MathHelper.almostEqualRelativeAndAbs(lhs.data[i], rhs.data[i]);
+    }
     return result;
   }
 }

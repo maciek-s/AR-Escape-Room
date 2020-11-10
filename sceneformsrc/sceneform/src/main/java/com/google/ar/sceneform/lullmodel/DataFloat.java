@@ -37,11 +37,6 @@ public final class DataFloat extends Table {
     builder.addFloat(0, value, 0.0f);
   }
 
-  public static int endDataFloat(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -57,6 +52,11 @@ public final class DataFloat extends Table {
   public float value() {
     int o = __offset(4);
     return o != 0 ? bb.getFloat(o + bb_pos) : 0.0f;
+  }
+
+  public static int endDataFloat(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

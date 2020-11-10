@@ -69,7 +69,7 @@ final public class Utf8Safe extends Utf8 {
    * both time and space.
    *
    * @throws IllegalArgumentException if {@code sequence} contains ill-formed UTF-16 (unpaired
-   *                                  surrogates)
+   *     surrogates)
    */
   private static int computeEncodedLength(CharSequence sequence) {
     // Warning to maintainers: this implementation is highly optimized.
@@ -425,7 +425,7 @@ final public class Utf8Safe extends Utf8 {
    * <p>Selects an optimal algorithm based on the type of {@link ByteBuffer} (i.e. heap or direct)
    * and the capabilities of the platform.
    *
-   * @param in  the source string to be encoded
+   * @param in the source string to be encoded
    * @param out the target buffer to receive the encoded string.
    */
   @Override

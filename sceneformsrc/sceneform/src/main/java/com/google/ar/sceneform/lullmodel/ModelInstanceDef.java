@@ -189,11 +189,6 @@ public final class ModelInstanceDef extends Table {
     builder.startVector(4, numElems, 4);
   }
 
-  public static int endModelInstanceDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -216,16 +211,13 @@ public final class ModelInstanceDef extends Table {
 
   public int vertexDataLength() {
     int o = __offset(4);
-    return o != 0 ? __vector_len(o) : 0;
-  }
+    return o != 0 ? __vector_len(o) : 0; }
 
   public ByteBuffer vertexDataAsByteBuffer() {
-    return __vector_as_bytebuffer(4, 1);
-  }
+    return __vector_as_bytebuffer(4, 1); }
 
   public ByteBuffer vertexDataInByteBuffer(ByteBuffer _bb) {
-    return __vector_in_bytebuffer(_bb, 4, 1);
-  }
+    return __vector_in_bytebuffer(_bb, 4, 1); }
 
   /**
    * Indices into the vertex data. Will either be an array of 16-bit or 32-bit
@@ -406,6 +398,11 @@ public final class ModelInstanceDef extends Table {
   public int aabbsLength() {
     int o = __offset(26);
     return o != 0 ? __vector_len(o) : 0;
+  }
+
+  public static int endModelInstanceDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

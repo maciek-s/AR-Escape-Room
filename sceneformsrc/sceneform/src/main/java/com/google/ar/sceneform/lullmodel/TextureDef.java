@@ -112,11 +112,6 @@ public final class TextureDef extends Table {
     builder.addBoolean(11, isRgbm, false);
   }
 
-  public static int endTextureDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -216,6 +211,11 @@ public final class TextureDef extends Table {
   public boolean isRgbm() {
     int o = __offset(26);
     return o != 0 ? 0 != bb.get(o + bb_pos) : false;
+  }
+
+  public static int endTextureDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

@@ -28,7 +28,7 @@ import com.google.ar.sceneform.Node;
  * <p>Example's include, changing the {@link TransformableNode}'s Scale based on a Pinch Gesture.
  */
 public abstract class BaseTransformationController<T extends BaseGesture<T>>
-        implements BaseGestureRecognizer.OnGestureStartedListener<T>,
+    implements BaseGestureRecognizer.OnGestureStartedListener<T>,
         BaseGesture.OnGestureEventListener<T>,
         Node.LifecycleListener {
   private final BaseTransformableNode transformableNode;
@@ -52,39 +52,27 @@ public abstract class BaseTransformationController<T extends BaseGesture<T>>
     return enabled;
   }
 
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-    updateActiveAndEnabled();
-  }
-
   @Nullable
   public T getActiveGesture() {
     return activeGesture;
   }
 
-  private void setActiveGesture(@Nullable T gesture) {
-    if (activeGesture != null) {
-      activeGesture.setGestureEventListener(null);
-    }
-
-    activeGesture = gesture;
-
-    if (activeGesture != null) {
-      activeGesture.setGestureEventListener(this);
-    }
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+    updateActiveAndEnabled();
   }
 
   public boolean isTransforming() {
     return activeGesture != null;
   }
 
-  // ---------------------------------------------------------------------------------------
-  // Implementation of interface Node.LifecycleListener
-  // ---------------------------------------------------------------------------------------
-
   public BaseTransformableNode getTransformableNode() {
     return transformableNode;
   }
+
+  // ---------------------------------------------------------------------------------------
+  // Implementation of interface Node.LifecycleListener
+  // ---------------------------------------------------------------------------------------
 
   @Override
   @CallSuper
@@ -96,10 +84,6 @@ public abstract class BaseTransformationController<T extends BaseGesture<T>>
   public void onUpdated(Node node, FrameTime frameTime) {
   }
 
-  // ---------------------------------------------------------------------------------------
-  // Implementation of interface BaseGestureRecognizer.OnGestureStartedListener
-  // ---------------------------------------------------------------------------------------
-
   @Override
   @CallSuper
   public void onDeactivated(Node node) {
@@ -107,7 +91,7 @@ public abstract class BaseTransformationController<T extends BaseGesture<T>>
   }
 
   // ---------------------------------------------------------------------------------------
-  // Implementation of interface BaseGesture.OnGestureEventListener
+  // Implementation of interface BaseGestureRecognizer.OnGestureStartedListener
   // ---------------------------------------------------------------------------------------
 
   @Override
@@ -120,6 +104,10 @@ public abstract class BaseTransformationController<T extends BaseGesture<T>>
       setActiveGesture(gesture);
     }
   }
+
+  // ---------------------------------------------------------------------------------------
+  // Implementation of interface BaseGesture.OnGestureEventListener
+  // ---------------------------------------------------------------------------------------
 
   @SuppressWarnings("UngroupedOverloads") // This is not an overload, it is a different interface.
   @Override
@@ -138,6 +126,18 @@ public abstract class BaseTransformationController<T extends BaseGesture<T>>
   protected abstract void onContinueTransformation(T gesture);
 
   protected abstract void onEndTransformation(T gesture);
+
+  private void setActiveGesture(@Nullable T gesture) {
+    if (activeGesture != null) {
+      activeGesture.setGestureEventListener(null);
+    }
+
+    activeGesture = gesture;
+
+    if (activeGesture != null) {
+      activeGesture.setGestureEventListener(this);
+    }
+  }
 
   private void updateActiveAndEnabled() {
     boolean newActiveAndEnabled = getTransformableNode().isActive() && enabled;

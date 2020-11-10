@@ -39,13 +39,9 @@ public class Table {
    * Used to hold the position of the `bb` buffer.
    */
   protected int bb_pos;
-  /**
-   * The underlying ByteBuffer to hold the data of the Table.
-   */
+  /** The underlying ByteBuffer to hold the data of the Table. */
   protected ByteBuffer bb;
-  /**
-   * Used to hold the vtable position.
-   */
+  /** Used to hold the vtable position. */
   protected int vtable_start;
   /**
    * Used to hold the vtable size.
@@ -58,7 +54,27 @@ public class Table {
     return bb.getShort(vtable + vtable_offset - bb.getInt(vtable)) + vtable;
   }
 
+  /**
+   * Look up a field in the vtable.
+   *
+   * @param vtable_offset An `int` offset to the vtable in the Table's ByteBuffer.
+   * @return Returns an offset into the object, or `0` if the field is not present.
+   */
+  protected int __offset(int vtable_offset) {
+    return vtable_offset < vtable_size ? bb.getShort(vtable_start + vtable_offset) : 0;
+  }
+
   protected static int __indirect(int offset, ByteBuffer bb) {
+    return offset + bb.getInt(offset);
+  }
+
+  /**
+   * Retrieve a relative offset.
+   *
+   * @param offset An `int` index into the Table's ByteBuffer containing the relative offset.
+   * @return Returns the relative offset stored at `offset`.
+   */
+  protected int __indirect(int offset) {
     return offset + bb.getInt(offset);
   }
 
@@ -73,9 +89,9 @@ public class Table {
   protected static boolean __has_identifier(ByteBuffer bb, String ident) {
     if (ident.length() != FILE_IDENTIFIER_LENGTH)
       throw new AssertionError("FlatBuffers: file identifier must be length " +
-              FILE_IDENTIFIER_LENGTH);
+                                 FILE_IDENTIFIER_LENGTH);
     for (int i = 0; i < FILE_IDENTIFIER_LENGTH; i++) {
-      if (ident.charAt(i) != (char) bb.get(bb.position() + SIZEOF_INT + i)) return false;
+      if (ident.charAt(i) != (char)bb.get(bb.position() + SIZEOF_INT + i)) return false;
     }
     return true;
   }
@@ -85,7 +101,7 @@ public class Table {
    *
    * @param offset_1 An 'int' index of the first string into the bb.
    * @param offset_2 An 'int' index of the second string into the bb.
-   * @param bb       A {@code ByteBuffer} to get the strings.
+   * @param bb A {@code ByteBuffer} to get the strings.
    */
   protected static int compareStrings(int offset_1, int offset_2, ByteBuffer bb) {
     offset_1 += bb.getInt(offset_1);
@@ -100,6 +116,29 @@ public class Table {
         return bb.get(i + startPos_1) - bb.get(i + startPos_2);
     }
     return len_1 - len_2;
+  }
+
+  /**
+   * Get the length of a vector.
+   *
+   * @param offset An `int` index into the Table's ByteBuffer.
+   * @return Returns the length of the vector whose offset is stored at `offset`.
+   */
+  protected int __vector_len(int offset) {
+    offset += bb_pos;
+    offset += bb.getInt(offset);
+    return bb.getInt(offset);
+  }
+
+  /**
+   * Get the start data of a vector.
+   *
+   * @param offset An `int` index into the Table's ByteBuffer.
+   * @return Returns the start of the vector data whose offset is stored at `offset`.
+   */
+  protected int __vector(int offset) {
+    offset += bb_pos;
+    return offset + bb.getInt(offset) + SIZEOF_INT;  // data starts after the length
   }
 
   /**
@@ -127,33 +166,11 @@ public class Table {
    *
    * @return Returns the Table's ByteBuffer.
    */
-  public ByteBuffer getByteBuffer() {
-    return bb;
-  }
-
-  /**
-   * Look up a field in the vtable.
-   *
-   * @param vtable_offset An `int` offset to the vtable in the Table's ByteBuffer.
-   * @return Returns an offset into the object, or `0` if the field is not present.
-   */
-  protected int __offset(int vtable_offset) {
-    return vtable_offset < vtable_size ? bb.getShort(vtable_start + vtable_offset) : 0;
-  }
-
-  /**
-   * Retrieve a relative offset.
-   *
-   * @param offset An `int` index into the Table's ByteBuffer containing the relative offset.
-   * @return Returns the relative offset stored at `offset`.
-   */
-  protected int __indirect(int offset) {
-    return offset + bb.getInt(offset);
-  }
+  public ByteBuffer getByteBuffer() { return bb; }
 
   /**
    * Create a Java `String` from UTF-8 data stored inside the FlatBuffer.
-   * <p>
+   *
    * This allocates a new string and converts to wide chars upon each access,
    * which is not very efficient. Instead, each FlatBuffer string also comes with an
    * accessor based on __vector_as_bytebuffer below, which is much more efficient,
@@ -169,37 +186,14 @@ public class Table {
   }
 
   /**
-   * Get the length of a vector.
-   *
-   * @param offset An `int` index into the Table's ByteBuffer.
-   * @return Returns the length of the vector whose offset is stored at `offset`.
-   */
-  protected int __vector_len(int offset) {
-    offset += bb_pos;
-    offset += bb.getInt(offset);
-    return bb.getInt(offset);
-  }
-
-  /**
-   * Get the start data of a vector.
-   *
-   * @param offset An `int` index into the Table's ByteBuffer.
-   * @return Returns the start of the vector data whose offset is stored at `offset`.
-   */
-  protected int __vector(int offset) {
-    offset += bb_pos;
-    return offset + bb.getInt(offset) + SIZEOF_INT;  // data starts after the length
-  }
-
-  /**
    * Get a whole vector as a ByteBuffer.
-   * <p>
+   *
    * This is efficient, since it only allocates a new {@link ByteBuffer} object,
    * but does not actually copy the data, it still refers to the same bytes
    * as the original ByteBuffer. Also useful with nested FlatBuffers, etc.
    *
    * @param vector_offset The position of the vector in the byte buffer
-   * @param elem_size     The size of each element in the array
+   * @param elem_size The size of each element in the array
    * @return The {@link ByteBuffer} for the array
    */
   protected ByteBuffer __vector_as_bytebuffer(int vector_offset, int elem_size) {
@@ -214,13 +208,13 @@ public class Table {
 
   /**
    * Initialize vector as a ByteBuffer.
-   * <p>
+   *
    * This is more efficient than using duplicate, since it doesn't copy the data
    * nor allocattes a new {@link ByteBuffer}, creating no garbage to be collected.
    *
-   * @param bb            The {@link ByteBuffer} for the array
+   * @param bb The {@link ByteBuffer} for the array
    * @param vector_offset The position of the vector in the byte buffer
-   * @param elem_size     The size of each element in the array
+   * @param elem_size The size of each element in the array
    * @return The {@link ByteBuffer} for the array
    */
   protected ByteBuffer __vector_in_bytebuffer(ByteBuffer bb, int vector_offset, int elem_size) {
@@ -236,7 +230,7 @@ public class Table {
   /**
    * Initialize any Table-derived type to point to the union at the given `offset`.
    *
-   * @param t      A `Table`-derived type that should point to the union at `offset`.
+   * @param t A `Table`-derived type that should point to the union at `offset`.
    * @param offset An `int` index into the Table's ByteBuffer.
    * @return Returns the Table that points to the union at `offset`.
    */
@@ -253,7 +247,7 @@ public class Table {
    * Sort tables by the key.
    *
    * @param offsets An 'int' indexes of the tables into the bb.
-   * @param bb      A {@code ByteBuffer} to get the tables.
+   * @param bb A {@code ByteBuffer} to get the tables.
    */
   protected void sortTables(int[] offsets, final ByteBuffer bb) {
     Integer[] off = new Integer[offsets.length];
@@ -273,13 +267,11 @@ public class Table {
    * @param o2 An 'Integer' index of the second key into the bb.
    * @param bb A {@code ByteBuffer} to get the keys.
    */
-  protected int keysCompare(Integer o1, Integer o2, ByteBuffer bb) {
-    return 0;
-  }
+  protected int keysCompare(Integer o1, Integer o2, ByteBuffer bb) { return 0; }
 
   /**
    * Resets the internal state with a null {@code ByteBuffer} and a zero position.
-   * <p>
+   *
    * This method exists primarily to allow recycling Table instances without risking memory leaks
    * due to {@code ByteBuffer} references. The instance will be unusable until it is assigned
    * again to a {@code ByteBuffer}.

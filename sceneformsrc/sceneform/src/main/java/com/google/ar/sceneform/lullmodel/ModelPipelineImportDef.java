@@ -137,11 +137,6 @@ public final class ModelPipelineImportDef extends Table {
     builder.addBoolean(15, mergeMaterials, true);
   }
 
-  public static int endModelPipelineImportDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -312,6 +307,11 @@ public final class ModelPipelineImportDef extends Table {
   public boolean mergeMaterials() {
     int o = __offset(34);
     return o != 0 ? 0 != bb.get(o + bb_pos) : true;
+  }
+
+  public static int endModelPipelineImportDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

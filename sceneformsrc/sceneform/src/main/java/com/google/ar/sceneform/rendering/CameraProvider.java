@@ -9,7 +9,7 @@ import com.google.ar.sceneform.math.Matrix;
  * @hide
  */
 public interface CameraProvider extends TransformProvider {
-    boolean isActive();
+  boolean isActive();
 
     float getNearClipPlane();
 

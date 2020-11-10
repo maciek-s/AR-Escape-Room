@@ -38,9 +38,7 @@ public class PlaneDiscoveryController {
     planeDiscoveryView = view;
   }
 
-  /**
-   * Show the plane discovery UX instructions for finding a plane.
-   */
+  /** Show the plane discovery UX instructions for finding a plane. */
   public void show() {
     if (planeDiscoveryView == null) {
       return;
@@ -49,9 +47,7 @@ public class PlaneDiscoveryController {
     planeDiscoveryView.setVisibility(View.VISIBLE);
   }
 
-  /**
-   * Hide the plane discovery UX instructions.
-   */
+  /** Hide the plane discovery UX instructions. */
   public void hide() {
     if (planeDiscoveryView == null) {
       return;

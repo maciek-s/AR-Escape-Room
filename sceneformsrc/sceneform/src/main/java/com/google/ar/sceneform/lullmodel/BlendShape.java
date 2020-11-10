@@ -143,11 +143,6 @@ public final class BlendShape extends Table {
     builder.startVector(2, numElems, 2);
   }
 
-  public static int endBlendShape(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -292,6 +287,11 @@ public final class BlendShape extends Table {
 
   public ByteBuffer tangentIndices16InByteBuffer(ByteBuffer _bb) {
     return __vector_in_bytebuffer(_bb, 16, 2);
+  }
+
+  public static int endBlendShape(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

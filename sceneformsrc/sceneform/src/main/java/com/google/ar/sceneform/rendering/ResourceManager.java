@@ -35,26 +35,6 @@ public class ResourceManager {
           new CleanupRegistry<>();
   private final CleanupRegistry<Texture> textureCleanupRegistry = new CleanupRegistry<>();
 
-  private ResourceManager() {
-    addResourceHolder(textureRegistry);
-    addResourceHolder(materialRegistry);
-    addResourceHolder(modelRenderableRegistry);
-    addViewRenderableRegistry();
-    addResourceHolder(cameraStreamCleanupRegistry);
-    addResourceHolder(externalTextureCleanupRegistry);
-    addResourceHolder(materialCleanupRegistry);
-    addResourceHolder(renderableInstanceCleanupRegistry);
-    addResourceHolder(textureCleanupRegistry);
-  }
-
-  public static ResourceManager getInstance() {
-    if (instance == null) {
-      instance = new ResourceManager();
-    }
-
-    return instance;
-  }
-
   ResourceRegistry<Texture> getTextureRegistry() {
     return textureRegistry;
   }
@@ -66,6 +46,7 @@ public class ResourceManager {
   ResourceRegistry<ModelRenderable> getModelRenderableRegistry() {
     return modelRenderableRegistry;
   }
+
 
   ResourceRegistry<ViewRenderable> getViewRenderableRegistry() {
     return viewRenderableRegistry;
@@ -99,6 +80,30 @@ public class ResourceManager {
     return resourcesInUse;
   }
 
+  private ResourceManager() {
+    addResourceHolder(textureRegistry);
+    addResourceHolder(materialRegistry);
+    addResourceHolder(modelRenderableRegistry);
+    addViewRenderableRegistry();
+    addResourceHolder(cameraStreamCleanupRegistry);
+    addResourceHolder(externalTextureCleanupRegistry);
+    addResourceHolder(materialCleanupRegistry);
+    addResourceHolder(renderableInstanceCleanupRegistry);
+    addResourceHolder(textureCleanupRegistry);
+  }
+
+  public void addResourceHolder(ResourceHolder resource) {
+    resourceHolders.add(resource);
+  }
+
+  public static ResourceManager getInstance() {
+    if (instance == null) {
+      instance = new ResourceManager();
+    }
+
+    return instance;
+  }
+
   /**
    * Forcibly deletes all tracked references
    */
@@ -108,9 +113,6 @@ public class ResourceManager {
     }
   }
 
-  public void addResourceHolder(ResourceHolder resource) {
-    resourceHolders.add(resource);
-  }
 
   private void addViewRenderableRegistry() {
     addResourceHolder(viewRenderableRegistry);

@@ -37,11 +37,6 @@ public final class DataHashValue extends Table {
     builder.addInt(0, (int) value, (int) 0L);
   }
 
-  public static int endDataHashValue(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -57,6 +52,11 @@ public final class DataHashValue extends Table {
   public long value() {
     int o = __offset(4);
     return o != 0 ? (long) bb.getInt(o + bb_pos) & 0xFFFFFFFFL : 0L;
+  }
+
+  public static int endDataHashValue(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

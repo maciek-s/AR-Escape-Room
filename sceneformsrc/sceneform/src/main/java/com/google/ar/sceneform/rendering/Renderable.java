@@ -32,22 +32,23 @@ import java.util.function.Function;
  */
 @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"}) // CompletableFuture
 public abstract class Renderable {
+  // Data that can be shared between Renderables with makeCopy()
+  private final IRenderableInternalData renderableData;
+
+  // Data that is unique per-Renderable.
+  private final ArrayList<Material> materialBindings = new ArrayList<>();
+  private final ArrayList<String> materialNames = new ArrayList<>();
+  private int renderPriority = RENDER_PRIORITY_DEFAULT;
+  private boolean isShadowCaster = true;
+  private boolean isShadowReceiver = true;
   public static final int RENDER_PRIORITY_DEFAULT = 4;
   public static final int RENDER_PRIORITY_FIRST = 0;
   public static final int RENDER_PRIORITY_LAST = 7;
   // Allow stale data two weeks old by default.
   private static final long DEFAULT_MAX_STALE_CACHE = TimeUnit.DAYS.toSeconds(14);
-  // Data that can be shared between Renderables with makeCopy()
-  private final IRenderableInternalData renderableData;
-  // Data that is unique per-Renderable.
-  private final ArrayList<Material> materialBindings = new ArrayList<>();
-  private final ArrayList<String> materialNames = new ArrayList<>();
   private final ChangeId changeId = new ChangeId();
   @Nullable
   protected CollisionShape collisionShape;
-  private int renderPriority = RENDER_PRIORITY_DEFAULT;
-  private boolean isShadowCaster = true;
-  private boolean isShadowReceiver = true;
 
   /**
    * @hide
@@ -112,23 +113,17 @@ public abstract class Renderable {
     changeId.update();
   }
 
-  /**
-   * Returns the material bound to the first submesh.
-   */
+  /** Returns the material bound to the first submesh. */
   public Material getMaterial() {
     return getMaterial(0);
   }
 
-  /**
-   * Sets the material bound to the first submesh.
-   */
+  /** Sets the material bound to the first submesh. */
   public void setMaterial(Material material) {
     setMaterial(0, material);
   }
 
-  /**
-   * Returns the material bound to the specified submesh.
-   */
+  /** Returns the material bound to the specified submesh. */
   public Material getMaterial(int submeshIndex) {
     if (submeshIndex < materialBindings.size()) {
       return materialBindings.get(submeshIndex);
@@ -137,9 +132,7 @@ public abstract class Renderable {
     throw makeSubmeshOutOfRangeException(submeshIndex);
   }
 
-  /**
-   * Sets the material bound to the specified submesh.
-   */
+  /** Sets the material bound to the specified submesh. */
   public void setMaterial(int submeshIndex, Material material) {
     if (submeshIndex < materialBindings.size()) {
       materialBindings.set(submeshIndex, material);
@@ -182,31 +175,23 @@ public abstract class Renderable {
     changeId.update();
   }
 
-  /**
-   * Returns true if configured to cast shadows on other renderables.
-   */
+  /** Returns true if configured to cast shadows on other renderables. */
   public boolean isShadowCaster() {
     return isShadowCaster;
   }
 
-  /**
-   * Sets whether the renderable casts shadow on other renderables in the scene.
-   */
+  /** Sets whether the renderable casts shadow on other renderables in the scene. */
   public void setShadowCaster(boolean isShadowCaster) {
     this.isShadowCaster = isShadowCaster;
     changeId.update();
   }
 
-  /**
-   * Returns true if configured to receive shadows cast by other renderables.
-   */
+  /** Returns true if configured to receive shadows cast by other renderables. */
   public boolean isShadowReceiver() {
     return isShadowReceiver;
   }
 
-  /**
-   * Sets whether the renderable receives shadows cast by other renderables in the scene.
-   */
+  /** Sets whether the renderable receives shadows cast by other renderables in the scene. */
   public void setShadowReceiver(boolean isShadowReceiver) {
     this.isShadowReceiver = isShadowReceiver;
     changeId.update();
@@ -219,16 +204,12 @@ public abstract class Renderable {
     return renderableData.getMeshes().size();
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public ChangeId getId() {
     return changeId;
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   public RenderableInstance createInstance(TransformProvider transformProvider) {
     return new RenderableInstance(transformProvider, this);
   }
@@ -272,11 +253,9 @@ public abstract class Renderable {
   void prepareForDraw() {
   }
 
-  void attachToRenderer(Renderer renderer) {
-  }
+  void attachToRenderer(Renderer renderer) {}
 
-  void detatchFromRenderer() {
-  }
+  void detatchFromRenderer() {}
 
   /**
    * Gets the final model matrix to use for rendering this {@link Renderable} based on the matrix
@@ -318,14 +297,10 @@ public abstract class Renderable {
    */
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"}) // CompletableFuture
   abstract static class Builder<T extends Renderable, B extends Builder<T, B>> {
-    /**
-     * @hide
-     */
+    /** @hide */
     @Nullable
     protected Object registryId = null;
-    /**
-     * @hide
-     */
+    /** @hide */
     @Nullable
     protected Context context = null;
 
@@ -344,9 +319,7 @@ public abstract class Renderable {
     @Nullable
     private byte[] materialsBytes = null;
 
-    /**
-     * Used to programmatically construct a {@link Renderable}.
-     */
+    /** Used to programmatically construct a {@link Renderable}. */
     protected Builder() {
     }
 
@@ -378,9 +351,7 @@ public abstract class Renderable {
       return getSelf();
     }
 
-    /**
-     * Build a {@link Renderable} from a {@link RenderableDefinition}.
-     */
+    /** Build a {@link Renderable} from a {@link RenderableDefinition}. */
     public B setSource(RenderableDefinition definition) {
       this.definition = definition;
       registryId = null;
@@ -393,11 +364,23 @@ public abstract class Renderable {
       return getSelf();
     }
 
+    
+
+
+
+
+
+
 
     public B setIsFilamentGltf(boolean isFilamentGltf) {
       this.isFilamentAsset = isFilamentGltf;
       return getSelf();
     }
+
+    
+
+
+
 
 
     /**

@@ -16,22 +16,18 @@ import java.util.ArrayList;
  */
 @RequiresApi(api = Build.VERSION_CODES.N)
 public class Light {
-  /**
-   * Minimum accepted light intensity
-   */
+  /** Minimum accepted light intensity */
   private static final float MIN_LIGHT_INTENSITY = 0.0001f;
   ;
-  private final Type type;
-  ;
-  private final boolean enableShadows;
   private final Color color;
+  ;
   private final ArrayList<LightChangedListener> changedListeners = new ArrayList<>();
+
+  private final Type type;
+  private final boolean enableShadows;
+
   private Vector3 position;
   private Vector3 direction;
-  private float intensity;
-  private float falloffRadius;
-  private float spotlightConeInner;
-  private float spotlightConeOuter;
 
   private Light(Builder builder) {
     this.type = builder.type;
@@ -45,9 +41,12 @@ public class Light {
     this.spotlightConeOuter = builder.spotlightConeOuter;
   }
 
-  /**
-   * Constructs a default light, if nothing else is set
-   */
+  private float intensity;
+  private float falloffRadius;
+  private float spotlightConeInner;
+  private float spotlightConeOuter;
+
+  /** Constructs a default light, if nothing else is set */
   public static Builder builder(Type type) {
     AndroidPreconditions.checkMinAndroidApiLevel();
     return new Builder(type);
@@ -57,11 +56,23 @@ public class Light {
    * Sets the "RGB" color of the light based on the desired "color temperature."
    *
    * @param temperature color temperature in Kelvin on a scale from 1,000 to 10,000K. Typical
-   *                    commercial and residential lighting falls somewhere in the 2000K to 6500K range.
+   *     commercial and residential lighting falls somewhere in the 2000K to 6500K range.
    */
   public void setColorTemperature(float temperature) {
     final float[] rgbColor = Colors.cct(temperature);
     setColor(new Color(rgbColor[0], rgbColor[1], rgbColor[2]));
+  }
+
+  /**
+   * Sets the "RGB" color of the light. Note that intensity is a separate parameter, so you should
+   * set the pure color (i.e. each channel is in the [0,1] range). However setting values outside
+   * that range is valid.
+   *
+   * @param color "RGB" color, the default is 0xffffffff
+   */
+  public void setColor(Color color) {
+    this.color.set(color);
+    fireChangedListeners();
   }
 
   /**
@@ -76,6 +87,43 @@ public class Light {
    */
   public boolean isShadowCastingEnabled() {
     return this.enableShadows;
+  }
+
+  /**
+   * Sets the range that the light intensity falls off to zero. This has no affect on the {@link
+   * Light.Type#DIRECTIONAL} type.
+   *
+   * @param falloffRadius the light radius in world units, default is 10.0
+   */
+  public void setFalloffRadius(float falloffRadius) {
+    this.falloffRadius = falloffRadius;
+    fireChangedListeners();
+  }
+
+  /**
+   * Spotlights shine light in a cone, this value determines the size of the inner part of the cone.
+   * The intensity is interpolated between the inner and outer cone angles - meaning if they are the
+   * same than the cone is perfectly sharp. Generally you will want the inner cone to be smaller
+   * than the outer cone to avoid aliasing.
+   *
+   * @param coneInner inner cone angle in radians, default 0.5
+   */
+  public void setInnerConeAngle(float coneInner) {
+    this.spotlightConeInner = coneInner;
+    fireChangedListeners();
+  }
+
+  /**
+   * Spotlights shine light in a cone, this value determines the size of the outer part of the cone.
+   * The intensity is interpolated between the inner and outer cone angles - meaning if they are the
+   * same than the cone is perfectly sharp. Generally you will want the inner cone to be smaller
+   * than the outer cone to avoid aliasing.
+   *
+   * @param coneOuter outer cone angle in radians, default is 0.6
+   */
+  public void setOuterConeAngle(float coneOuter) {
+    this.spotlightConeOuter = coneOuter;
+    fireChangedListeners();
   }
 
   /**
@@ -97,18 +145,6 @@ public class Light {
    */
   public Color getColor() {
     return new Color(this.color);
-  }
-
-  /**
-   * Sets the "RGB" color of the light. Note that intensity is a separate parameter, so you should
-   * set the pure color (i.e. each channel is in the [0,1] range). However setting values outside
-   * that range is valid.
-   *
-   * @param color "RGB" color, the default is 0xffffffff
-   */
-  public void setColor(Color color) {
-    this.color.set(color);
-    fireChangedListeners();
   }
 
   /**
@@ -142,17 +178,6 @@ public class Light {
   }
 
   /**
-   * Sets the range that the light intensity falls off to zero. This has no affect on the {@link
-   * Light.Type#DIRECTIONAL} type.
-   *
-   * @param falloffRadius the light radius in world units, default is 10.0
-   */
-  public void setFalloffRadius(float falloffRadius) {
-    this.falloffRadius = falloffRadius;
-    fireChangedListeners();
-  }
-
-  /**
    * Get the inner cone angle for spotlights.
    */
   public float getInnerConeAngle() {
@@ -160,36 +185,10 @@ public class Light {
   }
 
   /**
-   * Spotlights shine light in a cone, this value determines the size of the inner part of the cone.
-   * The intensity is interpolated between the inner and outer cone angles - meaning if they are the
-   * same than the cone is perfectly sharp. Generally you will want the inner cone to be smaller
-   * than the outer cone to avoid aliasing.
-   *
-   * @param coneInner inner cone angle in radians, default 0.5
-   */
-  public void setInnerConeAngle(float coneInner) {
-    this.spotlightConeInner = coneInner;
-    fireChangedListeners();
-  }
-
-  /**
    * Get the outer cone angle for spotlights.
    */
   public float getOuterConeAngle() {
     return this.spotlightConeOuter;
-  }
-
-  /**
-   * Spotlights shine light in a cone, this value determines the size of the outer part of the cone.
-   * The intensity is interpolated between the inner and outer cone angles - meaning if they are the
-   * same than the cone is perfectly sharp. Generally you will want the inner cone to be smaller
-   * than the outer cone to avoid aliasing.
-   *
-   * @param coneOuter outer cone angle in radians, default is 0.6
-   */
-  public void setOuterConeAngle(float coneOuter) {
-    this.spotlightConeOuter = coneOuter;
-    fireChangedListeners();
   }
 
   /**
@@ -211,9 +210,7 @@ public class Light {
     changedListeners.add(listener);
   }
 
-  /**
-   * package-private function to remove change listeners.
-   */
+  /** package-private function to remove change listeners. */
   void removeChangedListener(LightChangedListener listener) {
     changedListeners.remove(listener);
   }
@@ -224,9 +221,7 @@ public class Light {
     }
   }
 
-  /**
-   * Type of Light Source
-   */
+/** Type of Light Source */
   public enum Type {
     /**
      * Approximates light radiating in all directions from a single point in space, where the
@@ -234,9 +229,7 @@ public class Light {
      * no direction. Use {@link #setFalloffRadius} to control the falloff.
      */
     POINT,
-    /**
-     * Approximates an infinitely far away, purely directional light
-     */
+    /** Approximates an infinitely far away, purely directional light */
     DIRECTIONAL,
     /**
      * Similar to a point light but radiating light in a cone rather than all directions. Note that
@@ -253,13 +246,11 @@ public class Light {
     FOCUSED_SPOTLIGHT
   }
 
-  interface LightChangedListener {
+interface LightChangedListener {
     void onChange();
   }
 
-  /**
-   * Factory class for {@link Light}
-   */
+  /** Factory class for {@link Light} */
   public static final class Builder {
     // LINT.IfChange
     private static final float DEFAULT_DIRECTIONAL_INTENSITY = 420.0f;
@@ -276,9 +267,7 @@ public class Light {
     private float spotlightConeInner = 0.5f;
     private float spotlightConeOuter = 0.6f;
 
-    /**
-     * Constructor for building.
-     */
+    /** Constructor for building. */
     private Builder(Type type) {
       this.type = type;
       // Directional lights should have a different default intensity
@@ -313,7 +302,7 @@ public class Light {
      * Sets the "RGB" color of the light based on the desired "color temperature."
      *
      * @param temperature color temperature in Kelvin on a scale from 1,000 to 10,000K. Typical
-     *                    commercial and residential lighting falls somewhere in the 2000K to 6500K range.
+     *     commercial and residential lighting falls somewhere in the 2000K to 6500K range.
      */
     public Builder setColorTemperature(float temperature) {
       final float[] rgbColor = Colors.cct(temperature);
@@ -329,8 +318,8 @@ public class Light {
      * but values larger than sunlight (120,000 lx) are generally not needed.
      *
      * @param intensity the intensity of the light, values greater than one are valid. The intensity
-     *                  will be clamped and cannot be zero or negative. For directional lights the default is 420
-     *                  lx. For other other lights the default is 2500 lm.
+     *     will be clamped and cannot be zero or negative. For directional lights the default is 420
+     *     lx. For other other lights the default is 2500 lm.
      */
     public Builder setIntensity(float intensity) {
       this.intensity = intensity;
@@ -374,9 +363,7 @@ public class Light {
       return this;
     }
 
-    /**
-     * Creates a new {@link Light} based on the parameters set previously
-     */
+    /** Creates a new {@link Light} based on the parameters set previously */
     public Light build() {
       Light light = new Light(this);
       if (light == null) {

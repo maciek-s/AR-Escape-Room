@@ -92,11 +92,6 @@ public final class ModelPipelineDef extends Table {
     builder.startVector(4, numElems, 4);
   }
 
-  public static int endModelPipelineDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -118,13 +113,11 @@ public final class ModelPipelineDef extends Table {
 
   public ModelPipelineImportDef sources(ModelPipelineImportDef obj, int j) {
     int o = __offset(4);
-    return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null;
-  }
+    return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
 
   public int sourcesLength() {
     int o = __offset(4);
-    return o != 0 ? __vector_len(o) : 0;
-  }
+    return o != 0 ? __vector_len(o) : 0; }
 
   /**
    * The list of models used for rendering. Each index in the list specifies
@@ -183,6 +176,11 @@ public final class ModelPipelineDef extends Table {
   public int texturesLength() {
     int o = __offset(12);
     return o != 0 ? __vector_len(o) : 0;
+  }
+
+  public static int endModelPipelineDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

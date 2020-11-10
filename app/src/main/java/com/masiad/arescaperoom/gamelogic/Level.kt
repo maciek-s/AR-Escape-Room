@@ -5,5 +5,6 @@ data class Level(
     val instructionName: String,
     val placingModelName: String,
     val roomModelName: String,
+    val doorModelName: String,
     val gameModelNames: List<String>
 )

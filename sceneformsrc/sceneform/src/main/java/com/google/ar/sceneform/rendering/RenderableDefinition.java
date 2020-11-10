@@ -29,11 +29,7 @@ import java.util.List;
  */
 public class RenderableDefinition {
   private static final Matrix scratchMatrix = new Matrix();
-  private static final int BYTES_PER_FLOAT = Float.SIZE / 8;
-  private static final int POSITION_SIZE = 3; // x, y, z
-  private static final int UV_SIZE = 2;
-  private static final int TANGENTS_SIZE = 4; // quaternion
-  private static final int COLOR_SIZE = 4; // RGBA
+
   private List<Vertex> vertices;
   private List<Submesh> submeshes;
 
@@ -42,8 +38,18 @@ public class RenderableDefinition {
     submeshes = Preconditions.checkNotNull(builder.submeshes);
   }
 
+  private static final int BYTES_PER_FLOAT = Float.SIZE / 8;
+  private static final int POSITION_SIZE = 3; // x, y, z
+  private static final int UV_SIZE = 2;
+  private static final int TANGENTS_SIZE = 4; // quaternion
+  private static final int COLOR_SIZE = 4; // RGBA
+
   public static Builder builder() {
     return new Builder();
+  }
+
+  List<Vertex> getVertices() {
+    return vertices;
   }
 
   private static VertexBuffer createVertexBuffer(
@@ -95,6 +101,10 @@ public class RenderableDefinition {
     }
 
     return builder.build(EngineInstance.getEngine().getFilamentEngine());
+  }
+
+  List<Submesh> getSubmeshes() {
+    return submeshes;
   }
 
   private static void addVector3ToBuffer(Vector3 vector3, FloatBuffer buffer) {
@@ -159,16 +169,8 @@ public class RenderableDefinition {
     return orientationQuaternion;
   }
 
-  List<Vertex> getVertices() {
-    return vertices;
-  }
-
   public void setVertices(List<Vertex> vertices) {
     this.vertices = vertices;
-  }
-
-  List<Submesh> getSubmeshes() {
-    return submeshes;
   }
 
   public void setSubmeshes(List<Submesh> submeshes) {

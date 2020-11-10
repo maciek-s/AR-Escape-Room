@@ -31,15 +31,26 @@ import com.google.ar.sceneform.Node;
  * <p>Gestures are created and updated by BaseGestureRecognizer's.
  */
 public abstract class BaseGesture<T extends BaseGesture<T>> {
-  protected final GesturePointersUtility gesturePointersUtility;
   @Nullable
   protected Node targetNode;
+
+  protected final GesturePointersUtility gesturePointersUtility;
+
   private boolean hasStarted;
   private boolean justStarted;
   private boolean hasFinished;
   private boolean wasCancelled;
   @Nullable
   private OnGestureEventListener<T> eventListener;
+
+  /**
+   * Interface definition for callbacks to be invoked by a {@link BaseGesture}.
+   */
+  public interface OnGestureEventListener<T extends BaseGesture<T>> {
+    void onUpdated(T gesture);
+
+    void onFinished(T gesture);
+  }
 
   public BaseGesture(GesturePointersUtility gesturePointersUtility) {
     this.gesturePointersUtility = gesturePointersUtility;
@@ -135,13 +146,4 @@ public abstract class BaseGesture<T extends BaseGesture<T>> {
 
   // For compile-time safety so we don't need to cast when dispatching events.
   protected abstract T getSelf();
-
-  /**
-   * Interface definition for callbacks to be invoked by a {@link BaseGesture}.
-   */
-  public interface OnGestureEventListener<T extends BaseGesture<T>> {
-    void onUpdated(T gesture);
-
-    void onFinished(T gesture);
-  }
 }

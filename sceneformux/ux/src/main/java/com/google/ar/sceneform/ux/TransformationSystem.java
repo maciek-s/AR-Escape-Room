@@ -63,14 +63,6 @@ public class TransformationSystem {
   }
 
   /**
-   * Gets the selection visualizer used to visualize which {@link BaseTransformableNode} is
-   * currently selected.
-   */
-  public SelectionVisualizer getSelectionVisualizer() {
-    return selectionVisualizer;
-  }
-
-  /**
    * Sets the selection visualizer used to visualize which {@link BaseTransformableNode} is
    * currently selected. If there is already a selected node, then the old selection visual is
    * removed and the new one is applied immediately.
@@ -85,6 +77,14 @@ public class TransformationSystem {
     if (selectedNode != null) {
       this.selectionVisualizer.applySelectionVisual(selectedNode);
     }
+  }
+
+  /**
+   * Gets the selection visualizer used to visualize which {@link BaseTransformableNode} is
+   * currently selected.
+   */
+  public SelectionVisualizer getSelectionVisualizer() {
+    return selectionVisualizer;
   }
 
   /**
@@ -142,8 +142,8 @@ public class TransformationSystem {
    * node or if the currently selected node is not actively being transformed. If null, then
    * deselects the currently selected node if the node is not transforming.
    *
-   * @return true if the node was successfully selected
    * @see BaseTransformableNode#isTransforming
+   * @return true if the node was successfully selected
    */
   public boolean selectNode(@Nullable BaseTransformableNode node) {
     if (!deselectNode()) {
@@ -158,9 +158,7 @@ public class TransformationSystem {
     return true;
   }
 
-  /**
-   * Dispatches touch events to the gesture recognizers contained by this transformation system.
-   */
+  /** Dispatches touch events to the gesture recognizers contained by this transformation system. */
   public void onTouch(HitTestResult hitTestResult, MotionEvent motionEvent) {
     for (int i = 0; i < recognizers.size(); i++) {
       recognizers.get(i).onTouch(hitTestResult, motionEvent);
@@ -170,8 +168,8 @@ public class TransformationSystem {
   /**
    * Deselects the currently selected node if the node is not currently transforming.
    *
-   * @return true if the node was successfully deselected
    * @see BaseTransformableNode#isTransforming
+   * @return true if the node was successfully deselected
    */
   private boolean deselectNode() {
     if (selectedNode == null) {

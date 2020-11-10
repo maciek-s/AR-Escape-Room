@@ -16,26 +16,6 @@ import java.nio.ByteBuffer;
  * @hide
  */
 public class EnvironmentalHdrLightEstimate implements Serializable {
-  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
-  @Nullable
-  private final float[] sphericalHarmonics;
-  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
-  @Nullable
-  private final float[] direction;
-  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
-  private final float colorR;
-  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
-  private final float colorG;
-  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
-  private final float colorB;
-  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
-  private final float colorA;
-  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
-  private final float relativeIntensity;
-  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
-  @Nullable
-  private final CubeMapImage[] cubeMap;
-
   // incompatible types in argument.
   // incompatible types in assignment.
   @SuppressWarnings({
@@ -76,30 +56,32 @@ public class EnvironmentalHdrLightEstimate implements Serializable {
     }
   }
 
+  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
   @Nullable
-  public float[] getSphericalHarmonics() {
-    return sphericalHarmonics;
-  }
+  private final float[] sphericalHarmonics;
 
+  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
   @Nullable
-  public float[] getDirection() {
-    return direction;
-  }
+  private final float[] direction;
 
-  public Color getColor() {
-    return new Color(colorR, colorG, colorB, colorA);
-  }
+  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
+  private final float colorR;
 
-  public float getRelativeIntensity() {
-    return relativeIntensity;
-  }
+  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
+  private final float colorG;
 
-  // incompatible types in return.
-  @SuppressWarnings("nullness:return.type.incompatible")
+  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
+  private final float colorB;
+
+  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
+  private final float colorA;
+
+  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
+  private final float relativeIntensity;
+
+  @UsedByReflection("EnvironmentalHdrLightEstimate.java")
   @Nullable
-  public CubeMapImage[] getCubeMap() {
-    return cubeMap;
-  }
+  private final CubeMapImage[] cubeMap;
 
   @UsedByReflection("EnvironmentalHdrLightEstimate.java")
   static class CubeMapImage implements Serializable {
@@ -145,5 +127,30 @@ public class EnvironmentalHdrLightEstimate implements Serializable {
         rowStride = plane.getRowStride();
       }
     }
+  }
+
+  @Nullable
+  public float[] getSphericalHarmonics() {
+    return sphericalHarmonics;
+  }
+
+  @Nullable
+  public float[] getDirection() {
+    return direction;
+  }
+
+  public Color getColor() {
+    return new Color(colorR, colorG, colorB, colorA);
+  }
+
+  public float getRelativeIntensity() {
+    return relativeIntensity;
+  }
+
+  // incompatible types in return.
+  @SuppressWarnings("nullness:return.type.incompatible")
+  @Nullable
+  public CubeMapImage[] getCubeMap() {
+    return cubeMap;
   }
 }

@@ -23,10 +23,6 @@ import com.google.ar.sceneform.HitTestResult;
  * Gesture Recognizer for when the user performs a drag motion on the touch screen.
  */
 public class DragGestureRecognizer extends BaseGestureRecognizer<DragGesture> {
-  public DragGestureRecognizer(GesturePointersUtility gesturePointersUtility) {
-    super(gesturePointersUtility);
-  }
-
   @Override
   protected void tryCreateGestures(HitTestResult hitTestResult, MotionEvent motionEvent) {
     int action = motionEvent.getActionMasked();
@@ -39,10 +35,13 @@ public class DragGestureRecognizer extends BaseGestureRecognizer<DragGesture> {
     }
   }
 
+  public DragGestureRecognizer(GesturePointersUtility gesturePointersUtility) {
+    super(gesturePointersUtility);
+  }
+
   /**
    * Interface definition for a callbacks to be invoked when a {@link DragGesture} starts.
    */
   public interface OnGestureStartedListener
-          extends BaseGestureRecognizer.OnGestureStartedListener<DragGesture> {
-  }
+          extends BaseGestureRecognizer.OnGestureStartedListener<DragGesture> {}
 }

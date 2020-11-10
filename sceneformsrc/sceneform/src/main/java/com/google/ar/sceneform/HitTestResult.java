@@ -13,6 +13,14 @@ public class HitTestResult extends RayHit {
   private Node node;
 
   /**
+   * @hide
+   */
+  @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
+  public void setNode(@Nullable Node node) {
+    this.node = node;
+  }
+
+  /**
    * The node that was hit by the hit test. Null when there is no hit.
    *
    * @return the hit node
@@ -22,25 +30,13 @@ public class HitTestResult extends RayHit {
     return node;
   }
 
-  /**
-   * @hide
-   */
-  @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
-  public void setNode(@Nullable Node node) {
-    this.node = node;
-  }
-
-  /**
-   * @hide
-   */
+  /** @hide */
   public void set(HitTestResult other) {
     super.set(other);
     setNode(other.node);
   }
 
-  /**
-   * @hide
-   */
+  /** @hide */
   @Override
   public void reset() {
     super.reset();

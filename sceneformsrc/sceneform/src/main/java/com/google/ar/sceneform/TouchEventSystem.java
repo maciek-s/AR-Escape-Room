@@ -35,14 +35,14 @@ import java.util.ArrayList;
  * @hide
  */
 public class TouchEventSystem {
-  private final Object[] motionEventSplitParams = new Object[1];
-  private final ArrayList<OnPeekTouchListener> onPeekTouchListeners = new ArrayList<>();
   private Method motionEventSplitMethod;
+  private final Object[] motionEventSplitParams = new Object[1];
   @Nullable
   private Scene.OnTouchListener onTouchListener;
   // The touch listener that is handling the current gesture.
   @Nullable
   private Scene.OnTouchListener handlingTouchListener = null;
+  private final ArrayList<OnPeekTouchListener> onPeekTouchListeners = new ArrayList<>();
   // Linked list of nodes that are currently handling touches for a set of pointers.
   @Nullable
   private TouchTarget firstHandlingTouchTarget = null;
@@ -59,44 +59,6 @@ public class TouchEventSystem {
   @Nullable
   public Scene.OnTouchListener getOnTouchListener() {
     return onTouchListener;
-  }
-
-  /**
-   * Register a callback to be invoked when the scene is touched. The callback is invoked before any
-   * node receives the event. If the callback handles the event, then the gesture is never received
-   * by the nodes.
-   *
-   * @param onTouchListener the touch listener to attach
-   */
-  public void setOnTouchListener(@Nullable Scene.OnTouchListener onTouchListener) {
-    this.onTouchListener = onTouchListener;
-  }
-
-  /**
-   * Adds a listener that will be called before the {@link Scene.OnTouchListener} is invoked. This
-   * is invoked even if the gesture was consumed, making it possible to observe all motion events
-   * dispatched to the scene. This is called even if the touch is not over a node, in which case
-   * {@link HitTestResult#getNode()} will be null. The listeners will be called in the order in
-   * which they were added.
-   *
-   * @param onPeekTouchListener the peek touch listener to add
-   */
-  public void addOnPeekTouchListener(OnPeekTouchListener onPeekTouchListener) {
-    if (!onPeekTouchListeners.contains(onPeekTouchListener)) {
-      onPeekTouchListeners.add(onPeekTouchListener);
-    }
-  }
-
-  /**
-   * Removes a listener that will be called before the {@link Scene.OnTouchListener} is invoked.
-   * This is invoked even if the gesture was consumed, making it possible to observe all motion
-   * events dispatched to the scene. This is called even if the touch is not over a node, in which
-   * case {@link HitTestResult#getNode()} will be null.
-   *
-   * @param onPeekTouchListener the peek touch listener to remove
-   */
-  public void removeOnPeekTouchListener(OnPeekTouchListener onPeekTouchListener) {
-    onPeekTouchListeners.remove(onPeekTouchListener);
   }
 
   public void onTouchEvent(HitTestResult hitTestResult, MotionEvent motionEvent) {
@@ -189,6 +151,44 @@ public class TouchEventSystem {
     }
   }
 
+  /**
+   * Register a callback to be invoked when the scene is touched. The callback is invoked before any
+   * node receives the event. If the callback handles the event, then the gesture is never received
+   * by the nodes.
+   *
+   * @param onTouchListener the touch listener to attach
+   */
+  public void setOnTouchListener(@Nullable Scene.OnTouchListener onTouchListener) {
+    this.onTouchListener = onTouchListener;
+  }
+
+  /**
+   * Adds a listener that will be called before the {@link Scene.OnTouchListener} is invoked. This
+   * is invoked even if the gesture was consumed, making it possible to observe all motion events
+   * dispatched to the scene. This is called even if the touch is not over a node, in which case
+   * {@link HitTestResult#getNode()} will be null. The listeners will be called in the order in
+   * which they were added.
+   *
+   * @param onPeekTouchListener the peek touch listener to add
+   */
+  public void addOnPeekTouchListener(OnPeekTouchListener onPeekTouchListener) {
+    if (!onPeekTouchListeners.contains(onPeekTouchListener)) {
+      onPeekTouchListeners.add(onPeekTouchListener);
+    }
+  }
+
+  /**
+   * Removes a listener that will be called before the {@link Scene.OnTouchListener} is invoked.
+   * This is invoked even if the gesture was consumed, making it possible to observe all motion
+   * events dispatched to the scene. This is called even if the touch is not over a node, in which
+   * case {@link HitTestResult#getNode()} will be null.
+   *
+   * @param onPeekTouchListener the peek touch listener to remove
+   */
+  public void removeOnPeekTouchListener(OnPeekTouchListener onPeekTouchListener) {
+    onPeekTouchListeners.remove(onPeekTouchListener);
+  }
+
   private boolean tryDispatchToSceneTouchListener(
           HitTestResult hitTestResult, MotionEvent motionEvent) {
     // This is a new gesture, give the touch listener a chance to capture the input.
@@ -205,6 +205,57 @@ public class TouchEventSystem {
     }
 
     return false;
+  }
+
+  @Nullable
+  private Node dispatchTouchEvent(
+          MotionEvent motionEvent,
+          HitTestResult hitTestResult,
+          Node node,
+          int desiredPointerIdBits,
+          boolean bubble) {
+    // Calculate the number of pointers to deliver.
+    int eventPointerIdBits = getPointerIdBits(motionEvent);
+    int finalPointerIdBits = eventPointerIdBits & desiredPointerIdBits;
+
+    // If for some reason we ended up in an inconsistent state where it looks like we
+    // might produce a motion event with no pointers in it, then drop the event.
+    if (finalPointerIdBits == 0) {
+      return null;
+    }
+
+    // Split the motion event if necessary based on the pointer Ids included in the event
+    // compared to the pointer Ids that the node is handling.
+    MotionEvent finalEvent = motionEvent;
+    boolean needsRecycle = false;
+    if (finalPointerIdBits != eventPointerIdBits) {
+      finalEvent = splitMotionEvent(motionEvent, finalPointerIdBits);
+      needsRecycle = true;
+    }
+
+    // Bubble the event up the hierarchy until a node handles the event, or the root is reached.
+    Node resultNode = node;
+    while (resultNode != null) {
+      if (resultNode.dispatchTouchEvent(hitTestResult, finalEvent)) {
+        break;
+      } else {
+        if (bubble) {
+          resultNode = resultNode.getParent();
+        } else {
+          resultNode = null;
+        }
+      }
+    }
+
+    if (resultNode == null) {
+      tryDispatchToSceneTouchListener(hitTestResult, finalEvent);
+    }
+
+    if (needsRecycle) {
+      finalEvent.recycle();
+    }
+
+    return resultNode;
   }
 
   private MotionEvent splitMotionEvent(MotionEvent motionEvent, int idBits) {
@@ -264,55 +315,21 @@ public class TouchEventSystem {
     return null;
   }
 
-  @Nullable
-  private Node dispatchTouchEvent(
-          MotionEvent motionEvent,
-          HitTestResult hitTestResult,
-          Node node,
-          int desiredPointerIdBits,
-          boolean bubble) {
-    // Calculate the number of pointers to deliver.
-    int eventPointerIdBits = getPointerIdBits(motionEvent);
-    int finalPointerIdBits = eventPointerIdBits & desiredPointerIdBits;
+  /**
+   * Keeps track of which nodes are handling events for which pointer Id's. Implemented as a linked
+   * list to store an ordered list of touch targets.
+   */
+  private static class TouchTarget {
+    public static final int ALL_POINTER_IDS = -1; // all ones
 
-    // If for some reason we ended up in an inconsistent state where it looks like we
-    // might produce a motion event with no pointers in it, then drop the event.
-    if (finalPointerIdBits == 0) {
-      return null;
-    }
+    // The touch target.
+    public Node node;
 
-    // Split the motion event if necessary based on the pointer Ids included in the event
-    // compared to the pointer Ids that the node is handling.
-    MotionEvent finalEvent = motionEvent;
-    boolean needsRecycle = false;
-    if (finalPointerIdBits != eventPointerIdBits) {
-      finalEvent = splitMotionEvent(motionEvent, finalPointerIdBits);
-      needsRecycle = true;
-    }
+    // The combined bit mask of pointer ids for all pointers captured by the target.
+    public int pointerIdBits;
 
-    // Bubble the event up the hierarchy until a node handles the event, or the root is reached.
-    Node resultNode = node;
-    while (resultNode != null) {
-      if (resultNode.dispatchTouchEvent(hitTestResult, finalEvent)) {
-        break;
-      } else {
-        if (bubble) {
-          resultNode = resultNode.getParent();
-        } else {
-          resultNode = null;
-        }
-      }
-    }
-
-    if (resultNode == null) {
-      tryDispatchToSceneTouchListener(hitTestResult, finalEvent);
-    }
-
-    if (needsRecycle) {
-      finalEvent.recycle();
-    }
-
-    return resultNode;
+    // The next target in the target list.
+    @Nullable public TouchTarget next;
   }
 
   private int getPointerIdBits(MotionEvent motionEvent) {
@@ -336,23 +353,5 @@ public class TouchEventSystem {
   private void clearTouchTargets() {
     handlingTouchListener = null;
     firstHandlingTouchTarget = null;
-  }
-
-  /**
-   * Keeps track of which nodes are handling events for which pointer Id's. Implemented as a linked
-   * list to store an ordered list of touch targets.
-   */
-  private static class TouchTarget {
-    public static final int ALL_POINTER_IDS = -1; // all ones
-
-    // The touch target.
-    public Node node;
-
-    // The combined bit mask of pointer ids for all pointers captured by the target.
-    public int pointerIdBits;
-
-    // The next target in the target list.
-    @Nullable
-    public TouchTarget next;
   }
 }

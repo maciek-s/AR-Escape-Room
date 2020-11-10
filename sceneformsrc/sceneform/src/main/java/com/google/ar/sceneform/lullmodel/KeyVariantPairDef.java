@@ -56,11 +56,6 @@ public final class KeyVariantPairDef extends Table {
     builder.addOffset(3, valueOffset, 0);
   }
 
-  public static int endKeyVariantPairDef(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -99,6 +94,11 @@ public final class KeyVariantPairDef extends Table {
   public Table value(Table obj) {
     int o = __offset(10);
     return o != 0 ? __union(obj, o) : null;
+  }
+
+  public static int endKeyVariantPairDef(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

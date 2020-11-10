@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
  * Displays the Camera stream using Filament.
  *
  * @hide Note: The class is hidden because it should only be used by the Filament Renderer and does
- * not expose a user facing API.
+ *     not expose a user facing API.
  */
 @SuppressWarnings("AndroidApiChecker") // CompletableFuture
 public class CameraStream {
@@ -49,11 +49,14 @@ public class CameraStream {
 
   private final Scene scene;
   private final int cameraTextureId;
+
+  private int cameraStreamRenderable = UNINITIALIZED_FILAMENT_RENDERABLE;
+
   private final IndexBuffer cameraIndexBuffer;
   private final VertexBuffer cameraVertexBuffer;
   private final FloatBuffer cameraUvCoords;
   private final FloatBuffer transformedCameraUvCoords;
-  private int cameraStreamRenderable = UNINITIALIZED_FILAMENT_RENDERABLE;
+
   @Nullable
   private ExternalTexture cameraTexture;
 
@@ -144,17 +147,6 @@ public class CameraStream {
                     });
   }
 
-  private static FloatBuffer createCameraUVBuffer() {
-    FloatBuffer buffer =
-            ByteBuffer.allocateDirect(CAMERA_UVS.length * FLOAT_SIZE_IN_BYTES)
-                    .order(ByteOrder.nativeOrder())
-                    .asFloatBuffer();
-    buffer.put(CAMERA_UVS);
-    buffer.rewind();
-
-    return buffer;
-  }
-
   public boolean isTextureInitialized() {
     return isTextureInitialized;
   }
@@ -181,6 +173,17 @@ public class CameraStream {
     }
   }
 
+  private static FloatBuffer createCameraUVBuffer() {
+    FloatBuffer buffer =
+            ByteBuffer.allocateDirect(CAMERA_UVS.length * FLOAT_SIZE_IN_BYTES)
+                    .order(ByteOrder.nativeOrder())
+                    .asFloatBuffer();
+    buffer.put(CAMERA_UVS);
+    buffer.rewind();
+
+    return buffer;
+  }
+
   public void recalculateCameraUvs(Frame frame) {
     IEngine engine = EngineInstance.getEngine();
 
@@ -191,6 +194,25 @@ public class CameraStream {
     adjustCameraUvsForOpenGL();
     cameraVertexBuffer.setBufferAt(
             engine.getFilamentEngine(), UV_BUFFER_INDEX, transformedCameraUvCoords);
+  }
+
+  public void setCameraMaterialToDefault() {
+    if (defaultCameraMaterial != null) {
+      setCameraMaterial(defaultCameraMaterial);
+    } else {
+      // Default camera material hasn't been loaded yet, so just remove any custom material
+      // that has been set.
+      cameraMaterial = null;
+    }
+  }
+
+  public void setRenderPriority(int priority) {
+    renderablePriority = priority;
+    if (cameraStreamRenderable != UNINITIALIZED_FILAMENT_RENDERABLE) {
+      RenderableManager renderableManager = EngineInstance.getEngine().getRenderableManager();
+      int renderableInstance = renderableManager.getInstance(cameraStreamRenderable);
+      renderableManager.setPriority(renderableInstance, renderablePriority);
+    }
   }
 
   public void setCameraMaterial(Material material) {
@@ -216,34 +238,15 @@ public class CameraStream {
     }
   }
 
-  public void setCameraMaterialToDefault() {
-    if (defaultCameraMaterial != null) {
-      setCameraMaterial(defaultCameraMaterial);
-    } else {
-      // Default camera material hasn't been loaded yet, so just remove any custom material
-      // that has been set.
-      cameraMaterial = null;
-    }
-  }
-
-  public int getRenderPriority() {
-    return renderablePriority;
-  }
-
-  public void setRenderPriority(int priority) {
-    renderablePriority = priority;
-    if (cameraStreamRenderable != UNINITIALIZED_FILAMENT_RENDERABLE) {
-      RenderableManager renderableManager = EngineInstance.getEngine().getRenderableManager();
-      int renderableInstance = renderableManager.getInstance(cameraStreamRenderable);
-      renderableManager.setPriority(renderableInstance, renderablePriority);
-    }
-  }
-
   private void adjustCameraUvsForOpenGL() {
     // Correct for vertical coordinates to match OpenGL
     for (int i = 1; i < VERTEX_COUNT * 2; i += 2) {
       transformedCameraUvCoords.put(i, 1.0f - transformedCameraUvCoords.get(i));
     }
+  }
+
+  public int getRenderPriority() {
+    return renderablePriority;
   }
 
   private void initializeFilamentRenderable() {

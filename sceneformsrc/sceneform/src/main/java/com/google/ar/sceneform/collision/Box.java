@@ -38,7 +38,7 @@ public class Box extends CollisionShape {
   /**
    * Create a box with a specified center and size.
    *
-   * @param size   the size of the box
+   * @param size the size of the box
    * @param center the center of the box
    */
   @SuppressWarnings("initialization") // Suppress @UnderInitialization warning.
@@ -53,8 +53,8 @@ public class Box extends CollisionShape {
   /**
    * Get a copy of the box's center.
    *
-   * @return a new vector that represents the box's center
    * @see #setCenter(Vector3)
+   * @return a new vector that represents the box's center
    */
   public Vector3 getCenter() {
     return new Vector3(center);
@@ -63,8 +63,8 @@ public class Box extends CollisionShape {
   /**
    * Set the center of this box.
    *
-   * @param center the new center of the box
    * @see #getCenter()
+   * @param center the new center of the box
    */
   public void setCenter(Vector3 center) {
     Preconditions.checkNotNull(center, "Parameter \"center\" was null.");
@@ -75,8 +75,8 @@ public class Box extends CollisionShape {
   /**
    * Get a copy of the box's size.
    *
-   * @return a new vector that represents the box's size
    * @see #setSize(Vector3)
+   * @return a new vector that represents the box's size
    */
   public Vector3 getSize() {
     return new Vector3(size);
@@ -85,8 +85,8 @@ public class Box extends CollisionShape {
   /**
    * Set the size of this box.
    *
-   * @param size the new size of the box
    * @see #getSize()
+   * @param size the new size of the box
    */
   public void setSize(Vector3 size) {
     Preconditions.checkNotNull(size, "Parameter \"size\" was null.");
@@ -106,8 +106,8 @@ public class Box extends CollisionShape {
   /**
    * Get a copy of the box's rotation.
    *
-   * @return a new quaternion that represents the box's rotation
    * @see #setRotation(Quaternion)
+   * @return a new quaternion that represents the box's rotation
    */
   public Quaternion getRotation() {
     Quaternion result = new Quaternion();
@@ -118,8 +118,8 @@ public class Box extends CollisionShape {
   /**
    * Set the rotation of this box.
    *
-   * @param rotation the new rotation of the box
    * @see #getRotation()
+   * @param rotation the new rotation of the box
    */
   public void setRotation(Quaternion rotation) {
     Preconditions.checkNotNull(rotation, "Parameter \"rotation\" was null.");
@@ -142,9 +142,7 @@ public class Box extends CollisionShape {
     return rotationMatrix;
   }
 
-  /**
-   * @hide protected method
-   */
+  /** @hide protected method */
   @Override
   protected boolean rayIntersection(Ray ray, RayHit result) {
     Preconditions.checkNotNull(ray, "Parameter \"ray\" was null.");
@@ -247,26 +245,20 @@ public class Box extends CollisionShape {
     return true;
   }
 
-  /**
-   * @hide protected method
-   */
+  /** @hide protected method */
   @Override
   protected boolean shapeIntersection(CollisionShape shape) {
     Preconditions.checkNotNull(shape, "Parameter \"shape\" was null.");
     return shape.boxIntersection(this);
   }
 
-  /**
-   * @hide protected method
-   */
+  /** @hide protected method */
   @Override
   protected boolean sphereIntersection(Sphere sphere) {
     return Intersections.sphereBoxIntersection(sphere, this);
   }
 
-  /**
-   * @hide protected method
-   */
+  /** @hide protected method */
   @Override
   protected boolean boxIntersection(Box box) {
     return Intersections.boxBoxIntersection(this, box);

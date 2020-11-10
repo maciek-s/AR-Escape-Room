@@ -19,10 +19,10 @@ import java.nio.ByteBuffer;
  * @hide
  */
 public final class SceneformBundle {
+  private static final String TAG = SceneformBundle.class.getSimpleName();
   // TODO: This 'version range' is too narrow
   public static final float RCB_MAJOR_VERSION = 0.54f;
   public static final int RCB_MINOR_VERSION = 2;
-  private static final String TAG = SceneformBundle.class.getSimpleName();
   private static final char[] RCB_SIGNATURE = {'R', 'B', 'U', 'N'};
   // Per flatbuffer documentation, a buffer signature is written to
   // bytes 4 - 7 inclusively.
@@ -53,6 +53,12 @@ public final class SceneformBundle {
     return null;
   }
 
+  static class VersionException extends Exception {
+    public VersionException(String message) {
+      super(message);
+    }
+  }
+
   public static CollisionShape readCollisionGeometry(SceneformBundleDef rcb) throws IOException {
     SuggestedCollisionShapeDef shape = rcb.suggestedCollisionShape();
     int type = shape.type();
@@ -79,11 +85,5 @@ public final class SceneformBundle {
       }
     }
     return true;
-  }
-
-  static class VersionException extends Exception {
-    public VersionException(String message) {
-      super(message);
-    }
   }
 }

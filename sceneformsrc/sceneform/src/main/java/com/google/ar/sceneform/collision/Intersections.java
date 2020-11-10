@@ -18,9 +18,7 @@ class Intersections {
   private static final int NUM_VERTICES_PER_BOX = 8;
   private static final int NUM_TEST_AXES = 15;
 
-  /**
-   * Determine if two spheres intersect with each other.
-   */
+  /** Determine if two spheres intersect with each other. */
   static boolean sphereSphereIntersection(Sphere sphere1, Sphere sphere2) {
     Preconditions.checkNotNull(sphere1, "Parameter \"sphere1\" was null.");
     Preconditions.checkNotNull(sphere2, "Parameter \"sphere2\" was null.");
@@ -34,9 +32,7 @@ class Intersections {
             && differenceLengthSquared != 0.0f;
   }
 
-  /**
-   * Determine if two boxes intersect with each other.
-   */
+  /** Determine if two boxes intersect with each other. */
   static boolean boxBoxIntersection(Box box1, Box box2) {
     Preconditions.checkNotNull(box1, "Parameter \"box1\" was null.");
     Preconditions.checkNotNull(box2, "Parameter \"box2\" was null.");
@@ -72,9 +68,7 @@ class Intersections {
     return true;
   }
 
-  /**
-   * Determine if a sphere and a box intersect with each other.
-   */
+  /** Determine if a sphere and a box intersect with each other. */
   static boolean sphereBoxIntersection(Sphere sphere, Box box) {
     Preconditions.checkNotNull(sphere, "Parameter \"sphere\" was null.");
     Preconditions.checkNotNull(box, "Parameter \"box\" was null.");
@@ -170,9 +164,7 @@ class Intersections {
     return min2 <= max1 && min1 <= max2;
   }
 
-  /**
-   * Converts a box into an array of 8 vertices that represent the corners of the box.
-   */
+  /** Converts a box into an array of 8 vertices that represent the corners of the box. */
   private static List<Vector3> getVerticesFromBox(Box box) {
     Preconditions.checkNotNull(box, "Parameter \"box\" was null.");
 

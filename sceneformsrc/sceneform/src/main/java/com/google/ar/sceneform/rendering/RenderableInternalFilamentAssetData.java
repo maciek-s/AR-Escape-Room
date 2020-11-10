@@ -26,10 +26,11 @@ import java.util.function.Function;
 @SuppressWarnings("AndroidJdkLibsChecker")
 public class RenderableInternalFilamentAssetData implements IRenderableInternalData {
 
-  static MaterialProvider materialProvider;
   Context context;
   Buffer gltfByteBuffer;
+  static MaterialProvider materialProvider;
   ResourceLoader resourceLoader;
+  boolean isGltfBinary;
   @Nullable
   Function<String, Uri> urlResolver;
 
@@ -41,13 +42,18 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
   }
 
   @Override
+  public void setCenterAabb(Vector3 center) {
+    // Not Implemented
+  }
+
+  @Override
   public Vector3 getCenterAabb() {
     // Not Implemented
     return Vector3.zero();
   }
 
   @Override
-  public void setCenterAabb(Vector3 center) {
+  public void setExtentsAabb(Vector3 halfExtents) {
     // Not Implemented
   }
 
@@ -57,14 +63,14 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
   }
 
   @Override
-  public void setExtentsAabb(Vector3 halfExtents) {
-    // Not Implemented
-  }
-
-  @Override
   public Vector3 getSizeAabb() {
     // Not Implemented
     return Vector3.zero();
+  }
+
+  @Override
+  public void setTransformScale(float scale) {
+    // Not Implemented
   }
 
   @Override
@@ -74,7 +80,7 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
   }
 
   @Override
-  public void setTransformScale(float scale) {
+  public void setTransformOffset(Vector3 offset) {
     // Not Implemented
   }
 
@@ -82,11 +88,6 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
   public Vector3 getTransformOffset() {
     // Not Implemented
     return Vector3.zero();
-  }
-
-  @Override
-  public void setTransformOffset(Vector3 offset) {
-    // Not Implemented
   }
 
   @Override
@@ -100,13 +101,6 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
     return new ArrayList<>();
   }
 
-  @Nullable
-  @Override
-  public IndexBuffer getIndexBuffer() {
-    // Not Implemented
-    return null;
-  }
-
   @Override
   public void setIndexBuffer(@Nullable IndexBuffer indexBuffer) {
     // Not Implemented
@@ -114,7 +108,7 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
 
   @Nullable
   @Override
-  public VertexBuffer getVertexBuffer() {
+  public IndexBuffer getIndexBuffer() {
     // Not Implemented
     return null;
   }
@@ -126,7 +120,7 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
 
   @Nullable
   @Override
-  public IntBuffer getRawIndexBuffer() {
+  public VertexBuffer getVertexBuffer() {
     // Not Implemented
     return null;
   }
@@ -138,7 +132,7 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
 
   @Nullable
   @Override
-  public FloatBuffer getRawPositionBuffer() {
+  public IntBuffer getRawIndexBuffer() {
     // Not Implemented
     return null;
   }
@@ -150,7 +144,7 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
 
   @Nullable
   @Override
-  public FloatBuffer getRawTangentsBuffer() {
+  public FloatBuffer getRawPositionBuffer() {
     // Not Implemented
     return null;
   }
@@ -162,7 +156,7 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
 
   @Nullable
   @Override
-  public FloatBuffer getRawUvBuffer() {
+  public FloatBuffer getRawTangentsBuffer() {
     // Not Implemented
     return null;
   }
@@ -174,13 +168,25 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
 
   @Nullable
   @Override
-  public FloatBuffer getRawColorBuffer() {
+  public FloatBuffer getRawUvBuffer() {
     // Not Implemented
     return null;
   }
 
   @Override
   public void setRawColorBuffer(@Nullable FloatBuffer rawColorBuffer) {
+    // Not Implemented
+  }
+
+  @Nullable
+  @Override
+  public FloatBuffer getRawColorBuffer() {
+    // Not Implemented
+    return null;
+  }
+
+  @Override
+  public void setAnimationNames(@NonNull List<String> animationNames) {
     // Not Implemented
   }
 
@@ -191,16 +197,10 @@ public class RenderableInternalFilamentAssetData implements IRenderableInternalD
     return new ArrayList<>();
   }
 
-  @Override
-  public void setAnimationNames(@NonNull List<String> animationNames) {
-    // Not Implemented
-  }
 
   @Override
-  public void buildInstanceData(Renderable renderable, int renderedEntity) {
-  }
+  public void buildInstanceData(Renderable renderable, int renderedEntity) {}
 
   @Override
-  public void dispose() {
-  }
+  public void dispose() {}
 }

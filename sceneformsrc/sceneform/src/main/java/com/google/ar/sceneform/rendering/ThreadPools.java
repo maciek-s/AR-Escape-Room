@@ -36,16 +36,12 @@ public class ThreadPools {
     return mainExecutor;
   }
 
-  /**
-   * @param executor provides access to the main thread.
-   */
+  /** @param executor provides access to the main thread. */
   public static void setMainExecutor(Executor executor) {
     mainExecutor = executor;
   }
 
-  /**
-   * Default background {@link Executor} for async operations including file reading.
-   */
+  /** Default background {@link Executor} for async operations including file reading. */
   public static Executor getThreadPoolExecutor() {
     if (threadPoolExecutor == null) {
       return AsyncTask.THREAD_POOL_EXECUTOR;

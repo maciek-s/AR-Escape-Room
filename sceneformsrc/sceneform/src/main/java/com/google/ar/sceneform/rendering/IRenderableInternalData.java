@@ -19,68 +19,68 @@ import java.util.List;
 // RenderableInternalDefinitionData
 interface IRenderableInternalData {
 
-  Vector3 getCenterAabb();
-
   void setCenterAabb(Vector3 minAabb);
 
-  Vector3 getExtentsAabb();
+  Vector3 getCenterAabb();
 
   void setExtentsAabb(Vector3 maxAabb);
 
-  Vector3 getSizeAabb();
+  Vector3 getExtentsAabb();
 
-  float getTransformScale();
+  Vector3 getSizeAabb();
 
   void setTransformScale(float scale);
 
-  Vector3 getTransformOffset();
+  float getTransformScale();
 
   void setTransformOffset(Vector3 offset);
 
-  ArrayList<MeshData> getMeshes();
+  Vector3 getTransformOffset();
 
-  @Nullable
-  IndexBuffer getIndexBuffer();
+  ArrayList<MeshData> getMeshes();
 
   void setIndexBuffer(@Nullable IndexBuffer indexBuffer);
 
   @Nullable
-  VertexBuffer getVertexBuffer();
+  IndexBuffer getIndexBuffer();
 
   void setVertexBuffer(@Nullable VertexBuffer vertexBuffer);
 
   @Nullable
-  IntBuffer getRawIndexBuffer();
+  VertexBuffer getVertexBuffer();
 
   void setRawIndexBuffer(@Nullable IntBuffer rawIndexBuffer);
 
   @Nullable
-  FloatBuffer getRawPositionBuffer();
+  IntBuffer getRawIndexBuffer();
 
   void setRawPositionBuffer(@Nullable FloatBuffer rawPositionBuffer);
 
   @Nullable
-  FloatBuffer getRawTangentsBuffer();
+  FloatBuffer getRawPositionBuffer();
 
   void setRawTangentsBuffer(@Nullable FloatBuffer rawTangentsBuffer);
 
   @Nullable
-  FloatBuffer getRawUvBuffer();
+  FloatBuffer getRawTangentsBuffer();
 
   void setRawUvBuffer(@Nullable FloatBuffer rawUvBuffer);
 
   @Nullable
-  FloatBuffer getRawColorBuffer();
+  FloatBuffer getRawUvBuffer();
 
   void setRawColorBuffer(@Nullable FloatBuffer rawColorBuffer);
+
+  @Nullable
+  FloatBuffer getRawColorBuffer();
+
+  void setAnimationNames(@NonNull List<String> animationNames);
 
   @NonNull
   List<String> getAnimationNames();
 
-  void setAnimationNames(@NonNull List<String> animationNames);
 
   void buildInstanceData(Renderable renderable, @Entity int renderedEntity);
-
   /**
    * Removes any memory used by the object.
    *

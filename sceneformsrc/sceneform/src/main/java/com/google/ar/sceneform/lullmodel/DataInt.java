@@ -37,11 +37,6 @@ public final class DataInt extends Table {
     builder.addInt(0, value, 0);
   }
 
-  public static int endDataInt(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -57,6 +52,11 @@ public final class DataInt extends Table {
   public int value() {
     int o = __offset(4);
     return o != 0 ? bb.getInt(o + bb_pos) : 0;
+  }
+
+  public static int endDataInt(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

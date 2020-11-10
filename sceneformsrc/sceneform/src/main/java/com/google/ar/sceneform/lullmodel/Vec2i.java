@@ -9,13 +9,6 @@ import java.nio.ByteBuffer;
 
 @SuppressWarnings("unused")
 public final class Vec2i extends Struct {
-  public static int createVec2i(FlatBufferBuilder builder, int x, int y) {
-    builder.prep(4, 8);
-    builder.putInt(y);
-    builder.putInt(x);
-    return builder.offset();
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -32,6 +25,13 @@ public final class Vec2i extends Struct {
 
   public int y() {
     return bb.getInt(bb_pos + 4);
+  }
+
+  public static int createVec2i(FlatBufferBuilder builder, int x, int y) {
+    builder.prep(4, 8);
+    builder.putInt(y);
+    builder.putInt(x);
+    return builder.offset();
   }
 }
 

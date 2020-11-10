@@ -26,8 +26,11 @@ import com.google.ar.sceneform.math.Vector3;
  */
 public class TwistGesture extends BaseGesture<TwistGesture> {
   private static final String TAG = TwistGesture.class.getSimpleName();
-  private static final boolean TWIST_GESTURE_DEBUG = false;
+
   private static final float SLOP_ROTATION_DEGREES = 15.0f;
+
+  private static final boolean TWIST_GESTURE_DEBUG = false;
+
   private final int pointerId1;
   private final int pointerId2;
   private final Vector3 startPosition1;
@@ -55,6 +58,10 @@ public class TwistGesture extends BaseGesture<TwistGesture> {
     }
   }
 
+  public float getDeltaRotationDegrees() {
+    return deltaRotationDegrees;
+  }
+
   private static float calculateDeltaRotation(
           Vector3 currentPosition1,
           Vector3 currentPosition2,
@@ -68,8 +75,11 @@ public class TwistGesture extends BaseGesture<TwistGesture> {
     return Vector3.angleBetweenVectors(currentDirection, previousDirection) * sign;
   }
 
-  public float getDeltaRotationDegrees() {
-    return deltaRotationDegrees;
+  @Override
+  protected void onStart(HitTestResult hitTestResult, MotionEvent motionEvent) {
+    debugLog("Started");
+    gesturePointersUtility.retainPointerId(pointerId1);
+    gesturePointersUtility.retainPointerId(pointerId2);
   }
 
   @Override
@@ -122,10 +132,20 @@ public class TwistGesture extends BaseGesture<TwistGesture> {
   }
 
   @Override
-  protected void onStart(HitTestResult hitTestResult, MotionEvent motionEvent) {
-    debugLog("Started");
-    gesturePointersUtility.retainPointerId(pointerId1);
-    gesturePointersUtility.retainPointerId(pointerId2);
+  protected void onCancel() {
+    debugLog("Cancelled");
+  }
+
+  @Override
+  protected void onFinish() {
+    debugLog("Finished");
+    gesturePointersUtility.releasePointerId(pointerId1);
+    gesturePointersUtility.releasePointerId(pointerId2);
+  }
+
+  @Override
+  protected TwistGesture getSelf() {
+    return this;
   }
 
   @Override
@@ -159,27 +179,9 @@ public class TwistGesture extends BaseGesture<TwistGesture> {
     return true;
   }
 
-  @Override
-  protected void onCancel() {
-    debugLog("Cancelled");
-  }
-
-  @Override
-  protected void onFinish() {
-    debugLog("Finished");
-    gesturePointersUtility.releasePointerId(pointerId1);
-    gesturePointersUtility.releasePointerId(pointerId2);
-  }
-
-  @Override
-  protected TwistGesture getSelf() {
-    return this;
-  }
-
   /**
    * Interface definition for callbacks to be invoked by a {@link TwistGesture}.
    */
   public interface OnGestureEventListener
-          extends BaseGesture.OnGestureEventListener<TwistGesture> {
-  }
+          extends BaseGesture.OnGestureEventListener<TwistGesture> {}
 }

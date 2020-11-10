@@ -12,16 +12,6 @@ import java.nio.ByteBuffer;
  * ArcDef defines a portion of a circulur annulus.
  */
 public final class ArcDef extends Struct {
-  public static int createArcDef(FlatBufferBuilder builder, float startAngle, float angleSize, float innerRadius, float outerRadius, int numSamples) {
-    builder.prep(4, 20);
-    builder.putInt(numSamples);
-    builder.putFloat(outerRadius);
-    builder.putFloat(innerRadius);
-    builder.putFloat(angleSize);
-    builder.putFloat(startAngle);
-    return builder.offset();
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -66,6 +56,16 @@ public final class ArcDef extends Struct {
    */
   public int numSamples() {
     return bb.getInt(bb_pos + 16);
+  }
+
+  public static int createArcDef(FlatBufferBuilder builder, float startAngle, float angleSize, float innerRadius, float outerRadius, int numSamples) {
+    builder.prep(4, 20);
+    builder.putInt(numSamples);
+    builder.putFloat(outerRadius);
+    builder.putFloat(innerRadius);
+    builder.putFloat(angleSize);
+    builder.putFloat(startAngle);
+    return builder.offset();
   }
 }
 

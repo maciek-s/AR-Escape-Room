@@ -44,11 +44,6 @@ public final class VariantArrayDefImpl extends Table {
     builder.addOffset(1, valueOffset, 0);
   }
 
-  public static int endVariantArrayDefImpl(FlatBufferBuilder builder) {
-    int o = builder.endObject();
-    return o;
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -69,6 +64,11 @@ public final class VariantArrayDefImpl extends Table {
   public Table value(Table obj) {
     int o = __offset(6);
     return o != 0 ? __union(obj, o) : null;
+  }
+
+  public static int endVariantArrayDefImpl(FlatBufferBuilder builder) {
+    int o = builder.endObject();
+    return o;
   }
 }
 

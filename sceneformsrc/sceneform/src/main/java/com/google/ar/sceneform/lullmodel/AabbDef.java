@@ -9,19 +9,6 @@ import java.nio.ByteBuffer;
 
 @SuppressWarnings("unused")
 public final class AabbDef extends Struct {
-  public static int createAabbDef(FlatBufferBuilder builder, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z) {
-    builder.prep(4, 24);
-    builder.prep(4, 12);
-    builder.putFloat(max_z);
-    builder.putFloat(max_y);
-    builder.putFloat(max_x);
-    builder.prep(4, 12);
-    builder.putFloat(min_z);
-    builder.putFloat(min_y);
-    builder.putFloat(min_x);
-    return builder.offset();
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -46,6 +33,19 @@ public final class AabbDef extends Struct {
 
   public Vec3 max(Vec3 obj) {
     return obj.__assign(bb_pos + 12, bb);
+  }
+
+  public static int createAabbDef(FlatBufferBuilder builder, float min_x, float min_y, float min_z, float max_x, float max_y, float max_z) {
+    builder.prep(4, 24);
+    builder.prep(4, 12);
+    builder.putFloat(max_z);
+    builder.putFloat(max_y);
+    builder.putFloat(max_x);
+    builder.prep(4, 12);
+    builder.putFloat(min_z);
+    builder.putFloat(min_y);
+    builder.putFloat(min_x);
+    return builder.offset();
   }
 }
 

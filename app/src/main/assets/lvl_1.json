@@ -1,10 +1,10 @@
 {
   "number": 1,
   "instructionName": "instruction_level_1",
-  "placingModelName": "wooden_crate",
+  "placingModelName": "door_transparent",
   "roomModelName": "room",
+  "doorModelName": "door_open",
   "gameModelNames": [
-    "door_open",
     "lamp"
   ]
 }

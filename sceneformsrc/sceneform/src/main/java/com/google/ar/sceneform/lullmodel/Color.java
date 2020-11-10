@@ -9,15 +9,6 @@ import java.nio.ByteBuffer;
 
 @SuppressWarnings("unused")
 public final class Color extends Struct {
-  public static int createColor(FlatBufferBuilder builder, float r, float g, float b, float a) {
-    builder.prep(4, 16);
-    builder.putFloat(a);
-    builder.putFloat(b);
-    builder.putFloat(g);
-    builder.putFloat(r);
-    return builder.offset();
-  }
-
   public void __init(int _i, ByteBuffer _bb) {
     bb_pos = _i;
     bb = _bb;
@@ -42,6 +33,15 @@ public final class Color extends Struct {
 
   public float a() {
     return bb.getFloat(bb_pos + 12);
+  }
+
+  public static int createColor(FlatBufferBuilder builder, float r, float g, float b, float a) {
+    builder.prep(4, 16);
+    builder.putFloat(a);
+    builder.putFloat(b);
+    builder.putFloat(g);
+    builder.putFloat(r);
+    return builder.offset();
   }
 }
 
