@@ -36,8 +36,8 @@ class GameViewModel @ViewModelInject constructor(
 
     fun loadLevel(levelNumber: Int) {
         viewModelScope.launch {
-            _level.value = levelManager.loadLevel(levelNumber)
             setLoadingProgress(50)
+            _level.value = levelManager.loadLevel(levelNumber)
         }
     }
 

@@ -2,9 +2,21 @@
   "number": 1,
   "instructionName": "instruction_level_1",
   "placingModelName": "door_transparent",
-  "roomModelName": "room",
-  "doorModelName": "door_open",
-  "gameModelNames": [
-    "lamp"
-  ]
+  "roomModelData": {
+    "modelName": "room",
+    "localPosition": {
+      "x": "0",
+      "y": "0",
+      "z": "-1.5"
+    }
+  },
+  "doorModelData": {
+    "modelName": "door",
+    "localPosition": {
+      "x": "0",
+      "y": "0",
+      "z": "1.5"
+    }
+  },
+  "modelDataList": []
 }

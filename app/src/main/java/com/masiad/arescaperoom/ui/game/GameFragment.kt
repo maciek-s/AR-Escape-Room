@@ -1,9 +1,11 @@
 package com.masiad.arescaperoom.ui.game
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.animation.doOnEnd
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,8 +17,11 @@ import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GamePhase
+import com.masiad.arescaperoom.gamelogic.Level
+import com.masiad.arescaperoom.gamelogic.ar.AnimatedNode
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
 import com.masiad.arescaperoom.util.extenstion.hasAnchor
+import com.masiad.arescaperoom.util.extenstion.horizontalDistanceBetween
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -44,11 +49,17 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     private val arSceneView: ArSceneView
         get() = arCoreFragment.arSceneView
 
+    private val cameraNode: Camera
+        get() = arSceneView.scene.camera
+
+    private val isTrackingState: Boolean
+        get() = arSceneView.arFrame?.camera?.trackingState == TrackingState.TRACKING
+
     private val rootNode by lazy { AnchorNode() }
     private val placingNode by lazy { Node() }
     private val roomNode by lazy { Node() }
 
-    private val doorNode by lazy { Node() }
+    private val doorNode by lazy { AnimatedNode() }
 
     private val hitPosition by lazy {
         Pair(arSceneView.width / 2f, arSceneView.height * 0.75f)
@@ -96,10 +107,7 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     private fun observeLevel() {
         viewModel.level.observe(viewLifecycleOwner, { level ->
             lifecycleScope.launch {
-                placingNode.renderable = modelLoader.load(level.placingModelName)
-                roomNode.renderable = modelLoader.load(level.roomModelName)
-                doorNode.renderable = modelLoader.load(level.doorModelName)
-                prepareEscapeRoom()
+                prepareEscapeRoom(level)
                 viewModel.informPreparingEnded()
             }
         })
@@ -120,7 +128,7 @@ class GameFragment : Fragment(R.layout.game_fragment) {
 
     private fun setupPlacing() {
         placingNode.setParent(rootNode)
-        arSceneView.setOnClickListener {
+        placingNode.setOnTapListener { hitTestResult, motionEvent ->
             viewModel.informOnSceneClicked(rootNode.hasAnchor())
         }
         arSceneView.updateSceneOnUpdateListener {
@@ -142,18 +150,20 @@ class GameFragment : Fragment(R.layout.game_fragment) {
         }
     }
 
-    private fun prepareEscapeRoom() {
-        // TODO: store position in json
-        // ROOM
-        // Half scale, future animate to full scale
-        roomNode.localScale = Vector3(0.5f, 0.5f, 0.5f)
-        // Total 3m, so from center to door 1.5 but half scale -> 0.75
-        roomNode.localPosition = Vector3(0f, 0f, -0.75f)
+    private suspend fun prepareEscapeRoom(level: Level) {
+        // Placing preview node
+        placingNode.renderable = modelLoader.load(level.placingModelName)
 
-        // DOOR
+        // Room node
+        val roomModelData = level.roomModelData
+        roomNode.renderable = modelLoader.load(roomModelData.modelName)
+        roomNode.localPosition = roomModelData.localPosition
+
+        // Door node
         doorNode.setParent(roomNode)
-//        doorNode.localScale = Vector3(0.5f, 0.5f, 0.5f)
-        doorNode.localPosition = Vector3(0f, 0f, 1.5f)
+        val doorModelData = level.doorModelData
+        doorNode.renderable = modelLoader.load(doorModelData.modelName)
+        doorNode.localPosition = doorModelData.localPosition
 
         // TODO INSIDE
     }
@@ -161,8 +171,28 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     private fun showEscapeRoom() {
         placingNode.setParent(null)
         roomNode.setParent(rootNode)
-        arSceneView.setOnClickListener(null)
+
+        ValueAnimator.ofFloat(0.5f, 1f).apply {
+            duration = 500
+            addUpdateListener {
+                val value = it.animatedValue as Float
+                roomNode.localScale = Vector3(value, value, value)
+                //roomNode.localPosition = Vector3(0f, 0f, -value * 1.5f)
+            }
+            doOnEnd {
+                doorNode.startAnimation()
+            }
+        }.start()
+
         arSceneView.updateSceneOnUpdateListener {
+            if (isTrackingState) {
+                val distanceToStart =
+                    cameraNode.worldPosition.horizontalDistanceBetween(doorNode.worldPosition)
+                binding.logs.text = "$distanceToStart"
+                if (distanceToStart < 0.25) {
+                    doorNode.startAnimationBackward()
+                }
+            }
             // TODO close door when enter and start time out
         }
     }
