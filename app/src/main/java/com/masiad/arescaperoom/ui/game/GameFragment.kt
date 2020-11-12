@@ -16,6 +16,7 @@ import com.google.ar.sceneform.*
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
+import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.ar.AnimatedNode
@@ -62,7 +63,10 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     private val doorNode by lazy { AnimatedNode() }
 
     private val hitPosition by lazy {
-        Pair(arSceneView.width / 2f, arSceneView.height * 0.75f)
+        Pair(
+            arSceneView.width * GameConstants.hitMultiplierX,
+            arSceneView.height * GameConstants.hitMultiplierY
+        )
     }
 
     private var sceneUpdateListener: Scene.OnUpdateListener? = null
@@ -118,7 +122,6 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     }
 
     private fun showInstruction() {
-//        val instructionResId = resources.getIdentifier(viewModel.instructionName, "string", context?.packageName)
         binding.alert.infoText = getString(R.string.instruction_placing)
         binding.alert.clickListener = View.OnClickListener {
             binding.alert.infoText = null
@@ -172,8 +175,8 @@ class GameFragment : Fragment(R.layout.game_fragment) {
         placingNode.setParent(null)
         roomNode.setParent(rootNode)
 
-        ValueAnimator.ofFloat(0.5f, 1f).apply {
-            duration = 500
+        ValueAnimator.ofFloat(GameConstants.showRoomAnimationStartScale, 1f).apply {
+            duration = GameConstants.showRoomAnimationDurationMs
             addUpdateListener {
                 val value = it.animatedValue as Float
                 roomNode.localScale = Vector3(value, value, value)
@@ -189,20 +192,37 @@ class GameFragment : Fragment(R.layout.game_fragment) {
                 val distanceToStart =
                     cameraNode.worldPosition.horizontalDistanceBetween(doorNode.worldPosition)
                 binding.logs.text = "$distanceToStart"
-                if (distanceToStart < 0.25) {
+                if (distanceToStart < GameConstants.startGameDistanceThreshold) {
+                    arSceneView.removeSceneOnUpdateListener()
                     doorNode.startAnimationBackward()
+                    showGameStartedInstruction()
                 }
             }
-            // TODO close door when enter and start time out
+        }
+    }
+
+    private fun showGameStartedInstruction() {
+        val instructionResId =
+            resources.getIdentifier(viewModel.instructionName, "string", context?.packageName)
+        binding.alert.infoText = getString(instructionResId)
+        binding.alert.clickListener = View.OnClickListener {
+            binding.alert.infoText = null
+//            viewModel.informInstructionAlertClosed()
+            // TODO start timeout
+            // Show inventory
         }
     }
 
     private inline fun ArSceneView.updateSceneOnUpdateListener(crossinline updateAction: (frameTime: FrameTime?) -> Unit) {
-        sceneUpdateListener?.let {
-            scene.removeOnUpdateListener(it)
-        }
+        removeSceneOnUpdateListener()
         sceneUpdateListener = Scene.OnUpdateListener {
             updateAction(it)
         }.also { scene.addOnUpdateListener(it) }
+    }
+
+    private fun ArSceneView.removeSceneOnUpdateListener() {
+        sceneUpdateListener?.let {
+            scene.removeOnUpdateListener(it)
+        }
     }
 }
