@@ -34,6 +34,16 @@ class GameViewModel @ViewModelInject constructor(
             return level.value?.instructionName ?: ""
         }
 
+    val isInventoryLayoutVisible by lazy { MutableLiveData(false) }
+    val isInventoryLayoutToggle by lazy { MutableLiveData(true) }
+
+    fun informInventoryToggle() {
+        isInventoryLayoutToggle.value?.let {
+            isInventoryLayoutToggle.value = !it
+        }
+
+    }
+
     fun loadLevel(levelNumber: Int) {
         viewModelScope.launch {
             setLoadingProgress(50)
@@ -61,5 +71,9 @@ class GameViewModel @ViewModelInject constructor(
         if (hasAnchor) {
             switchPhase(GamePhase.PLACED)
         }
+    }
+
+    fun informGameStarted() {
+        isInventoryLayoutVisible.value = true
     }
 }

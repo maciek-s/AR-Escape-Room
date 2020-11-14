@@ -9,6 +9,10 @@
             name="viewModel"
             type="com.masiad.arescaperoom.ui.game.GameViewModel" />
 
+        <variable
+            name="inventoryToggleClickListener"
+            type="android.view.View.OnClickListener" />
+
         <import type="com.masiad.arescaperoom.gamelogic.GamePhase" />
     </data>
 
@@ -39,7 +43,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:progress="@{viewModel.loadingProgress}" />
+            app:progress="@{viewModel.loadingProgress}"
+            tools:visibility="invisible" />
 
         <include
             android:id="@+id/alert"
@@ -51,15 +56,28 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="invisible" />
+
+        <include
+            android:id="@+id/inventory"
+            layout="@layout/inventory_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:isToggle="@{viewModel.isInventoryLayoutToggle}"
+            app:isVisible="@{viewModel.isInventoryLayoutVisible}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:toggleClickListener="@{inventoryToggleClickListener}" />
 
         <TextView
             android:id="@+id/logs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="LOGS" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

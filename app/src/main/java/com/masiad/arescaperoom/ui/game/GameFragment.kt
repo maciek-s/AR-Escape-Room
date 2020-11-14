@@ -15,6 +15,8 @@ import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
+import com.masiad.arescaperoom.adapter.InventoryAdapter
+import com.masiad.arescaperoom.data.Inventory
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
@@ -38,6 +40,9 @@ class GameFragment : Fragment(R.layout.game_fragment) {
 
     @Inject
     lateinit var modelLoader: ModelLoader
+
+    @Inject
+    lateinit var inventoryAdapter: InventoryAdapter
 
     private lateinit var binding: GameFragmentBinding
 
@@ -90,8 +95,20 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     // PRIVATE
     private fun bindData() {
         binding.viewModel = viewModel
+        setupInventory()
         observeGamePhase()
         observeLevel()
+    }
+
+    private fun setupInventory() {
+        binding.inventory.recyclerView.apply {
+            adapter = inventoryAdapter
+        }
+        //todo disable this list and obserwe some in vm
+        inventoryAdapter.submitList(listOf(Inventory("a"), Inventory("b")))
+        binding.inventoryToggleClickListener = View.OnClickListener {
+            viewModel.informInventoryToggle()
+        }
     }
 
     private fun observeGamePhase() {
@@ -207,7 +224,7 @@ class GameFragment : Fragment(R.layout.game_fragment) {
         binding.alert.infoText = getString(instructionResId)
         binding.alert.clickListener = View.OnClickListener {
             binding.alert.infoText = null
-//            viewModel.informInstructionAlertClosed()
+            viewModel.informGameStarted()
             // TODO start timeout
             // Show inventory
         }
