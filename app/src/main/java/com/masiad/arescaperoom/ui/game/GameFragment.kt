@@ -21,7 +21,11 @@ import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Level
-import com.masiad.arescaperoom.gamelogic.ar.AnimatedNode
+import com.masiad.arescaperoom.gamelogic.ar.node.animated.filament.FilamentAnimationNode
+import com.masiad.arescaperoom.gamelogic.ar.node.animated.property.PropertyAnimationNode
+import com.masiad.arescaperoom.gamelogic.ar.node.common.ActionType
+import com.masiad.arescaperoom.gamelogic.ar.node.common.AnimationType
+import com.masiad.arescaperoom.gamelogic.ar.node.stationary.StationaryNode
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
 import com.masiad.arescaperoom.util.extenstion.hasAnchor
 import com.masiad.arescaperoom.util.extenstion.horizontalDistanceBetween
@@ -65,7 +69,7 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     private val placingNode by lazy { Node() }
     private val roomNode by lazy { Node() }
 
-    private val doorNode by lazy { AnimatedNode() }
+    private val doorNode by lazy { FilamentAnimationNode() }
 
     private val hitPosition by lazy {
         Pair(
@@ -176,7 +180,8 @@ class GameFragment : Fragment(R.layout.game_fragment) {
 
         // Room node
         val roomModelData = level.roomModelData
-        roomNode.renderable = modelLoader.load(roomModelData.modelName)
+        //todo correct room model
+        roomNode.renderable = modelLoader.load("room_floor")
         roomNode.localPosition = roomModelData.localPosition
 
         // Door node
@@ -186,6 +191,45 @@ class GameFragment : Fragment(R.layout.game_fragment) {
         doorNode.localPosition = doorModelData.localPosition
 
         // TODO INSIDE
+        level.modelDataList.forEach { model ->
+            val node = when (model.animationType) {
+                AnimationType.NONE, null -> {
+                    val node = StationaryNode()
+                    node
+                }
+                AnimationType.FILAMENT -> {
+                    val node = FilamentAnimationNode()
+                    node
+
+                }
+                AnimationType.PROPERTY -> {
+                    requireNotNull(model.propertyAnimation) { "AnimationType.PROPERTY but propertyAnimation is null" }
+                    val node = PropertyAnimationNode(model.propertyAnimation)
+                    node
+                }
+            }
+            with(node) {
+                when (model.actionType) {
+                    ActionType.NONE, null -> {
+
+                    }
+                    ActionType.PICK_UP -> {
+
+                    }
+                    ActionType.ANIMATE -> {
+                        setOnTapListener { _, _ ->
+                            startNextAnimation()
+                        }
+                    }
+                    ActionType.USE_INVENTORY -> {
+
+                    }
+                }
+                setParent(roomNode)
+                renderable = modelLoader.load(model.modelName)
+                localPosition = model.localPosition
+            }
+        }
     }
 
     private fun showEscapeRoom() {
@@ -200,7 +244,7 @@ class GameFragment : Fragment(R.layout.game_fragment) {
                 //roomNode.localPosition = Vector3(0f, 0f, -value * 1.5f)
             }
             doOnEnd {
-                doorNode.startAnimation()
+                doorNode.startNextAnimation()
             }
         }.start()
 
@@ -211,7 +255,7 @@ class GameFragment : Fragment(R.layout.game_fragment) {
                 binding.logs.text = "$distanceToStart"
                 if (distanceToStart < GameConstants.startGameDistanceThreshold) {
                     arSceneView.removeSceneOnUpdateListener()
-                    doorNode.startAnimationBackward()
+                    doorNode.startNextAnimation()
                     showGameStartedInstruction()
                 }
             }

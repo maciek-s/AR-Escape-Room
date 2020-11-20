@@ -1,12 +1,12 @@
 package com.masiad.arescaperoom.gamelogic
 
-import com.masiad.arescaperoom.gamelogic.ar.ModelData
+import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNodeModel
 
 data class Level(
     val number: Int,
     val instructionName: String,
     val placingModelName: String,
-    val roomModelData: ModelData,
-    val doorModelData: ModelData,
-    val modelDataList: List<ModelData>
+    val roomModelData: GameNodeModel,
+    val doorModelData: GameNodeModel,
+    val modelDataList: List<GameNodeModel>
 )

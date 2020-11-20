@@ -16,7 +16,36 @@
       "x": "0",
       "y": "0",
       "z": "1.5"
-    }
+    },
+    "animationType": "FILAMENT"
   },
-  "modelDataList": []
+  "modelDataList": [
+    {
+      "modelName": "desk_main",
+      "localPosition": {
+        "x": "0",
+        "y": "0",
+        "z": "0"
+      }
+    },
+    {
+      "modelName": "desk_left_drawer",
+      "localPosition": {
+        "x": "0",
+        "y": "0",
+        "z": "0"
+      },
+      "animationType": "PROPERTY",
+      "propertyAnimation": {
+        "propertyName": "localPosition",
+        "animationVector": {
+          "x": "0",
+          "y": "0",
+          "z": "0.3"
+        },
+        "duration": 500
+      },
+      "actionType": "ANIMATE"
+    }
+  ]
 }
