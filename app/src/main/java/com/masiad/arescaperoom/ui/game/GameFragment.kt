@@ -13,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
+import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.adapter.InventoryAdapter
@@ -180,17 +181,18 @@ class GameFragment : Fragment(R.layout.game_fragment) {
 
         // Room node
         val roomModelData = level.roomModelData
-        //todo correct room model
-        roomNode.renderable = modelLoader.load("room_floor")
+        //todo correct room model (walls)
+        roomNode.renderable = modelLoader.load(roomModelData.modelName)
         roomNode.localPosition = roomModelData.localPosition
 
         // Door node
-        doorNode.setParent(roomNode)
+        //doorNode.setParent(roomNode)
         val doorModelData = level.doorModelData
         doorNode.renderable = modelLoader.load(doorModelData.modelName)
         doorNode.localPosition = doorModelData.localPosition
 
         // TODO INSIDE
+        // TODO recursive inner node build (child location to 000
         level.modelDataList.forEach { model ->
             val node = when (model.animationType) {
                 AnimationType.NONE, null -> {
@@ -228,6 +230,9 @@ class GameFragment : Fragment(R.layout.game_fragment) {
                 setParent(roomNode)
                 renderable = modelLoader.load(model.modelName)
                 localPosition = model.localPosition
+                model.localRotation?.let {
+                    localRotation = Quaternion.axisAngle(Vector3(it.x, it.y, it.z), it.w)
+                }
             }
         }
     }
@@ -241,7 +246,6 @@ class GameFragment : Fragment(R.layout.game_fragment) {
             addUpdateListener {
                 val value = it.animatedValue as Float
                 roomNode.localScale = Vector3(value, value, value)
-                //roomNode.localPosition = Vector3(0f, 0f, -value * 1.5f)
             }
             doOnEnd {
                 doorNode.startNextAnimation()

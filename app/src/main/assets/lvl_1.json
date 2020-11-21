@@ -3,11 +3,11 @@
   "instructionName": "instruction_level_1",
   "placingModelName": "door_transparent",
   "roomModelData": {
-    "modelName": "room",
+    "modelName": "room_floor",
     "localPosition": {
       "x": "0",
       "y": "0",
-      "z": "-1.5"
+      "z": "-1.4"
     }
   },
   "doorModelData": {
@@ -15,7 +15,7 @@
     "localPosition": {
       "x": "0",
       "y": "0",
-      "z": "1.5"
+      "z": "1.4"
     },
     "animationType": "FILAMENT"
   },
@@ -26,6 +26,12 @@
         "x": "0",
         "y": "0",
         "z": "0"
+      },
+      "localRotation": {
+        "x": "1",
+        "y": "0",
+        "z": "0",
+        "w": "95"
       }
     },
     {
@@ -34,6 +40,25 @@
         "x": "0",
         "y": "0",
         "z": "0"
+      },
+      "animationType": "PROPERTY",
+      "propertyAnimation": {
+        "propertyName": "localPosition",
+        "animationVector": {
+          "x": "0",
+          "y": "0",
+          "z": "0.3"
+        },
+        "duration": 500
+      },
+      "actionType": "ANIMATE"
+    },
+    {
+      "modelName": "desk_right_drawer",
+      "localPosition": {
+        "x": "0",
+        "y": "0",
+        "z": "0.0"
       },
       "animationType": "PROPERTY",
       "propertyAnimation": {
