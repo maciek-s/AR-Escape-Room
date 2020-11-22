@@ -42,7 +42,7 @@
             "animationVector": {
               "x": "0",
               "y": "0",
-              "z": "0.3"
+              "z": "0.25"
             },
             "duration": 500
           },
@@ -56,13 +56,49 @@
             "animationVector": {
               "x": "0",
               "y": "0",
-              "z": "0.3"
+              "z": "0.25"
             },
             "duration": 500
           },
-          "actionType": "ANIMATE"
+          "actionType": "ANIMATE",
+          "childrenDataList": [
+            {
+              "modelName": "gold_key",
+              "isVisible": false,
+              "localPosition": {
+                "x": "0.32",
+                "y": "0.67",
+                "z": "0.14"
+              },
+              "localRotation": {
+                "x": "0",
+                "y": "1",
+                "z": "0",
+                "w": "17"
+              },
+              "actionType": "PICK_UP"
+            }
+          ]
         }
       ]
+    },
+    {
+      "modelName": "chest",
+      "localPosition": {
+        "x": "0.9",
+        "y": "0.0",
+        "z": "0.0"
+      },
+      "localRotation": {
+        "x": "0",
+        "y": "1",
+        "z": "0",
+        "w": "-90"
+      },
+      "animationType": "FILAMENT",
+      "actionType": "USE_INVENTORY",
+      "actionInventoryModelName": "gold_key",
+      "inventoryActionType": "UNLOCK"
     }
   ]
 }

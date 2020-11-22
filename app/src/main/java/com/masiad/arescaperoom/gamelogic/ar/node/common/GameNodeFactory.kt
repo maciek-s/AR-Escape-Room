@@ -1,6 +1,8 @@
 package com.masiad.arescaperoom.gamelogic.ar.node.common
 
+import androidx.fragment.app.Fragment
 import com.google.ar.sceneform.Node
+import com.google.ar.sceneform.collision.Box
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.gamelogic.ar.node.animated.filament.FilamentAnimationNode
@@ -12,6 +14,7 @@ import javax.inject.Inject
 
 @FragmentScoped
 class GameNodeFactory @Inject constructor(
+    private val fragment: Fragment,
     private val modelLoader: ModelLoader
 ) {
 
@@ -33,24 +36,12 @@ class GameNodeFactory @Inject constructor(
             }
         }
         with(node) {
-            when (model.actionType) {
-                ActionType.NONE, null -> {
-
-                }
-                ActionType.PICK_UP -> {
-
-                }
-                ActionType.ANIMATE -> {
-                    setOnTapListener { _, _ ->
-                        startNextAnimation()
-                    }
-                }
-                ActionType.USE_INVENTORY -> {
-
-                }
-            }
             setParent(parent)
             renderable = modelLoader.load(model.modelName)
+            name = model.modelName
+            model.isVisible?.let {
+                isVisible = it
+            }
             model.localPosition?.let {
                 localPosition = it
             }
@@ -59,6 +50,14 @@ class GameNodeFactory @Inject constructor(
             }
             model.childrenDataList?.forEach {
                 createNode(node, it)
+            }
+            if (fragment is GameNode.OnTapListener) {
+                setOnGameNodeTapListener(fragment)
+            }
+
+            //todo
+            if (model.modelName == "gold_key") {
+                node.collisionShape = Box(Vector3(1f, 1f, 1f))
             }
         }
         return node

@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.masiad.arescaperoom.data.Inventory
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.LevelManager
@@ -36,6 +37,10 @@ class GameViewModel @ViewModelInject constructor(
 
     val isInventoryLayoutVisible by lazy { MutableLiveData(false) }
     val isInventoryLayoutToggle by lazy { MutableLiveData(true) }
+
+    private val _inventoryList by lazy { MutableLiveData<List<Inventory>>() }
+    val inventoryList: LiveData<List<Inventory>>
+        get() = _inventoryList
 
     fun informInventoryToggle() {
         isInventoryLayoutToggle.value?.let {
@@ -75,5 +80,16 @@ class GameViewModel @ViewModelInject constructor(
 
     fun informGameStarted() {
         isInventoryLayoutVisible.value = true
+    }
+
+    fun informInventoryPickUp(inventory: Inventory) {
+        addInventoryToList(inventory)
+    }
+
+    //todo update list
+    private fun addInventoryToList(inventory: Inventory) {
+        val current = _inventoryList.value ?: emptyList()
+        current.toMutableList().add(inventory)
+        _inventoryList.value = listOf(inventory)
     }
 }

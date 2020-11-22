@@ -6,10 +6,13 @@ import com.masiad.arescaperoom.gamelogic.ar.node.animated.property.PropertyAnima
 
 data class GameNodeModel(
     val modelName: String,
+    val isVisible: Boolean?,
     val localPosition: Vector3?,
     val localRotation: Quaternion?,
     val animationType: AnimationType?,
     val propertyAnimation: PropertyAnimation?,
     val actionType: ActionType?,
+    val actionInventoryModelName: String?,
+    val inventoryActionType: InventoryActionType?,
     val childrenDataList: List<GameNodeModel>?
 )

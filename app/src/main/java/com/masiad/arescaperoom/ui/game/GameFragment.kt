@@ -3,6 +3,7 @@ package com.masiad.arescaperoom.ui.game
 import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.doOnEnd
@@ -35,7 +36,7 @@ import javax.inject.Inject
  * Main AR game fragment
  */
 @AndroidEntryPoint
-class GameFragment : Fragment(R.layout.game_fragment) {
+class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     private val args: GameFragmentArgs by navArgs()
 
@@ -114,8 +115,9 @@ class GameFragment : Fragment(R.layout.game_fragment) {
         binding.inventory.recyclerView.apply {
             adapter = inventoryAdapter
         }
-        //todo disable this list and obserwe some in vm
-        inventoryAdapter.submitList(listOf(Inventory("a"), Inventory("b")))
+        viewModel.inventoryList.observe(viewLifecycleOwner, {
+            inventoryAdapter.submitList(it)
+        })
         binding.inventoryToggleClickListener = View.OnClickListener {
             viewModel.informInventoryToggle()
         }
@@ -190,8 +192,8 @@ class GameFragment : Fragment(R.layout.game_fragment) {
         doorNode = gameNodeFactory.createNode(roomNode, level.doorModelData)
 
         // Room inside
-        level.modelDataList.forEach {
-            gameNodeFactory.createNode(roomNode, it)
+        level.modelDataList.forEach { model ->
+            gameNodeFactory.createNode(roomNode, model)
         }
     }
 
@@ -246,6 +248,19 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     private fun ArSceneView.removeSceneOnUpdateListener() {
         sceneUpdateListener?.let {
             scene.removeOnUpdateListener(it)
+        }
+    }
+
+    override fun onNodeTap(
+        node: GameNode,
+        hitTestResult: HitTestResult?,
+        motionEvent: MotionEvent?
+    ) {
+        // todo other action
+        node.startNextAnimation()
+
+        if (node.name == "gold_key") {
+            viewModel.informInventoryPickUp(Inventory("KEY GOLD"))
         }
     }
 }
