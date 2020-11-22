@@ -24,6 +24,7 @@
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/ar_core_fragment"
             android:name="com.masiad.arescaperoom.ui.ar.ArCoreFragment"
+            visibility="@{viewModel.loadingProgress.equals(100)}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -13,7 +13,6 @@ import androidx.navigation.fragment.navArgs
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
-import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.adapter.InventoryAdapter
@@ -22,11 +21,8 @@ import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Level
-import com.masiad.arescaperoom.gamelogic.ar.node.animated.filament.FilamentAnimationNode
-import com.masiad.arescaperoom.gamelogic.ar.node.animated.property.PropertyAnimationNode
-import com.masiad.arescaperoom.gamelogic.ar.node.common.ActionType
-import com.masiad.arescaperoom.gamelogic.ar.node.common.AnimationType
-import com.masiad.arescaperoom.gamelogic.ar.node.stationary.StationaryNode
+import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNode
+import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNodeFactory
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
 import com.masiad.arescaperoom.util.extenstion.hasAnchor
 import com.masiad.arescaperoom.util.extenstion.horizontalDistanceBetween
@@ -45,6 +41,9 @@ class GameFragment : Fragment(R.layout.game_fragment) {
 
     @Inject
     lateinit var modelLoader: ModelLoader
+
+    @Inject
+    lateinit var gameNodeFactory: GameNodeFactory
 
     @Inject
     lateinit var inventoryAdapter: InventoryAdapter
@@ -66,11 +65,17 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     private val isTrackingState: Boolean
         get() = arSceneView.arFrame?.camera?.trackingState == TrackingState.TRACKING
 
-    private val rootNode by lazy { AnchorNode() }
-    private val placingNode by lazy { Node() }
-    private val roomNode by lazy { Node() }
+    // Root objects node
+    private val rootAnchorNode by lazy { AnchorNode() }
 
-    private val doorNode by lazy { FilamentAnimationNode() }
+    // Updated placing node
+    private val placingNode by lazy { Node() }
+
+    // Root room node
+    private lateinit var roomNode: GameNode
+
+    // Room entry node
+    private lateinit var doorNode: GameNode
 
     private val hitPosition by lazy {
         Pair(
@@ -152,9 +157,9 @@ class GameFragment : Fragment(R.layout.game_fragment) {
     }
 
     private fun setupPlacing() {
-        placingNode.setParent(rootNode)
+        placingNode.setParent(rootAnchorNode)
         placingNode.setOnTapListener { hitTestResult, motionEvent ->
-            viewModel.informOnSceneClicked(rootNode.hasAnchor())
+            viewModel.informOnSceneClicked(rootAnchorNode.hasAnchor())
         }
         arSceneView.updateSceneOnUpdateListener {
             run {
@@ -164,82 +169,35 @@ class GameFragment : Fragment(R.layout.game_fragment) {
                         val trackable = hitResult.trackable
                         if (trackable is Plane && trackable.trackingState == TrackingState.TRACKING) {
                             val anchor = hitResult.createAnchor()
-                            rootNode.anchor?.detach()
-                                ?: rootNode.setParent(arSceneView.scene)
-                            rootNode.anchor = anchor
+                            rootAnchorNode.anchor?.detach()
+                                ?: rootAnchorNode.setParent(arSceneView.scene)
+                            rootAnchorNode.anchor = anchor
                             return@run
                         }
                     }
-                rootNode.anchor?.detach()
+                rootAnchorNode.anchor?.detach()
             }
         }
     }
 
     private suspend fun prepareEscapeRoom(level: Level) {
-        // Placing preview node
         placingNode.renderable = modelLoader.load(level.placingModelName)
 
         // Room node
-        val roomModelData = level.roomModelData
-        //todo correct room model (walls)
-        roomNode.renderable = modelLoader.load(roomModelData.modelName)
-        roomNode.localPosition = roomModelData.localPosition
+        roomNode = gameNodeFactory.createNode(null, level.roomModelData)
 
         // Door node
-        //doorNode.setParent(roomNode)
-        val doorModelData = level.doorModelData
-        doorNode.renderable = modelLoader.load(doorModelData.modelName)
-        doorNode.localPosition = doorModelData.localPosition
+        doorNode = gameNodeFactory.createNode(roomNode, level.doorModelData)
 
-        // TODO INSIDE
-        // TODO recursive inner node build (child location to 000
-        level.modelDataList.forEach { model ->
-            val node = when (model.animationType) {
-                AnimationType.NONE, null -> {
-                    val node = StationaryNode()
-                    node
-                }
-                AnimationType.FILAMENT -> {
-                    val node = FilamentAnimationNode()
-                    node
-
-                }
-                AnimationType.PROPERTY -> {
-                    requireNotNull(model.propertyAnimation) { "AnimationType.PROPERTY but propertyAnimation is null" }
-                    val node = PropertyAnimationNode(model.propertyAnimation)
-                    node
-                }
-            }
-            with(node) {
-                when (model.actionType) {
-                    ActionType.NONE, null -> {
-
-                    }
-                    ActionType.PICK_UP -> {
-
-                    }
-                    ActionType.ANIMATE -> {
-                        setOnTapListener { _, _ ->
-                            startNextAnimation()
-                        }
-                    }
-                    ActionType.USE_INVENTORY -> {
-
-                    }
-                }
-                setParent(roomNode)
-                renderable = modelLoader.load(model.modelName)
-                localPosition = model.localPosition
-                model.localRotation?.let {
-                    localRotation = Quaternion.axisAngle(Vector3(it.x, it.y, it.z), it.w)
-                }
-            }
+        // Room inside
+        level.modelDataList.forEach {
+            gameNodeFactory.createNode(roomNode, it)
         }
     }
 
     private fun showEscapeRoom() {
         placingNode.setParent(null)
-        roomNode.setParent(rootNode)
+        roomNode.setParent(rootAnchorNode)
 
         ValueAnimator.ofFloat(GameConstants.showRoomAnimationStartScale, 1f).apply {
             duration = GameConstants.showRoomAnimationDurationMs

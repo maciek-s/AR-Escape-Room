@@ -23,54 +23,46 @@
     {
       "modelName": "desk_main",
       "localPosition": {
-        "x": "0",
-        "y": "0",
-        "z": "0"
+        "x": "-0.95",
+        "y": "0.0",
+        "z": "-0.7"
       },
       "localRotation": {
-        "x": "1",
-        "y": "0",
+        "x": "0",
+        "y": "1",
         "z": "0",
-        "w": "95"
-      }
-    },
-    {
-      "modelName": "desk_left_drawer",
-      "localPosition": {
-        "x": "0",
-        "y": "0",
-        "z": "0"
+        "w": "90"
       },
-      "animationType": "PROPERTY",
-      "propertyAnimation": {
-        "propertyName": "localPosition",
-        "animationVector": {
-          "x": "0",
-          "y": "0",
-          "z": "0.3"
+      "childrenDataList": [
+        {
+          "modelName": "desk_left_drawer",
+          "animationType": "PROPERTY",
+          "propertyAnimation": {
+            "propertyName": "localPosition",
+            "animationVector": {
+              "x": "0",
+              "y": "0",
+              "z": "0.3"
+            },
+            "duration": 500
+          },
+          "actionType": "ANIMATE"
         },
-        "duration": 500
-      },
-      "actionType": "ANIMATE"
-    },
-    {
-      "modelName": "desk_right_drawer",
-      "localPosition": {
-        "x": "0",
-        "y": "0",
-        "z": "0.0"
-      },
-      "animationType": "PROPERTY",
-      "propertyAnimation": {
-        "propertyName": "localPosition",
-        "animationVector": {
-          "x": "0",
-          "y": "0",
-          "z": "0.3"
-        },
-        "duration": 500
-      },
-      "actionType": "ANIMATE"
+        {
+          "modelName": "desk_right_drawer",
+          "animationType": "PROPERTY",
+          "propertyAnimation": {
+            "propertyName": "localPosition",
+            "animationVector": {
+              "x": "0",
+              "y": "0",
+              "z": "0.3"
+            },
+            "duration": 500
+          },
+          "actionType": "ANIMATE"
+        }
+      ]
     }
   ]
 }
