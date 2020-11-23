@@ -17,7 +17,6 @@ import com.google.ar.sceneform.*
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.adapter.InventoryAdapter
-import com.masiad.arescaperoom.data.Inventory
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
@@ -130,7 +129,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
                 GamePhase.GAME_LOADED -> showInstruction()
                 GamePhase.PLACING -> setupPlacing()
                 GamePhase.PLACED -> showEscapeRoom()
-                GamePhase.GAME_STARTED -> TODO()
+                GamePhase.GAME_STARTED -> setupGameStartedUpdateListener()
                 GamePhase.ESCAPING -> TODO()
                 GamePhase.ESCAPED -> TODO()
             }
@@ -212,10 +211,11 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
             }
         }.start()
 
+        val startPoint = Vector3.add(doorNode.worldPosition, GameConstants.startPointAddVector)
         arSceneView.updateSceneOnUpdateListener {
             if (isTrackingState) {
                 val distanceToStart =
-                    cameraNode.worldPosition.horizontalDistanceBetween(doorNode.worldPosition)
+                    cameraNode.worldPosition.horizontalDistanceBetween(startPoint)
                 binding.logs.text = "$distanceToStart"
                 if (distanceToStart < GameConstants.startGameDistanceThreshold) {
                     arSceneView.removeSceneOnUpdateListener()
@@ -233,9 +233,13 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         binding.alert.clickListener = View.OnClickListener {
             binding.alert.infoText = null
             viewModel.informGameStarted()
-            // TODO start timeout
-            // Show inventory
         }
+    }
+
+    private fun setupGameStartedUpdateListener() {
+//        arSceneView.updateSceneOnUpdateListener {
+//            // TODO detect outside the room? / tracking list? global tracking lost?
+//        }
     }
 
     private inline fun ArSceneView.updateSceneOnUpdateListener(crossinline updateAction: (frameTime: FrameTime?) -> Unit) {
@@ -256,11 +260,6 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         hitTestResult: HitTestResult?,
         motionEvent: MotionEvent?
     ) {
-        // todo other action
-        node.startNextAnimation()
-
-        if (node.name == "gold_key") {
-            viewModel.informInventoryPickUp(Inventory("KEY GOLD"))
-        }
+        // handle node action
     }
 }

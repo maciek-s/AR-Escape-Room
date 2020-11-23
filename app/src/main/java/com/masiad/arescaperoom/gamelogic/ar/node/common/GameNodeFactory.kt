@@ -2,7 +2,6 @@ package com.masiad.arescaperoom.gamelogic.ar.node.common
 
 import androidx.fragment.app.Fragment
 import com.google.ar.sceneform.Node
-import com.google.ar.sceneform.collision.Box
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.gamelogic.ar.node.animated.filament.FilamentAnimationNode
@@ -53,11 +52,6 @@ class GameNodeFactory @Inject constructor(
             }
             if (fragment is GameNode.OnTapListener) {
                 setOnGameNodeTapListener(fragment)
-            }
-
-            //todo
-            if (model.modelName == "gold_key") {
-                node.collisionShape = Box(Vector3(1f, 1f, 1f))
             }
         }
         return node

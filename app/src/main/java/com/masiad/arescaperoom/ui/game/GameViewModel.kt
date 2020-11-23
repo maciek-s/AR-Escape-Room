@@ -79,7 +79,7 @@ class GameViewModel @ViewModelInject constructor(
     }
 
     fun informGameStarted() {
-        isInventoryLayoutVisible.value = true
+        switchPhase(GamePhase.GAME_STARTED)
     }
 
     fun informInventoryPickUp(inventory: Inventory) {

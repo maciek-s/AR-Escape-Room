@@ -35,8 +35,8 @@ class InventoryAdapter @Inject constructor() :
 
         init {
             binding.root.setOnClickListener {
-                binding.inventory?.let { plant ->
-                    // TODO open inventory modal?
+                binding.inventory?.let { inventory ->
+                    // TODO open inventory modal? / make selected?
                 }
             }
         }
