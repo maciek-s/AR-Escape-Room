@@ -23,17 +23,36 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
+        <TextView
+            android:id="@+id/title"
+            inventoryListTranslateX="@{isToggle}"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="@dimen/inventory_arrow_size_half"
+            android:autoSizeTextType="uniform"
+            android:background="?attr/colorSurface"
+            android:gravity="center"
+            android:lines="1"
+            android:paddingStart="@dimen/margin_extra_small"
+            android:paddingEnd="@dimen/margin_extra_small"
+            android:text="@string/inventory"
+            android:textAllCaps="true"
+            app:layout_constraintBottom_toTopOf="@id/recycler_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             inventoryListTranslateX="@{isToggle}"
-            android:layout_width="wrap_content"
+            android:layout_width="@dimen/inventory_list_width"
             android:layout_height="0dp"
             android:layout_marginStart="@dimen/inventory_arrow_size_half"
             android:background="?attr/colorSurface"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title"
             tools:listitem="@layout/inventory_item" />
 
         <ImageButton
@@ -41,14 +60,13 @@
             inventoryToggleTranslateX="@{isToggle}"
             android:layout_width="@dimen/inventory_arrow_size"
             android:layout_height="0dp"
-            android:layout_marginTop="@dimen/margin_normal"
             android:background="?attr/colorSurface"
             android:onClick="@{toggleClickListener}"
             android:scaleType="centerCrop"
             android:src="@{isToggle ? @drawable/ic_round_keyboard_arrow_right : @drawable/ic_round_keyboard_arrow_left}"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title"
             tools:src="@drawable/ic_round_keyboard_arrow_right" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
