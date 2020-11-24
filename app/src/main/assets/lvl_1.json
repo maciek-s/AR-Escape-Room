@@ -84,6 +84,7 @@
     },
     {
       "modelName": "chest",
+      "isLocked": "true",
       "localPosition": {
         "x": "0.9",
         "y": "0.0",

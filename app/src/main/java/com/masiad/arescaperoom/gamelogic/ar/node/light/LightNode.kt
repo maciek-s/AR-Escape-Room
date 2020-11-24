@@ -3,9 +3,10 @@ package com.masiad.arescaperoom.gamelogic.ar.node.light
 import com.google.ar.sceneform.collision.Sphere
 import com.google.ar.sceneform.rendering.Light
 import com.masiad.arescaperoom.data.Inventory
+import com.masiad.arescaperoom.gamelogic.ar.node.common.ActionType
 import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNode
 
-class LightNode(model: LightModel) : GameNode() {
+class LightNode(actionType: ActionType, model: LightModel) : GameNode(actionType) {
 
     init {
         val light = Light.builder(model.lightType)

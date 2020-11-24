@@ -8,6 +8,7 @@ import com.masiad.arescaperoom.gamelogic.ar.node.light.LightModel
 data class GameNodeModel(
     val modelName: String,
     val isVisible: Boolean?,
+    val isLocked: Boolean?,
     val localPosition: Vector3?,
     val localRotation: Quaternion?,
     val nodeType: NodeType?,

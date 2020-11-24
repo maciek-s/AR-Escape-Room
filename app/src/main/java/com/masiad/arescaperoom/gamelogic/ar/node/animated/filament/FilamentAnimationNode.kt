@@ -3,10 +3,11 @@ package com.masiad.arescaperoom.gamelogic.ar.node.animated.filament
 import android.animation.ValueAnimator
 import com.google.android.filament.gltfio.Animator
 import com.masiad.arescaperoom.data.Inventory
+import com.masiad.arescaperoom.gamelogic.ar.node.common.ActionType
 import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNode
 import kotlin.math.roundToLong
 
-class FilamentAnimationNode : GameNode() {
+class FilamentAnimationNode(actionType: ActionType) : GameNode(actionType) {
 
     private val animator: Animator?
         get() = renderableInstance?.filamentAsset?.animator

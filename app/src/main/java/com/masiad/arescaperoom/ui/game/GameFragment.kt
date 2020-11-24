@@ -257,20 +257,28 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         }
     }
 
+    // todo onInventory tap ect
     override fun onNodeTap(
         node: GameNode,
         hitTestResult: HitTestResult?,
         motionEvent: MotionEvent?
     ) {
-        // handle node action
-        // todo delete below
+        Log.i(TAG, "onNodeTap $node")
+        with(node) {
+            when {
+                // Open/Close if visible and unlocked
+                isVisible && !isLocked -> {
+                    isOpen = !isOpen
+                }
+            }
+        }
         val hitTestAll = arSceneView.scene.hitTestAll(motionEvent)
         hitTestAll
             .map { it.node }
             .filterIsInstance<GameNode>()
             .forEach {
                 Log.i(TAG, "hit all ${it.name}")
-                it.startNextAnimation()
+                //it.startNextAnimation()
             }
     }
 }

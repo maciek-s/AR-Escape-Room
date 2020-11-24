@@ -4,9 +4,13 @@ import android.animation.ObjectAnimator
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.math.Vector3Evaluator
 import com.masiad.arescaperoom.data.Inventory
+import com.masiad.arescaperoom.gamelogic.ar.node.common.ActionType
 import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNode
 
-class PropertyAnimationNode(propertyAnimation: PropertyAnimation) : GameNode() {
+class PropertyAnimationNode(
+    actionType: ActionType,
+    propertyAnimation: PropertyAnimation
+) : GameNode(actionType) {
 
     private val objectAnimator = ObjectAnimator()
 

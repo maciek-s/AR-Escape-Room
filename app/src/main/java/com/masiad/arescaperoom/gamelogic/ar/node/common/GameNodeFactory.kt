@@ -19,24 +19,25 @@ class GameNodeFactory @Inject constructor(
 ) {
 
     suspend fun createNode(parent: Node?, model: GameNodeModel): GameNode {
+        val actionType = model.actionType ?: ActionType.NONE
         val node = when (model.nodeType) {
             NodeType.STATIONARY, null -> {
-                val node = StationaryNode()
+                val node = StationaryNode(actionType)
                 node
             }
             NodeType.FILAMENT -> {
-                val node = FilamentAnimationNode()
+                val node = FilamentAnimationNode(actionType)
                 node
 
             }
             NodeType.PROPERTY -> {
                 requireNotNull(model.propertyAnimation) { "NodeType.PROPERTY but propertyAnimation is null" }
-                val node = PropertyAnimationNode(model.propertyAnimation)
+                val node = PropertyAnimationNode(actionType, model.propertyAnimation)
                 node
             }
             NodeType.LIGHT -> {
                 requireNotNull(model.lightModel) { "NodeType.LIGHT but lightModel is null" }
-                val node = LightNode(model.lightModel)
+                val node = LightNode(actionType, model.lightModel)
                 node
             }
         }
@@ -50,6 +51,9 @@ class GameNodeFactory @Inject constructor(
             name = model.modelName
             model.isVisible?.let {
                 isVisible = it
+            }
+            model.isLocked?.let {
+                isLocked = it
             }
             model.localPosition?.let {
                 localPosition = it
