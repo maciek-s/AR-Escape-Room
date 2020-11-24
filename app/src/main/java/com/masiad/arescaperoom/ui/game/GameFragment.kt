@@ -2,6 +2,7 @@ package com.masiad.arescaperoom.ui.game
 
 import android.animation.ValueAnimator
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -24,6 +25,7 @@ import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNode
 import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNodeFactory
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
+import com.masiad.arescaperoom.util.extenstion.TAG
 import com.masiad.arescaperoom.util.extenstion.hasAnchor
 import com.masiad.arescaperoom.util.extenstion.horizontalDistanceBetween
 import com.masiad.arescaperoom.util.model.ModelLoader
@@ -238,7 +240,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     private fun setupGameStartedUpdateListener() {
 //        arSceneView.updateSceneOnUpdateListener {
-//            // TODO detect outside the room? / tracking list? global tracking lost?
+//            // TODO detect outside the room? / tracking list? global tracking lost? // move camera on button tap?
 //        }
     }
 
@@ -261,5 +263,14 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         motionEvent: MotionEvent?
     ) {
         // handle node action
+        // todo delete below
+        val hitTestAll = arSceneView.scene.hitTestAll(motionEvent)
+        hitTestAll
+            .map { it.node }
+            .filterIsInstance<GameNode>()
+            .forEach {
+                Log.i(TAG, "hit all ${it.name}")
+                it.startNextAnimation()
+            }
     }
 }

@@ -17,7 +17,7 @@
       "y": "0",
       "z": "1.4"
     },
-    "animationType": "FILAMENT"
+    "nodeType": "FILAMENT"
   },
   "modelDataList": [
     {
@@ -36,7 +36,7 @@
       "childrenDataList": [
         {
           "modelName": "desk_left_drawer",
-          "animationType": "PROPERTY",
+          "nodeType": "PROPERTY",
           "propertyAnimation": {
             "propertyName": "localPosition",
             "animationVector": {
@@ -50,7 +50,7 @@
         },
         {
           "modelName": "desk_right_drawer",
-          "animationType": "PROPERTY",
+          "nodeType": "PROPERTY",
           "propertyAnimation": {
             "propertyName": "localPosition",
             "animationVector": {
@@ -95,10 +95,38 @@
         "z": "0",
         "w": "-90"
       },
-      "animationType": "FILAMENT",
+      "nodeType": "FILAMENT",
       "actionType": "USE_INVENTORY",
       "actionInventoryModelName": "gold_key",
       "inventoryActionType": "UNLOCK"
+    },
+    {
+      "modelName": "floor_lamp",
+      "localPosition": {
+        "x": "0.9",
+        "y": "0.0",
+        "z": "-0.9"
+      },
+      "localRotation": {
+        "x": "0",
+        "y": "1",
+        "z": "0",
+        "w": "-135"
+      },
+      "childrenDataList": [
+        {
+          "modelName": "light",
+          "nodeType": "LIGHT",
+          "localPosition": {
+            "x": "0.74",
+            "y": "1.67",
+            "z": "0.0"
+          },
+          "lightModel": {
+            "lightType": "POINT"
+          }
+        }
+      ]
     }
   ]
 }

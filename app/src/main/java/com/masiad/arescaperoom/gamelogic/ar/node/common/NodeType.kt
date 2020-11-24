@@ -1,7 +1,8 @@
 package com.masiad.arescaperoom.gamelogic.ar.node.common
 
-enum class AnimationType {
-    NONE,
+enum class NodeType {
+    STATIONARY,
     FILAMENT,
-    PROPERTY
+    PROPERTY,
+    LIGHT
 }

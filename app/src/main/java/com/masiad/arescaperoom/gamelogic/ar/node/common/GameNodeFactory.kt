@@ -6,6 +6,7 @@ import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.gamelogic.ar.node.animated.filament.FilamentAnimationNode
 import com.masiad.arescaperoom.gamelogic.ar.node.animated.property.PropertyAnimationNode
+import com.masiad.arescaperoom.gamelogic.ar.node.light.LightNode
 import com.masiad.arescaperoom.gamelogic.ar.node.stationary.StationaryNode
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.scopes.FragmentScoped
@@ -18,25 +19,34 @@ class GameNodeFactory @Inject constructor(
 ) {
 
     suspend fun createNode(parent: Node?, model: GameNodeModel): GameNode {
-        val node = when (model.animationType) {
-            AnimationType.NONE, null -> {
+        val node = when (model.nodeType) {
+            NodeType.STATIONARY, null -> {
                 val node = StationaryNode()
                 node
             }
-            AnimationType.FILAMENT -> {
+            NodeType.FILAMENT -> {
                 val node = FilamentAnimationNode()
                 node
 
             }
-            AnimationType.PROPERTY -> {
-                requireNotNull(model.propertyAnimation) { "AnimationType.PROPERTY but propertyAnimation is null" }
+            NodeType.PROPERTY -> {
+                requireNotNull(model.propertyAnimation) { "NodeType.PROPERTY but propertyAnimation is null" }
                 val node = PropertyAnimationNode(model.propertyAnimation)
+                node
+            }
+            NodeType.LIGHT -> {
+                requireNotNull(model.lightModel) { "NodeType.LIGHT but lightModel is null" }
+                val node = LightNode(model.lightModel)
                 node
             }
         }
         with(node) {
             setParent(parent)
-            renderable = modelLoader.load(model.modelName)
+            // todo remoce try catch after implement sealed class
+            try {
+                renderable = modelLoader.load(model.modelName)
+            } catch (e: Exception) {
+            }
             name = model.modelName
             model.isVisible?.let {
                 isVisible = it
