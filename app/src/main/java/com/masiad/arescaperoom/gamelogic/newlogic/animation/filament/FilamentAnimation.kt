@@ -4,13 +4,17 @@ import android.animation.ValueAnimator
 import com.google.android.filament.gltfio.Animator
 import com.google.ar.sceneform.rendering.RenderableInstance
 import com.masiad.arescaperoom.gamelogic.newlogic.animation.NodeAnimation
-import kotlin.math.roundToLong
+import com.masiad.arescaperoom.util.extenstion.toMilliseconds
 
 class FilamentAnimation(
     renderableInstance: RenderableInstance?
 ) : NodeAnimation {
 
     // TODO temporary only 0 index and recerse on second click
+
+    companion object {
+        private const val ONE_FRAME = 1f / 24
+    }
 
     override var isReverse = false
 
@@ -40,10 +44,10 @@ class FilamentAnimation(
             requireNotNull(durationSeconds)
             val (start, stop) = if (isReverse) {
                 isReverse = false
-                Pair(durationSeconds, 0f)
+                Pair(durationSeconds - ONE_FRAME, 0f)
             } else {
                 isReverse = true
-                Pair(0f, durationSeconds)
+                Pair(0f, durationSeconds - ONE_FRAME)
             }
             it.apply {
                 setFloatValues(start, stop)
@@ -52,8 +56,3 @@ class FilamentAnimation(
         }
     }
 }
-
-private fun Float.toMilliseconds(): Long = (this * 1000).roundToLong()
-
-//todo delete or use
-private val ONE_FRAME: Float = 1f / 24

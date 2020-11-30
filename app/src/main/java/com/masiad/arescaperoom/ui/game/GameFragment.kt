@@ -209,7 +209,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
                 roomNode.localScale = Vector3(value, value, value)
             }
             doOnEnd {
-                //doorNode.startNextAnimation()
+                doorNode.animate()
             }
         }.start()
 
@@ -221,7 +221,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
                 binding.logs.text = "$distanceToStart"
                 if (distanceToStart < GameConstants.startGameDistanceThreshold) {
                     arSceneView.removeSceneOnUpdateListener()
-                    //doorNode.startNextAnimation()
+                    doorNode.animate()
                     showGameStartedInstruction()
                 }
             }

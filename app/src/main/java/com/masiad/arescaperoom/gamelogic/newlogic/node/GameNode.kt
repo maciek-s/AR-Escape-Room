@@ -28,4 +28,8 @@ open class GameNode : Node() {
      * Node animation
      */
     var nodeAnimation: NodeAnimation? = null
+
+    fun animate() {
+        nodeAnimation?.startNextAnimation()
+    }
 }
