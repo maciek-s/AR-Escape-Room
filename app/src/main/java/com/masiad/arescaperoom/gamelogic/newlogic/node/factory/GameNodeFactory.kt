@@ -2,6 +2,8 @@ package com.masiad.arescaperoom.gamelogic.newlogic.node.factory
 
 import androidx.fragment.app.Fragment
 import com.google.ar.sceneform.Node
+import com.google.ar.sceneform.math.Quaternion
+import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.gamelogic.newlogic.animation.NodeAnimationFactory
 import com.masiad.arescaperoom.gamelogic.newlogic.node.GameNode
 import com.masiad.arescaperoom.gamelogic.newlogic.node.InventoryNode
@@ -44,7 +46,7 @@ class GameNodeFactory @Inject constructor(
                 localPosition = it
             }
             model.localRotation?.let {
-                localRotation = it
+                localRotation = Quaternion.axisAngle(Vector3(it.x, it.y, it.z), it.w)
             }
             model.childrenModels?.forEach {
                 createNode(this, it)
@@ -53,7 +55,6 @@ class GameNodeFactory @Inject constructor(
                 renderable = modelLoader.load(model.modelName)
                 model.animationType?.let {
                     nodeAnimation = nodeAnimationFactory.createAnimation(it, this)
-                    val x = 3
                 }
             }
         }
