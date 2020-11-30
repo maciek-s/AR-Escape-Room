@@ -11,6 +11,7 @@ private enum class Type {
 
 private interface Model {
     val isVisible: Boolean?
+    val isClickable: Boolean?
     val localPosition: Vector3?
     val localRotation: Quaternion?
     val childrenModels: List<GameNodeModel>?
@@ -37,6 +38,7 @@ sealed class GameNodeModel(
 
 data class NormalModel(
     override val isVisible: Boolean?,
+    override val isClickable: Boolean?,
     override val localPosition: Vector3?,
     override val localRotation: Quaternion?,
     override val childrenModels: List<GameNodeModel>?,
@@ -46,6 +48,7 @@ data class NormalModel(
 
 data class InventoryModel(
     override val isVisible: Boolean?,
+    override val isClickable: Boolean?,
     override val localPosition: Vector3?,
     override val localRotation: Quaternion?,
     override val childrenModels: List<GameNodeModel>?,
@@ -55,17 +58,19 @@ data class InventoryModel(
 
 data class PuzzleModel(
     override val isVisible: Boolean?,
+    override val isClickable: Boolean?,
     override val localPosition: Vector3?,
     override val localRotation: Quaternion?,
     override val childrenModels: List<GameNodeModel>?,
     override val modelName: String,
     override val animationType: AnimationType?,
     val openInventoryName: String
-) : GameNodeModel(Type.INVENTORY.name), RenderableModel
+) : GameNodeModel(Type.PUZZLE.name), RenderableModel
 
 data class LightNodeModel(
     override val isVisible: Boolean?,
+    override val isClickable: Boolean?,
     override val localPosition: Vector3?,
     override val localRotation: Quaternion?,
     override val childrenModels: List<GameNodeModel>?,
-) : GameNodeModel(Type.INVENTORY.name)
+) : GameNodeModel(Type.LIGHT.name)

@@ -40,6 +40,7 @@
       "childrenModels": [
         {
           "type": "NORMAL",
+          "isClickable": true,
           "modelName": "desk_left_drawer",
           "animationType": {
             "type": "PROPERTY",
@@ -56,6 +57,7 @@
         },
         {
           "type": "NORMAL",
+          "isClickable": true,
           "modelName": "desk_right_drawer",
           "animationType": {
             "type": "PROPERTY",
@@ -72,6 +74,7 @@
           "childrenModels": [
             {
               "type": "INVENTORY",
+              "isClickable": true,
               "modelName": "gold_key",
               "isVisible": false,
               "localPosition": {
@@ -92,6 +95,7 @@
     },
     {
       "type": "PUZZLE",
+      "isClickable": true,
       "modelName": "chest",
       "localPosition": {
         "x": "0.9",

@@ -15,14 +15,17 @@ open class GameNode : Node() {
     }
 
     /**
-     * Is node visible to user in current setup
+     * When node is visible to user
      */
     var isVisible = true
 
     /**
      * Node tap listener
      */
-    protected var tapListener: OnTapListener? = null
+    private var tapListener: OnTapListener? = null
+    fun setTapListener(listener: OnTapListener?) {
+        tapListener = listener
+    }
 
     /**
      * Node animation
@@ -31,5 +34,14 @@ open class GameNode : Node() {
 
     fun animate() {
         nodeAnimation?.startNextAnimation()
+    }
+
+    /**
+     * Start animation when node is clickable and visible
+     */
+    fun performTap() {
+        if (isVisible) {
+            animate()
+        }
     }
 }

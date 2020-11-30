@@ -42,6 +42,14 @@ class GameNodeFactory @Inject constructor(
             model.isVisible?.let {
                 isVisible = it
             }
+            if (model.isClickable == true) {
+                setOnTapListener { _, _ ->
+                    performTap()
+                }
+                if (fragment is GameNode.OnTapListener) {
+                    setTapListener(fragment)
+                }
+            }
             model.localPosition?.let {
                 localPosition = it
             }

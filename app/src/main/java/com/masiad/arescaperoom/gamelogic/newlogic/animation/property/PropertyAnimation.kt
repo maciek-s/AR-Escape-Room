@@ -18,6 +18,7 @@ class PropertyAnimation(
         ObjectAnimator().apply {
             target = node
             setPropertyName(propertyAnimationModel.propertyName)
+            setObjectValues(propertyAnimationModel.animationVector)
             setEvaluator(Vector3Evaluator())
             duration = propertyAnimationModel.duration
         }
