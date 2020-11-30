@@ -110,7 +110,7 @@
       "openInventoryName": "gold_key"
     },
     {
-      "type": "LIGHT",
+      "type": "NORMAL",
       "modelName": "floor_lamp",
       "localPosition": {
         "x": "0.9",
@@ -122,7 +122,12 @@
         "y": "1",
         "z": "0",
         "w": "-135"
-      }
+      },
+      "childrenModels": [
+        {
+          "type": "LIGHT"
+        }
+      ]
     }
   ]
 }
