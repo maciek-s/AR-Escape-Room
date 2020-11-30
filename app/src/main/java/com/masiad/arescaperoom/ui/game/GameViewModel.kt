@@ -29,10 +29,10 @@ class GameViewModel @ViewModelInject constructor(
     val level: LiveData<Level>
         get() = _level
 
-    val instructionName: String
+    val levelNumber: Int
         get() {
             requireNotNull(level.value) { "getInstructionName() called but level not loaded" }
-            return level.value?.instructionName ?: ""
+            return level.value!!.number
         }
 
     val isInventoryLayoutVisible by lazy { MutableLiveData(false) }

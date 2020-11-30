@@ -1,8 +1,8 @@
 {
   "number": 1,
-  "instructionName": "instruction_level_1",
   "placingModelName": "door_transparent",
-  "roomModelData": {
+  "roomModel": {
+    "type": "NORMAL",
     "modelName": "room_floor",
     "localPosition": {
       "x": "0",
@@ -10,17 +10,21 @@
       "z": "-1.4"
     }
   },
-  "doorModelData": {
+  "doorModel": {
+    "type": "NORMAL",
     "modelName": "door",
     "localPosition": {
       "x": "0",
       "y": "0",
       "z": "1.4"
     },
-    "nodeType": "FILAMENT"
+    "animationType": {
+      "type": "FILAMENT"
+    }
   },
-  "modelDataList": [
+  "insideModels": [
     {
+      "type": "NORMAL",
       "modelName": "desk_main",
       "localPosition": {
         "x": "-0.95",
@@ -33,36 +37,41 @@
         "z": "0",
         "w": "90"
       },
-      "childrenDataList": [
+      "childrenModels": [
         {
+          "type": "NORMAL",
           "modelName": "desk_left_drawer",
-          "nodeType": "PROPERTY",
-          "propertyAnimation": {
-            "propertyName": "localPosition",
-            "animationVector": {
-              "x": "0",
-              "y": "0",
-              "z": "0.25"
-            },
-            "duration": 500
-          },
-          "actionType": "ANIMATE"
+          "animationType": {
+            "type": "PROPERTY",
+            "propertyAnimationModel": {
+              "propertyName": "localPosition",
+              "animationVector": {
+                "x": "0",
+                "y": "0",
+                "z": "0.25"
+              },
+              "duration": 500
+            }
+          }
         },
         {
+          "type": "NORMAL",
           "modelName": "desk_right_drawer",
-          "nodeType": "PROPERTY",
-          "propertyAnimation": {
-            "propertyName": "localPosition",
-            "animationVector": {
-              "x": "0",
-              "y": "0",
-              "z": "0.25"
-            },
-            "duration": 500
+          "animationType": {
+            "type": "PROPERTY",
+            "propertyAnimationModel": {
+              "propertyName": "localPosition",
+              "animationVector": {
+                "x": "0",
+                "y": "0",
+                "z": "0.25"
+              },
+              "duration": 500
+            }
           },
-          "actionType": "ANIMATE",
-          "childrenDataList": [
+          "childrenModels": [
             {
+              "type": "INVENTORY",
               "modelName": "gold_key",
               "isVisible": false,
               "localPosition": {
@@ -75,16 +84,15 @@
                 "y": "1",
                 "z": "0",
                 "w": "17"
-              },
-              "actionType": "PICK_UP"
+              }
             }
           ]
         }
       ]
     },
     {
+      "type": "PUZZLE",
       "modelName": "chest",
-      "isLocked": "true",
       "localPosition": {
         "x": "0.9",
         "y": "0.0",
@@ -96,12 +104,13 @@
         "z": "0",
         "w": "-90"
       },
-      "nodeType": "FILAMENT",
-      "actionType": "USE_INVENTORY",
-      "actionInventoryModelName": "gold_key",
-      "inventoryActionType": "UNLOCK"
+      "animationType": {
+        "type": "FILAMENT"
+      },
+      "openInventoryName": "gold_key"
     },
     {
+      "type": "LIGHT",
       "modelName": "floor_lamp",
       "localPosition": {
         "x": "0.9",
@@ -113,21 +122,7 @@
         "y": "1",
         "z": "0",
         "w": "-135"
-      },
-      "childrenDataList": [
-        {
-          "modelName": "light",
-          "nodeType": "LIGHT",
-          "localPosition": {
-            "x": "0.74",
-            "y": "1.67",
-            "z": "0.0"
-          },
-          "lightModel": {
-            "lightType": "POINT"
-          }
-        }
-      ]
+      }
     }
   ]
 }

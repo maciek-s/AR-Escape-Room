@@ -57,6 +57,7 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hilt_viewmodel_version"
     implementation "com.google.code.gson:gson:$gson_version"
+    implementation "org.danilopianini:gson-extras:$gson_extras_version"
 
     // Testing dependencies
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"

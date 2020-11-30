@@ -22,8 +22,8 @@ import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Level
-import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNode
-import com.masiad.arescaperoom.gamelogic.ar.node.common.GameNodeFactory
+import com.masiad.arescaperoom.gamelogic.newlogic.node.GameNode
+import com.masiad.arescaperoom.gamelogic.newlogic.node.factory.GameNodeFactory
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
 import com.masiad.arescaperoom.util.extenstion.TAG
 import com.masiad.arescaperoom.util.extenstion.hasAnchor
@@ -187,13 +187,13 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         placingNode.renderable = modelLoader.load(level.placingModelName)
 
         // Room node
-        roomNode = gameNodeFactory.createNode(null, level.roomModelData)
+        roomNode = gameNodeFactory.createNode(null, level.roomModel)
 
         // Door node
-        doorNode = gameNodeFactory.createNode(roomNode, level.doorModelData)
+        doorNode = gameNodeFactory.createNode(roomNode, level.doorModel)
 
         // Room inside
-        level.modelDataList.forEach { model ->
+        level.insideModels.forEach { model ->
             gameNodeFactory.createNode(roomNode, model)
         }
     }
@@ -209,7 +209,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
                 roomNode.localScale = Vector3(value, value, value)
             }
             doOnEnd {
-                doorNode.startNextAnimation()
+                //doorNode.startNextAnimation()
             }
         }.start()
 
@@ -221,7 +221,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
                 binding.logs.text = "$distanceToStart"
                 if (distanceToStart < GameConstants.startGameDistanceThreshold) {
                     arSceneView.removeSceneOnUpdateListener()
-                    doorNode.startNextAnimation()
+                    //doorNode.startNextAnimation()
                     showGameStartedInstruction()
                 }
             }
@@ -229,8 +229,13 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     private fun showGameStartedInstruction() {
+        //todo message resolver enter type + level number
         val instructionResId =
-            resources.getIdentifier(viewModel.instructionName, "string", context?.packageName)
+            resources.getIdentifier(
+                "instruction_level_${viewModel.levelNumber}",
+                "string",
+                context?.packageName
+            )
         binding.alert.infoText = getString(instructionResId)
         binding.alert.clickListener = View.OnClickListener {
             binding.alert.infoText = null
@@ -267,9 +272,9 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         with(node) {
             when {
                 // Open/Close if visible and unlocked
-                isVisible && !isLocked -> {
-                    isOpen = !isOpen
-                }
+//                isVisible && !isLocked -> {
+//                    isOpen = !isOpen
+//                }
             }
         }
         val hitTestAll = arSceneView.scene.hitTestAll(motionEvent)
