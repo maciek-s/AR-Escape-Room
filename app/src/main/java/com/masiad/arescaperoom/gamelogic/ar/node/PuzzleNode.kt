@@ -10,9 +10,23 @@ class PuzzleNode : ComplexNode() {
      */
     var isLocked = true
 
+    /**
+     * User see puzzle node content eg. drawer is open
+     * show proper animation and set children visibility
+     */
+    private var isOpen = false
+        set(value) {
+            field = value
+            animate()
+            setChildrenVisible(value)
+        }
+
+    /**
+     * Open if not locked on tap
+     */
     override fun performTap() {
-        if (!isLocked) {
-            super.performTap()
+        if (!isLocked && isVisible) {
+            isOpen = !isOpen
         }
     }
 }

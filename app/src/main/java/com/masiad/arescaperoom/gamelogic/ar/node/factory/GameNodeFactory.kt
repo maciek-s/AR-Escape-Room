@@ -48,6 +48,7 @@ class GameNodeFactory @Inject constructor(
                 setOnTapListener { _, _ ->
                     performTap()
                 }
+                //todo delete on delegate tap to fragment
                 if (fragment is GameNode.OnTapListener) {
                     setTapListener(fragment)
                 }
