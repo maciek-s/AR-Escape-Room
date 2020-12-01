@@ -1,4 +1,4 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.node
+package com.masiad.arescaperoom.gamelogic.ar.node
 
 /**
  * Puzzle node that need to be solved to open

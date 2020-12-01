@@ -1,9 +1,9 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.animation.filament
+package com.masiad.arescaperoom.gamelogic.ar.animation.filament
 
 import android.animation.ValueAnimator
 import com.google.android.filament.gltfio.Animator
 import com.google.ar.sceneform.rendering.RenderableInstance
-import com.masiad.arescaperoom.gamelogic.newlogic.animation.NodeAnimation
+import com.masiad.arescaperoom.gamelogic.ar.animation.NodeAnimation
 import com.masiad.arescaperoom.util.extenstion.toMilliseconds
 
 class FilamentAnimation(

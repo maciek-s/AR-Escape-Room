@@ -1,9 +1,9 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.node
+package com.masiad.arescaperoom.gamelogic.ar.node
 
 import android.view.MotionEvent
 import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.Node
-import com.masiad.arescaperoom.gamelogic.newlogic.animation.NodeAnimation
+import com.masiad.arescaperoom.gamelogic.ar.animation.NodeAnimation
 
 /**
  * Base game node without any action

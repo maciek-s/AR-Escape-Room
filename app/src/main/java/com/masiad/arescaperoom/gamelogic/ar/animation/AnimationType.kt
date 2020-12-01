@@ -1,7 +1,7 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.animation
+package com.masiad.arescaperoom.gamelogic.ar.animation
 
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
-import com.masiad.arescaperoom.gamelogic.newlogic.animation.property.PropertyAnimationModel
+import com.masiad.arescaperoom.gamelogic.ar.animation.property.PropertyAnimationModel
 
 private enum class Type {
     NONE, FILAMENT, PROPERTY

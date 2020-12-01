@@ -1,6 +1,6 @@
 package com.masiad.arescaperoom.gamelogic
 
-import com.masiad.arescaperoom.gamelogic.newlogic.node.model.GameNodeModel
+import com.masiad.arescaperoom.gamelogic.ar.node.model.GameNodeModel
 
 data class Level(
     val number: Int,

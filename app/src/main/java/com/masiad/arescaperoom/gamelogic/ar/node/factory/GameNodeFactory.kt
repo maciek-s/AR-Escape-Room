@@ -1,15 +1,15 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.node.factory
+package com.masiad.arescaperoom.gamelogic.ar.node.factory
 
 import androidx.fragment.app.Fragment
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
-import com.masiad.arescaperoom.gamelogic.newlogic.animation.NodeAnimationFactory
-import com.masiad.arescaperoom.gamelogic.newlogic.node.GameNode
-import com.masiad.arescaperoom.gamelogic.newlogic.node.InventoryNode
-import com.masiad.arescaperoom.gamelogic.newlogic.node.LightNode
-import com.masiad.arescaperoom.gamelogic.newlogic.node.PuzzleNode
-import com.masiad.arescaperoom.gamelogic.newlogic.node.model.*
+import com.masiad.arescaperoom.gamelogic.ar.animation.NodeAnimationFactory
+import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
+import com.masiad.arescaperoom.gamelogic.ar.node.InventoryNode
+import com.masiad.arescaperoom.gamelogic.ar.node.LightNode
+import com.masiad.arescaperoom.gamelogic.ar.node.PuzzleNode
+import com.masiad.arescaperoom.gamelogic.ar.node.model.*
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject

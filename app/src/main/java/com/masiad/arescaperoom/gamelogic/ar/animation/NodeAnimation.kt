@@ -1,4 +1,4 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.animation
+package com.masiad.arescaperoom.gamelogic.ar.animation
 
 interface NodeAnimation {
     var isReverse: Boolean

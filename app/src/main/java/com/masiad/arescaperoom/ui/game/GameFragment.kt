@@ -22,8 +22,8 @@ import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Level
-import com.masiad.arescaperoom.gamelogic.newlogic.node.GameNode
-import com.masiad.arescaperoom.gamelogic.newlogic.node.factory.GameNodeFactory
+import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
+import com.masiad.arescaperoom.gamelogic.ar.node.factory.GameNodeFactory
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
 import com.masiad.arescaperoom.util.extenstion.TAG
 import com.masiad.arescaperoom.util.extenstion.hasAnchor

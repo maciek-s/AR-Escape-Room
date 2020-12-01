@@ -1,4 +1,4 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.animation.property
+package com.masiad.arescaperoom.gamelogic.ar.animation.property
 
 import com.google.ar.sceneform.math.Vector3
 

@@ -1,10 +1,10 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.animation.property
+package com.masiad.arescaperoom.gamelogic.ar.animation.property
 
 import android.animation.ObjectAnimator
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.math.Vector3Evaluator
-import com.masiad.arescaperoom.gamelogic.newlogic.animation.NodeAnimation
-import com.masiad.arescaperoom.gamelogic.newlogic.node.GameNode
+import com.masiad.arescaperoom.gamelogic.ar.animation.NodeAnimation
+import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
 
 class PropertyAnimation(
     private val propertyAnimationModel: PropertyAnimationModel,

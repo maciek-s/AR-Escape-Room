@@ -1,9 +1,9 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.node.model
+package com.masiad.arescaperoom.gamelogic.ar.node.model
 
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
-import com.masiad.arescaperoom.gamelogic.newlogic.animation.AnimationType
+import com.masiad.arescaperoom.gamelogic.ar.animation.AnimationType
 
 private enum class Type {
     NORMAL, INVENTORY, PUZZLE, LIGHT

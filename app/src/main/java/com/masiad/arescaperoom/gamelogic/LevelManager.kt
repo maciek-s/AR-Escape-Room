@@ -4,8 +4,8 @@ import android.content.Context
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
-import com.masiad.arescaperoom.gamelogic.newlogic.animation.AnimationType
-import com.masiad.arescaperoom.gamelogic.newlogic.node.model.GameNodeModel
+import com.masiad.arescaperoom.gamelogic.ar.animation.AnimationType
+import com.masiad.arescaperoom.gamelogic.ar.node.model.GameNodeModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.Dispatchers

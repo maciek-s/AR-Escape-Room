@@ -1,8 +1,8 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.animation
+package com.masiad.arescaperoom.gamelogic.ar.animation
 
-import com.masiad.arescaperoom.gamelogic.newlogic.animation.filament.FilamentAnimation
-import com.masiad.arescaperoom.gamelogic.newlogic.animation.property.PropertyAnimation
-import com.masiad.arescaperoom.gamelogic.newlogic.node.GameNode
+import com.masiad.arescaperoom.gamelogic.ar.animation.filament.FilamentAnimation
+import com.masiad.arescaperoom.gamelogic.ar.animation.property.PropertyAnimation
+import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
 import javax.inject.Inject
 import javax.inject.Singleton
 

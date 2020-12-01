@@ -1,4 +1,4 @@
-package com.masiad.arescaperoom.gamelogic.newlogic.node
+package com.masiad.arescaperoom.gamelogic.ar.node
 
 /**
  * Node that can be picked up and use on puzzle node
