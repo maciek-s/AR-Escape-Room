@@ -39,7 +39,7 @@
       },
       "childrenModels": [
         {
-          "type": "NORMAL",
+          "type": "PUZZLE",
           "isClickable": true,
           "modelName": "desk_left_drawer",
           "animationType": {
@@ -53,10 +53,11 @@
               },
               "duration": 500
             }
-          }
+          },
+          "isLocked": false
         },
         {
-          "type": "NORMAL",
+          "type": "PUZZLE",
           "isClickable": true,
           "modelName": "desk_right_drawer",
           "animationType": {
@@ -71,6 +72,7 @@
               "duration": 500
             }
           },
+          "isLocked": false,
           "childrenModels": [
             {
               "type": "INVENTORY",

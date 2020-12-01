@@ -39,7 +39,7 @@ open class GameNode : Node() {
     /**
      * Start animation when node is clickable and visible
      */
-    fun performTap() {
+    open fun performTap() {
         if (isVisible) {
             animate()
         }

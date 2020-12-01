@@ -53,7 +53,7 @@ data class InventoryModel(
     override val localRotation: Quaternion?,
     override val childrenModels: List<GameNodeModel>?,
     override val modelName: String,
-    override val animationType: AnimationType?,
+    override val animationType: AnimationType?
 ) : GameNodeModel(Type.INVENTORY.name), RenderableModel
 
 data class PuzzleModel(
@@ -64,7 +64,8 @@ data class PuzzleModel(
     override val childrenModels: List<GameNodeModel>?,
     override val modelName: String,
     override val animationType: AnimationType?,
-    val openInventoryName: String
+    val isLocked: Boolean?,
+    val openInventoryName: String?
 ) : GameNodeModel(Type.PUZZLE.name), RenderableModel
 
 data class LightNodeModel(
