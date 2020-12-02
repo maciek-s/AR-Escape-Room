@@ -53,7 +53,8 @@ data class InventoryModel(
     override val localRotation: Quaternion?,
     override val childrenModels: List<GameNodeModel>?,
     override val modelName: String,
-    override val animationType: AnimationType?
+    override val animationType: AnimationType?,
+    val visibleAdditionalSize: Vector3?
 ) : GameNodeModel(Type.INVENTORY.name), RenderableModel
 
 data class PuzzleModel(

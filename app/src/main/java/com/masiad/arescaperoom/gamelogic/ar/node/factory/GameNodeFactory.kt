@@ -14,6 +14,7 @@ import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
+
 @FragmentScoped
 class GameNodeFactory @Inject constructor(
     private val fragment: Fragment,
@@ -28,7 +29,9 @@ class GameNodeFactory @Inject constructor(
 
             }
             is InventoryModel -> InventoryNode().apply {
-
+                model.visibleAdditionalSize?.let {
+                    visibleAdditionalSize = it
+                }
             }
             is PuzzleModel -> PuzzleNode().apply {
                 model.isLocked?.let {
