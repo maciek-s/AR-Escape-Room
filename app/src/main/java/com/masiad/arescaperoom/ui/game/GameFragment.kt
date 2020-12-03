@@ -15,6 +15,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
+import com.google.ar.sceneform.collision.Ray
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.adapter.InventoryAdapter
@@ -27,10 +28,12 @@ import com.masiad.arescaperoom.gamelogic.ar.node.factory.GameNodeFactory
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
 import com.masiad.arescaperoom.util.extenstion.TAG
 import com.masiad.arescaperoom.util.extenstion.hasAnchor
-import com.masiad.arescaperoom.util.extenstion.horizontalDistanceBetween
+import com.masiad.arescaperoom.util.extenstion.horizontalVector
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -107,9 +110,29 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     // PRIVATE
     private fun bindData() {
         binding.viewModel = viewModel
+        setupMoveButton()
         setupInventory()
         observeGamePhase()
         observeLevel()
+    }
+
+    private fun setupMoveButton() {
+        // todo continuous move?
+        binding.moveButton.setOnClickListener {
+            lifecycleScope.launch {
+                relocateRoom()
+            }
+        }
+    }
+
+    private suspend fun relocateRoom() {
+        withContext(Dispatchers.IO) {
+            val ray = Ray(cameraNode.worldPosition, cameraNode.forward)
+            val stepVector = ray.direction.horizontalVector.scaled(0.1f)
+            with(roomNode) {
+                localPosition = Vector3.subtract(localPosition, stepVector)
+            }
+        }
     }
 
     private fun setupInventory() {
@@ -213,13 +236,12 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
             }
         }.start()
 
-        val startPoint = Vector3.add(doorNode.worldPosition, GameConstants.startPointAddVector)
         arSceneView.updateSceneOnUpdateListener {
-            if (isTrackingState) {
-                val distanceToStart =
-                    cameraNode.worldPosition.horizontalDistanceBetween(startPoint)
-                binding.logs.text = "$distanceToStart"
-                if (distanceToStart < GameConstants.startGameDistanceThreshold) {
+            val ray = Ray(cameraNode.worldPosition, cameraNode.forward)
+            val hit = arSceneView.scene.hitTest(ray)
+            binding.logs.text = hit.distance.toString()
+            hit.node?.let { node ->
+                if (node == doorNode && hit.distance < GameConstants.startGameDistanceThreshold) {
                     arSceneView.removeSceneOnUpdateListener()
                     doorNode.animate()
                     showGameStartedInstruction()

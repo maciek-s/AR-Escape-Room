@@ -18,7 +18,6 @@ open class ComplexNode : GameNode() {
                     }
                 }
             }
-        parent?.renderable = null
     }
 }
 

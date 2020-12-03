@@ -1,10 +1,7 @@
 package com.masiad.arescaperoom.ui.game
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.masiad.arescaperoom.data.Inventory
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Level
@@ -37,6 +34,12 @@ class GameViewModel @ViewModelInject constructor(
 
     val isInventoryLayoutVisible by lazy { MutableLiveData(false) }
     val isInventoryLayoutToggle by lazy { MutableLiveData(true) }
+
+    val isMoveButtonVisible by lazy {
+        Transformations.map(gamePhase) {
+            it == GamePhase.PLACED || it == GamePhase.GAME_STARTED
+        }
+    }
 
     private val _inventoryList by lazy { MutableLiveData<List<Inventory>>() }
     val inventoryList: LiveData<List<Inventory>>

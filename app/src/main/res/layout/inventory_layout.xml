@@ -61,6 +61,7 @@
             android:layout_width="@dimen/inventory_arrow_size"
             android:layout_height="0dp"
             android:background="?attr/colorSurface"
+            android:elevation="8dp"
             android:onClick="@{toggleClickListener}"
             android:scaleType="centerCrop"
             android:src="@{isToggle ? @drawable/ic_round_keyboard_arrow_right : @drawable/ic_round_keyboard_arrow_left}"

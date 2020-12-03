@@ -12,3 +12,6 @@ fun Vector3.horizontalDistanceBetween(vector: Vector3): Float {
     val subtracted = Vector3.subtract(vector, this)
     return sqrt(subtracted.x.pow(2) + subtracted.z.pow(2))
 }
+
+val Vector3.horizontalVector: Vector3
+    get() = Vector3(x, 0f, z)
