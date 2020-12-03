@@ -1,7 +1,5 @@
 package com.masiad.arescaperoom.gamelogic.ar.node
 
-import android.view.MotionEvent
-import com.google.ar.sceneform.HitTestResult
 import com.google.ar.sceneform.Node
 import com.masiad.arescaperoom.gamelogic.ar.animation.NodeAnimation
 
@@ -11,7 +9,7 @@ import com.masiad.arescaperoom.gamelogic.ar.animation.NodeAnimation
 open class GameNode : Node() {
 
     interface OnTapListener {
-        fun onNodeTap(node: GameNode, hitTestResult: HitTestResult?, motionEvent: MotionEvent?)
+        fun onInventoryPickUp(inventoryNode: InventoryNode)
     }
 
     /**
@@ -22,8 +20,8 @@ open class GameNode : Node() {
     /**
      * Node tap listener
      */
-    private var tapListener: OnTapListener? = null
-    fun setTapListener(listener: OnTapListener?) {
+    protected var tapListener: OnTapListener? = null
+    fun setOnTapListener(listener: OnTapListener?) {
         tapListener = listener
     }
 
@@ -39,9 +37,13 @@ open class GameNode : Node() {
     /**
      * Start animation when node is clickable and visible
      */
-    open fun performTap() {
+    fun onTap() {
         if (isVisible) {
-            animate()
+            performTapAction()
         }
+    }
+
+    open fun performTapAction() {
+        animate()
     }
 }

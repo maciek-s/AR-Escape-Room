@@ -2,9 +2,7 @@ package com.masiad.arescaperoom.ui.game
 
 import android.animation.ValueAnimator
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.doOnEnd
@@ -19,14 +17,15 @@ import com.google.ar.sceneform.collision.Ray
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.adapter.InventoryAdapter
+import com.masiad.arescaperoom.data.Inventory
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
+import com.masiad.arescaperoom.gamelogic.ar.node.InventoryNode
 import com.masiad.arescaperoom.gamelogic.ar.node.factory.GameNodeFactory
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
-import com.masiad.arescaperoom.util.extenstion.TAG
 import com.masiad.arescaperoom.util.extenstion.hasAnchor
 import com.masiad.arescaperoom.util.extenstion.horizontalVector
 import com.masiad.arescaperoom.util.model.ModelLoader
@@ -284,28 +283,10 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         }
     }
 
-    // todo onInventory tap ect
-    override fun onNodeTap(
-        node: GameNode,
-        hitTestResult: HitTestResult?,
-        motionEvent: MotionEvent?
-    ) {
-        Log.i(TAG, "onNodeTap $node")
-        with(node) {
-            when {
-                // Open/Close if visible and unlocked
-//                isVisible && !isLocked -> {
-//                    isOpen = !isOpen
-//                }
-            }
-        }
-        val hitTestAll = arSceneView.scene.hitTestAll(motionEvent)
-        hitTestAll
-            .map { it.node }
-            .filterIsInstance<GameNode>()
-            .forEach {
-                Log.i(TAG, "hit all ${it.name}")
-                //it.startNextAnimation()
-            }
+    // GameNode.OnTapListener
+    override fun onInventoryPickUp(inventoryNode: InventoryNode) {
+        val inventory = Inventory(inventoryNode.name)
+        viewModel.informInventoryPickUp(inventory)
     }
+
 }

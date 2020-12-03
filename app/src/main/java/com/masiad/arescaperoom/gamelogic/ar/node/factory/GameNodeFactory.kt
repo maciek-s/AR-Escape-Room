@@ -49,11 +49,11 @@ class GameNodeFactory @Inject constructor(
             }
             if (model.isClickable == true) {
                 setOnTapListener { _, _ ->
-                    performTap()
+                    onTap()
                 }
                 //todo delete on delegate tap to fragment
                 if (fragment is GameNode.OnTapListener) {
-                    setTapListener(fragment)
+                    setOnTapListener(fragment)
                 }
             }
             model.localPosition?.let {
@@ -70,6 +70,7 @@ class GameNodeFactory @Inject constructor(
                 model.animationType?.let {
                     nodeAnimation = nodeAnimationFactory.createAnimation(it, this)
                 }
+                name = model.modelName
             }
         }
         return node

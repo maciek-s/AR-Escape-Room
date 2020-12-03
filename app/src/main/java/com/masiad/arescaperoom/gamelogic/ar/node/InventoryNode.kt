@@ -8,4 +8,9 @@ import com.google.ar.sceneform.math.Vector3
 class InventoryNode : GameNode() {
 
     var visibleAdditionalSize: Vector3? = null
+
+    override fun performTapAction() {
+        tapListener?.onInventoryPickUp(this)
+        setParent(null)
+    }
 }

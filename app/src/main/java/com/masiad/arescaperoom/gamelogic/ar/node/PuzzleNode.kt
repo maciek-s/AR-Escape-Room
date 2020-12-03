@@ -24,8 +24,8 @@ class PuzzleNode : ComplexNode() {
     /**
      * Open if not locked on tap
      */
-    override fun performTap() {
-        if (!isLocked && isVisible) {
+    override fun performTapAction() {
+        if (!isLocked) {
             isOpen = !isOpen
         }
     }
