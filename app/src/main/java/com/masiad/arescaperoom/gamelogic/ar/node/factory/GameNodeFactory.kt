@@ -37,6 +37,9 @@ class GameNodeFactory @Inject constructor(
                 model.isLocked?.let {
                     isLocked = it
                 }
+                model.openInventoryName?.let {
+                    openInventoryName = it
+                }
             }
             is LightNodeModel -> LightNode().apply {
 

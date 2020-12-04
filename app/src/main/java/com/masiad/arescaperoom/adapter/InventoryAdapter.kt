@@ -14,13 +14,29 @@ import javax.inject.Inject
 class InventoryAdapter @Inject constructor() :
     ListAdapter<Inventory, InventoryAdapter.ViewHolder>(InventoryDiffCallback()) {
 
+    interface OnInventoryClickListener {
+        fun onInventoryClick(inventory: Inventory)
+    }
+
+    private var inventoryClickListener: OnInventoryClickListener? = null
+
+    fun setOnInventoryClickListener(listener: (Inventory) -> Unit) {
+        this.inventoryClickListener = object : OnInventoryClickListener {
+            override fun onInventoryClick(inventory: Inventory) {
+                listener(inventory)
+            }
+
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             InventoryItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            inventoryClickListener
         )
     }
 
@@ -30,13 +46,14 @@ class InventoryAdapter @Inject constructor() :
     }
 
     class ViewHolder(
-        private val binding: InventoryItemBinding
+        private val binding: InventoryItemBinding,
+        private val inventoryClickListener: OnInventoryClickListener?
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
             binding.root.setOnClickListener {
                 binding.inventory?.let { inventory ->
-                    // TODO open inventory modal? / make selected?
+                    inventoryClickListener?.onInventoryClick(inventory)
                 }
             }
         }

@@ -9,7 +9,8 @@ import com.masiad.arescaperoom.gamelogic.ar.animation.NodeAnimation
 open class GameNode : Node() {
 
     interface OnTapListener {
-        fun onInventoryPickUp(inventoryNode: InventoryNode)
+        fun onInventoryPickUp(node: InventoryNode)
+        fun onTapLockedNode(node: PuzzleNode)
     }
 
     /**

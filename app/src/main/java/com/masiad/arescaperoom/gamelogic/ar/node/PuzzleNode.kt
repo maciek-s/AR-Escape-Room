@@ -22,10 +22,24 @@ class PuzzleNode : ComplexNode() {
         }
 
     /**
+     * Node name witch open
+     */
+    var openInventoryName: String? = null
+
+    fun unlock(inventoryName: String?) {
+        isLocked = inventoryName != openInventoryName
+        if (!isLocked) {
+            isOpen = true
+        }
+    }
+
+    /**
      * Open if not locked on tap
      */
     override fun performTapAction() {
-        if (!isLocked) {
+        if (isLocked) {
+            tapListener?.onTapLockedNode(this)
+        } else {
             isOpen = !isOpen
         }
     }

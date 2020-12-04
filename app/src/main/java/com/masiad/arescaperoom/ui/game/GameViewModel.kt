@@ -45,6 +45,8 @@ class GameViewModel @ViewModelInject constructor(
     val inventoryList: LiveData<List<Inventory>>
         get() = _inventoryList
 
+    var selectedInventory: Inventory? = null
+
     fun informInventoryToggle() {
         isInventoryLayoutToggle.value?.let {
             isInventoryLayoutToggle.value = !it
@@ -92,8 +94,20 @@ class GameViewModel @ViewModelInject constructor(
 
     //todo update list
     private fun addInventoryToList(inventory: Inventory) {
-        val current = _inventoryList.value ?: emptyList()
-        current.toMutableList().add(inventory)
-        _inventoryList.value = listOf(inventory)
+        val updated = (inventoryList.value?.toMutableList() ?: mutableListOf()).apply {
+            add(inventory)
+        }
+        _inventoryList.value = updated.toList()
+    }
+
+    fun informNodeUnlock(isLocked: Boolean) {
+        if (!isLocked) {
+            requireNotNull(inventoryList.value) { "informNodeUnlock() was called by inventory list is null" }
+            requireNotNull(selectedInventory) { "informNodeUnlock() was called by selected inventory is null" }
+            val updated = inventoryList.value?.toMutableList()?.apply {
+                remove(selectedInventory)
+            }
+            _inventoryList.value = updated?.toList()
+        }
     }
 }

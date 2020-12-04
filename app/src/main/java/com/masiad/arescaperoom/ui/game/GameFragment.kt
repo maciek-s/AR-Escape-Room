@@ -2,6 +2,7 @@ package com.masiad.arescaperoom.ui.game
 
 import android.animation.ValueAnimator
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +25,10 @@ import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
 import com.masiad.arescaperoom.gamelogic.ar.node.InventoryNode
+import com.masiad.arescaperoom.gamelogic.ar.node.PuzzleNode
 import com.masiad.arescaperoom.gamelogic.ar.node.factory.GameNodeFactory
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
+import com.masiad.arescaperoom.util.extenstion.TAG
 import com.masiad.arescaperoom.util.extenstion.hasAnchor
 import com.masiad.arescaperoom.util.extenstion.horizontalVector
 import com.masiad.arescaperoom.util.model.ModelLoader
@@ -137,6 +140,9 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     private fun setupInventory() {
         binding.inventory.recyclerView.apply {
             adapter = inventoryAdapter
+        }
+        inventoryAdapter.setOnInventoryClickListener { inventory ->
+            viewModel.selectedInventory = inventory
         }
         viewModel.inventoryList.observe(viewLifecycleOwner, {
             inventoryAdapter.submitList(it)
@@ -284,9 +290,20 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     // GameNode.OnTapListener
-    override fun onInventoryPickUp(inventoryNode: InventoryNode) {
-        val inventory = Inventory(inventoryNode.name)
+
+    override fun onInventoryPickUp(node: InventoryNode) {
+        Log.i(TAG, "onInventoryPickUp $node")
+        val inventory = Inventory(node.name)
         viewModel.informInventoryPickUp(inventory)
     }
 
+    override fun onTapLockedNode(node: PuzzleNode) {
+        Log.i(TAG, "onTapLockedNode $node")
+        viewModel.selectedInventory?.let {
+            node.unlock(it.name)
+            viewModel.informNodeUnlock(node.isLocked)
+        }
+    }
+
+    //todo chest bounding box!
 }
