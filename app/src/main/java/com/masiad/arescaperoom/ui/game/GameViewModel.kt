@@ -32,7 +32,8 @@ class GameViewModel @ViewModelInject constructor(
             return level.value!!.number
         }
 
-    val isInventoryLayoutVisible by lazy { MutableLiveData(false) }
+    // Visible on start to proper laid on
+    val isInventoryLayoutVisible by lazy { MutableLiveData(true) }
     val isInventoryLayoutToggle by lazy { MutableLiveData(true) }
 
     val isMoveButtonVisible by lazy {
@@ -46,6 +47,12 @@ class GameViewModel @ViewModelInject constructor(
         get() = _inventoryList
 
     var selectedInventory: Inventory? = null
+
+    fun informPostOnViewCreated() {
+        // Hide after correctly laid on view
+        isInventoryLayoutToggle.value = false
+        isInventoryLayoutVisible.value = false
+    }
 
     fun informInventoryToggle() {
         isInventoryLayoutToggle.value?.let {

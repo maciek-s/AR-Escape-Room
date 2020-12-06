@@ -24,13 +24,50 @@
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/ar_core_fragment"
             android:name="com.masiad.arescaperoom.ui.ar.ArCoreFragment"
-            visibility="@{viewModel.loadingProgress.equals(100)}"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/move_button"
+            visibility="@{viewModel.isMoveButtonVisible}"
+            android:layout_width="70dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="@dimen/margin_extra_large"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_round_arrow_circle_up"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <include
+            android:id="@+id/inventory"
+            layout="@layout/inventory_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:isToggle="@{viewModel.isInventoryLayoutToggle}"
+            app:isVisible="@{viewModel.isInventoryLayoutVisible}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:toggleClickListener="@{inventoryToggleClickListener}" />
+
+        <View
+            android:id="@+id/overlay"
+            visibility="@{viewModel.loadingProgress &lt; 100}"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?android:attr/colorBackground"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="invisible" />
 
         <include
             android:id="@+id/loading_progress"
@@ -59,32 +96,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="invisible" />
-
-        <include
-            android:id="@+id/inventory"
-            layout="@layout/inventory_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:isToggle="@{viewModel.isInventoryLayoutToggle}"
-            app:isVisible="@{viewModel.isInventoryLayoutVisible}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:toggleClickListener="@{inventoryToggleClickListener}" />
-
-        <ImageButton
-            android:id="@+id/move_button"
-            visibility="@{viewModel.isMoveButtonVisible}"
-            android:layout_width="70dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="@dimen/margin_extra_large"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_round_arrow_circle_up"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/logs"
