@@ -76,6 +76,7 @@
           "childrenModels": [
             {
               "type": "INVENTORY",
+              "nodeNameId": "gold_key",
               "isClickable": true,
               "modelName": "gold_key",
               "isVisible": false,
@@ -102,6 +103,7 @@
     },
     {
       "type": "PUZZLE",
+      "nodeNameId": "chest",
       "isClickable": true,
       "modelName": "chest",
       "localPosition": {

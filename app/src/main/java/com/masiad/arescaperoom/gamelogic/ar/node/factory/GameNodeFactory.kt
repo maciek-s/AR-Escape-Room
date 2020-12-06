@@ -10,6 +10,7 @@ import com.masiad.arescaperoom.gamelogic.ar.node.InventoryNode
 import com.masiad.arescaperoom.gamelogic.ar.node.LightNode
 import com.masiad.arescaperoom.gamelogic.ar.node.PuzzleNode
 import com.masiad.arescaperoom.gamelogic.ar.node.model.*
+import com.masiad.arescaperoom.helper.StringHelper
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
@@ -19,7 +20,8 @@ import javax.inject.Inject
 class GameNodeFactory @Inject constructor(
     private val fragment: Fragment,
     private val modelLoader: ModelLoader,
-    private val nodeAnimationFactory: NodeAnimationFactory
+    private val nodeAnimationFactory: NodeAnimationFactory,
+    private val stringHelper: StringHelper
 ) {
 
     suspend fun createNode(parent: Node?, model: GameNodeModel): GameNode {
@@ -47,6 +49,9 @@ class GameNodeFactory @Inject constructor(
         }
         with(node) {
             setParent(parent)
+            model.nodeNameId?.let {
+                name = stringHelper.resolveNodeName(it)
+            }
             model.isVisible?.let {
                 isVisible = it
             }
@@ -73,7 +78,6 @@ class GameNodeFactory @Inject constructor(
                 model.animationType?.let {
                     nodeAnimation = nodeAnimationFactory.createAnimation(it, this)
                 }
-                name = model.modelName
             }
         }
         return node

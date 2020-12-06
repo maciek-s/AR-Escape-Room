@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--  1  -->
     <string name="instruction_level_1">Oh, no! Someone lock the door. Search clues and find key to escape.</string>
+
+    <string name="node_name_gold_key">Key</string>
+    <string name="node_name_chest">Chest</string>
 </resources>

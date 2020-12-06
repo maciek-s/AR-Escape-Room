@@ -27,6 +27,7 @@ import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
 import com.masiad.arescaperoom.gamelogic.ar.node.InventoryNode
 import com.masiad.arescaperoom.gamelogic.ar.node.PuzzleNode
 import com.masiad.arescaperoom.gamelogic.ar.node.factory.GameNodeFactory
+import com.masiad.arescaperoom.helper.StringHelper
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
 import com.masiad.arescaperoom.util.extenstion.TAG
 import com.masiad.arescaperoom.util.extenstion.hasAnchor
@@ -54,6 +55,9 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     @Inject
     lateinit var inventoryAdapter: InventoryAdapter
+
+    @Inject
+    lateinit var stringHelper: StringHelper
 
     private lateinit var binding: GameFragmentBinding
 
@@ -264,13 +268,8 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     private fun showGameStartedInstruction() {
         //todo message resolver enter type + level number
-        val instructionResId =
-            resources.getIdentifier(
-                "instruction_level_${viewModel.levelNumber}",
-                "string",
-                context?.packageName
-            )
-        binding.alert.infoText = getString(instructionResId)
+        val instruction = stringHelper.resolveInstruction(viewModel.levelNumber)
+        binding.alert.infoText = instruction
         binding.alert.clickListener = View.OnClickListener {
             binding.alert.infoText = null
             viewModel.informGameStarted()
