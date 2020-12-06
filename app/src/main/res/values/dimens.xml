@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Common -->
     <dimen name="margin_extra_large">32dp</dimen>
     <dimen name="margin_large">24dp</dimen>
     <dimen name="margin_normal">16dp</dimen>
     <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_extra_small">4dp</dimen>
 
+    <!-- Buttons -->
+    <dimen name="button_big_min_height">64dp</dimen>
+
+    <!-- Progress -->
     <dimen name="progress_layout_height">40dp</dimen>
 
+    <!-- Inventory -->
     <dimen name="inventory_list_width">96dp</dimen>
     <dimen name="inventory_arrow_size">40dp</dimen>
     <dimen name="inventory_arrow_size_half">20dp</dimen>

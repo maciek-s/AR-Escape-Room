@@ -31,6 +31,7 @@
             android:padding="@dimen/margin_small"
             android:text="@{@string/loading(progress)}"
             android:textAlignment="center"
+            android:textColor="?attr/colorOnPrimary"
             android:textStyle="bold"
             tools:text="Loading… 20%" />
 

@@ -37,7 +37,7 @@ class MainFragment : Fragment(R.layout.main_fragment) {
     }
 
     private fun setupListeners() {
-        binding.button.setOnClickListener {
+        binding.play.setOnClickListener {
             // TODO: Implement level chooser, temporary always start firs
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToGameFragment(1))
         }

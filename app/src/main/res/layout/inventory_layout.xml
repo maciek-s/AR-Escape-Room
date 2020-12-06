@@ -31,6 +31,7 @@
             android:layout_marginStart="@dimen/inventory_arrow_size_half"
             android:autoSizeTextType="uniform"
             android:background="?attr/colorSurface"
+            android:fontFamily="@font/baloo_thambi"
             android:gravity="center"
             android:lines="1"
             android:paddingStart="@dimen/margin_extra_small"
@@ -55,20 +56,27 @@
             app:layout_constraintTop_toBottomOf="@id/title"
             tools:listitem="@layout/inventory_item" />
 
-        <ImageButton
-            android:id="@+id/toggle_arrow"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/toggle_arrow_card"
             inventoryToggleTranslateX="@{isToggle}"
             android:layout_width="@dimen/inventory_arrow_size"
             android:layout_height="0dp"
-            android:background="?attr/colorSurface"
             android:elevation="8dp"
-            android:onClick="@{toggleClickListener}"
-            android:scaleType="centerCrop"
-            android:src="@{isToggle ? @drawable/ic_round_keyboard_arrow_right : @drawable/ic_round_keyboard_arrow_left}"
+            app:cardCornerRadius="0dp"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/title"
-            tools:src="@drawable/ic_round_keyboard_arrow_right" />
+            app:layout_constraintTop_toBottomOf="@id/title">
+
+            <ImageButton
+                android:id="@+id/toggle_arrow"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackgroundBorderless"
+                android:onClick="@{toggleClickListener}"
+                android:scaleType="centerCrop"
+                android:src="@{isToggle ? @drawable/ic_round_keyboard_arrow_right : @drawable/ic_round_keyboard_arrow_left}"
+                tools:src="@drawable/ic_round_keyboard_arrow_right" />
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

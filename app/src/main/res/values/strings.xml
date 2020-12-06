@@ -1,7 +1,8 @@
 <resources>
     <!-- Common -->
     <string name="ok">OK</string>
-    <string name="start">Start</string>
+    <string name="play">Play</string>
+    <string name="about">About</string>
 
     <!-- Game-->
     <string name="loading">Loading… %d%%</string>
