@@ -4,12 +4,14 @@ import androidx.fragment.app.Fragment
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
+import com.masiad.arescaperoom.gamelogic.Inventory
 import com.masiad.arescaperoom.gamelogic.ar.animation.NodeAnimationFactory
 import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
 import com.masiad.arescaperoom.gamelogic.ar.node.InventoryNode
 import com.masiad.arescaperoom.gamelogic.ar.node.LightNode
 import com.masiad.arescaperoom.gamelogic.ar.node.PuzzleNode
 import com.masiad.arescaperoom.gamelogic.ar.node.model.*
+import com.masiad.arescaperoom.helper.DrawableHelper
 import com.masiad.arescaperoom.helper.StringHelper
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.scopes.FragmentScoped
@@ -21,7 +23,8 @@ class GameNodeFactory @Inject constructor(
     private val fragment: Fragment,
     private val modelLoader: ModelLoader,
     private val nodeAnimationFactory: NodeAnimationFactory,
-    private val stringHelper: StringHelper
+    private val stringHelper: StringHelper,
+    private val drawableHelper: DrawableHelper
 ) {
 
     suspend fun createNode(parent: Node?, model: GameNodeModel): GameNode {
@@ -34,13 +37,17 @@ class GameNodeFactory @Inject constructor(
                 model.visibleAdditionalSize?.let {
                     visibleAdditionalSize = it
                 }
+                requireNotNull(model.nodeNameId) { "nodeNameId is null but inventory should be created" }
+                val name = stringHelper.resolveNodeName(model.nodeNameId!!)
+                val drawableResId = drawableHelper.resolveDrawableResId(model.drawableNameId)
+                inventory = Inventory(name, model.unlockName, drawableResId)
             }
             is PuzzleModel -> PuzzleNode().apply {
                 model.isLocked?.let {
                     isLocked = it
                 }
-                model.openInventoryName?.let {
-                    openInventoryName = it
+                model.unlockInventoryName?.let {
+                    unlockInventoryName = it
                 }
             }
             is LightNodeModel -> LightNode().apply {

@@ -22,14 +22,14 @@ class PuzzleNode : ComplexNode() {
         }
 
     /**
-     * Node name witch open
+     * Node name witch unlock
      */
-    var openInventoryName: String? = null
+    var unlockInventoryName: String? = null
 
-    fun unlock(inventoryName: String?) {
-        isLocked = inventoryName != openInventoryName
-        if (!isLocked) {
-            isOpen = true
+    fun unlock(unlockName: String) {
+        if (unlockName == unlockInventoryName) {
+            isLocked = false
+            isOpen = false
         }
     }
 

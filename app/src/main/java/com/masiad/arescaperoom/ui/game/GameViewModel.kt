@@ -2,8 +2,8 @@ package com.masiad.arescaperoom.ui.game
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.masiad.arescaperoom.data.Inventory
 import com.masiad.arescaperoom.gamelogic.GamePhase
+import com.masiad.arescaperoom.gamelogic.Inventory
 import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.LevelManager
 import kotlinx.coroutines.delay

@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.masiad.arescaperoom.data.Inventory
 import com.masiad.arescaperoom.databinding.InventoryItemBinding
+import com.masiad.arescaperoom.gamelogic.Inventory
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 

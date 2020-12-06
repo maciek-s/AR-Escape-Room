@@ -57,6 +57,8 @@ data class InventoryModel(
     override val childrenModels: List<GameNodeModel>?,
     override val modelName: String,
     override val animationType: AnimationType?,
+    val unlockName: String,
+    val drawableNameId: String,
     val visibleAdditionalSize: Vector3?
 ) : GameNodeModel(Type.INVENTORY.name), RenderableModel
 
@@ -70,7 +72,7 @@ data class PuzzleModel(
     override val modelName: String,
     override val animationType: AnimationType?,
     val isLocked: Boolean?,
-    val openInventoryName: String?
+    val unlockInventoryName: String?
 ) : GameNodeModel(Type.PUZZLE.name), RenderableModel
 
 data class LightNodeModel(

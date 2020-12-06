@@ -18,7 +18,6 @@ import com.google.ar.sceneform.collision.Ray
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.adapter.InventoryAdapter
-import com.masiad.arescaperoom.data.Inventory
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
@@ -299,17 +298,21 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     override fun onInventoryPickUp(node: InventoryNode) {
         Log.i(TAG, "onInventoryPickUp $node")
-        val inventory = Inventory(node.name)
-        viewModel.informInventoryPickUp(inventory)
+        //todo show pick up snackbar
+        viewModel.informInventoryPickUp(node.inventory)
     }
 
     override fun onTapLockedNode(node: PuzzleNode) {
         Log.i(TAG, "onTapLockedNode $node")
+
+        //todo show no inventory
         viewModel.selectedInventory?.let {
-            node.unlock(it.name)
+            node.unlock(it.unlockName)
             viewModel.informNodeUnlock(node.isLocked)
         }
     }
 
     //todo chest bounding box!
+
+    //todo key drawable bake
 }
