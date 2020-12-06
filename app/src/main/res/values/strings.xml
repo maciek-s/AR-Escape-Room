@@ -2,7 +2,7 @@
     <!-- Common -->
     <string name="ok">OK</string>
     <string name="play">Play</string>
-    <string name="about">About</string>
+    <string name="info">Info</string>
 
     <!-- Game-->
     <string name="loading">Loading… %d%%</string>

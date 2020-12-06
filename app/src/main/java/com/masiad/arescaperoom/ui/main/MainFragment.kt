@@ -1,5 +1,7 @@
 package com.masiad.arescaperoom.ui.main
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,6 +42,11 @@ class MainFragment : Fragment(R.layout.main_fragment) {
         binding.play.setOnClickListener {
             // TODO: Implement level chooser, temporary always start firs
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToGameFragment(1))
+        }
+        binding.info.setOnClickListener {
+            val uriString = "https://maciek-s.github.io/"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString))
+            startActivity(intent)
         }
     }
 }

@@ -29,7 +29,7 @@
         android:layout_marginStart="@dimen/margin_normal"
         android:layout_marginEnd="@dimen/margin_normal"
         android:text="@string/play"
-        app:layout_constraintBottom_toTopOf="@id/about"
+        app:layout_constraintBottom_toTopOf="@id/info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -37,12 +37,12 @@
         app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/about"
+        android:id="@+id/info"
         style="@style/Widget.AREscapeRoom.Button.Big"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_normal"
-        android:text="@string/about"
+        android:text="@string/info"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/play"
         app:layout_constraintStart_toStartOf="@id/play"
