@@ -9,4 +9,10 @@
         <item name="materialButtonStyle">@style/Widget.AREscapeRoom.Button</item>
         <item name="imageButtonStyle">@style/Widget.AREscapeRoom.ImageButton</item>
     </style>
+
+    <!-- MaterialCardView Alert style -->
+    <style name="Widget.AREscapeRoom.CardView.Alert" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">@dimen/alert_corner_radius</item>
+        <item name="contentPadding">@dimen/margin_normal</item>
+    </style>
 </resources>

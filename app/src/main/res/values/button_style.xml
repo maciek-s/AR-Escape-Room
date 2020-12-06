@@ -8,7 +8,7 @@
         <item name="autoSizeTextType">uniform</item>
 
         <item name="strokeColor">?attr/colorSecondary</item>
-        <item name="strokeWidth">3dp</item>
+        <item name="strokeWidth">@dimen/stroke_width</item>
     </style>
 
     <style name="TextAppearance.AREscapeRoom.Button" parent="TextAppearance.MaterialComponents.Button">

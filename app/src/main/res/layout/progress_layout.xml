@@ -11,9 +11,9 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.AREscapeRoom.CardView.Alert"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:contentPadding="@dimen/margin_normal">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.progressindicator.ProgressIndicator
             animateProgress="@{progress}"

@@ -17,4 +17,6 @@
     <dimen name="inventory_list_width">96dp</dimen>
     <dimen name="inventory_arrow_size">40dp</dimen>
     <dimen name="inventory_arrow_size_half">20dp</dimen>
+    <dimen name="stroke_width">3dp</dimen>
+    <dimen name="alert_corner_radius">8dp</dimen>
 </resources>

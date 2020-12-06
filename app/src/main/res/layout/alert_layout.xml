@@ -15,10 +15,10 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.AREscapeRoom.CardView.Alert"
         visibility="@{infoText != null}"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:contentPadding="@dimen/margin_normal">
+        android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
