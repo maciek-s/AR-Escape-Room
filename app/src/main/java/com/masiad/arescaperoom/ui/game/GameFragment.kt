@@ -37,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import com.masiad.arescaperoom.util.extenstion.setupSnackbar
 
 /**
  * Main AR game fragment
@@ -122,10 +123,19 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     // PRIVATE
     private fun bindData() {
         binding.viewModel = viewModel
+        setupSnackbar()
         setupMoveButton()
         setupInventory()
         observeGamePhase()
         observeLevel()
+    }
+
+    private fun setupSnackbar() {
+        binding.root.setupSnackbar(
+            viewLifecycleOwner,
+            viewModel.showSnackBarEvent,
+            viewModel::doneShowingSnackbar
+        )
     }
 
     private fun setupMoveButton() {
@@ -305,11 +315,10 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     override fun onTapLockedNode(node: PuzzleNode) {
         Log.i(TAG, "onTapLockedNode $node")
 
-        //todo show no inventory
         viewModel.selectedInventory?.let {
             node.unlock(it.unlockName)
-            viewModel.informNodeUnlock(node.isLocked)
         }
+        viewModel.informNodeUnlock(node.isLocked, node.name)
     }
 
     //todo chest bounding box!

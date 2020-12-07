@@ -2,6 +2,7 @@ package com.masiad.arescaperoom.ui.game
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.masiad.arescaperoom.helper.StringHelper
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Inventory
 import com.masiad.arescaperoom.gamelogic.Level
@@ -10,7 +11,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class GameViewModel @ViewModelInject constructor(
-    private val levelManager: LevelManager
+    private val levelManager: LevelManager,
+    private val stringHelper: StringHelper,
 ) : ViewModel() {
 
     private val _gamePhase by lazy { MutableLiveData(GamePhase.LOADING) }
@@ -20,6 +22,14 @@ class GameViewModel @ViewModelInject constructor(
     val loadingProgress = MutableLiveData(0)
     fun setLoadingProgress(progress: Int) {
         loadingProgress.value = progress
+    }
+
+    private var _showSnackbarEvent = MutableLiveData<String>()
+    val showSnackBarEvent: LiveData<String>
+        get() = _showSnackbarEvent
+
+    fun doneShowingSnackbar() {
+        _showSnackbarEvent.value = ""
     }
 
     private val _level by lazy { MutableLiveData<Level>() }
@@ -107,14 +117,18 @@ class GameViewModel @ViewModelInject constructor(
         _inventoryList.value = updated.toList()
     }
 
-    fun informNodeUnlock(isLocked: Boolean) {
-        if (!isLocked) {
+    fun informNodeUnlock(isLocked: Boolean, name: String) {
+        if (isLocked) {
+            val message = stringHelper.resolveNodeLockedMessage(name)
+            _showSnackbarEvent.value = message
+        } else {
             requireNotNull(inventoryList.value) { "informNodeUnlock() was called by inventory list is null" }
             requireNotNull(selectedInventory) { "informNodeUnlock() was called by selected inventory is null" }
             val updated = inventoryList.value?.toMutableList()?.apply {
                 remove(selectedInventory)
             }
             _inventoryList.value = updated?.toList()
+            selectedInventory = null
         }
     }
 }

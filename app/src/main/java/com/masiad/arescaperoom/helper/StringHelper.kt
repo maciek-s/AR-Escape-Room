@@ -1,6 +1,7 @@
 package com.masiad.arescaperoom.helper
 
 import android.content.Context
+import com.masiad.arescaperoom.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,6 +23,10 @@ class StringHelper @Inject constructor(
 
     fun resolveNodeName(nodeNameId: String): String {
         return resolveString("$NODE_NAME_PREFIX$nodeNameId")
+    }
+
+    fun resolveNodeLockedMessage(nodeName: String): String {
+        return context.getString(R.string.node_locked_message, nodeName)
     }
 
     private fun resolveString(identifierName: String): String {
