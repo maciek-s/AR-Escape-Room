@@ -6,4 +6,7 @@
     <string name="node_name_gold_key">Key</string>
     <string name="node_name_chest">Chest</string>
     <string name="node_name_card_hearts_2">Two Hearts</string>
+    <string name="node_name_card_tiles_8">Eight Tiles</string>
+    <string name="node_name_card_pikes_6">Six Pikes</string>
+    <string name="node_name_card_clovers_5">Five Clovers</string>
 </resources>
