@@ -5,4 +5,5 @@
 
     <string name="node_name_gold_key">Key</string>
     <string name="node_name_chest">Chest</string>
+    <string name="node_name_card_hearts_2">Two Hearts</string>
 </resources>
