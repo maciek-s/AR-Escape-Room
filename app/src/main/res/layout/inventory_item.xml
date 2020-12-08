@@ -6,14 +6,26 @@
     <data>
 
         <variable
+            name="isSelected"
+            type="Boolean" />
+
+        <variable
+            name="position"
+            type="int" />
+
+        <variable
             name="inventory"
             type="com.masiad.arescaperoom.gamelogic.Inventory" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
+        checked="@{isSelected}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_small"
+        android:checkable="true"
+        android:clickable="true"
+        android:focusable="true"
         app:cardCornerRadius="16dp"
         app:contentPadding="@dimen/margin_small">
 
@@ -23,9 +35,9 @@
 
             <ImageView
                 android:id="@+id/image"
+                imageRes="@{inventory.drawableResId}"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                imageRes="@{inventory.drawableResId}"
                 app:layout_constraintBottom_toTopOf="@id/name"
                 app:layout_constraintDimensionRatio="1"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -40,8 +52,8 @@
                 android:text="@{inventory.name}"
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/image"
                 tools:text="Name" />

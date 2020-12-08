@@ -11,13 +11,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.selection.SelectionTracker
+import androidx.recyclerview.selection.StorageStrategy
+import com.masiad.arescaperoom.gamelogic.Inventory
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
 import com.google.ar.sceneform.collision.Ray
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
-import com.masiad.arescaperoom.adapter.InventoryAdapter
+import com.masiad.arescaperoom.adapter.inventory.InventoryAdapter
+import com.masiad.arescaperoom.adapter.inventory.InventoryKeyProvider
+import com.masiad.arescaperoom.adapter.inventory.SelectionChecker
+import com.masiad.arescaperoom.adapter.inventory.InventorySelectionPredicate
+import com.masiad.arescaperoom.adapter.inventory.InventoryDetailsLookup
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
@@ -97,6 +104,8 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     private var sceneUpdateListener: Scene.OnUpdateListener? = null
 
+    private var selectionTracker: SelectionTracker<Inventory>? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -161,8 +170,17 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         binding.inventory.recyclerView.apply {
             adapter = inventoryAdapter
         }
-        inventoryAdapter.setOnInventoryClickListener { inventory ->
-            viewModel.selectedInventory = inventory
+        selectionTracker = SelectionTracker.Builder<Inventory>(
+            "inventory-selection-id",
+            binding.inventory.recyclerView,
+            InventoryKeyProvider(inventoryAdapter),
+            InventoryDetailsLookup(binding.inventory.recyclerView),
+            StorageStrategy.createParcelableStorage(Inventory::class.java)
+        )
+            .withSelectionPredicate(InventorySelectionPredicate())
+            .build()
+        inventoryAdapter.selectionChecker = SelectionChecker {
+            selectionTracker?.isSelected(it) ?: false
         }
         viewModel.inventoryList.observe(viewLifecycleOwner, {
             inventoryAdapter.submitList(it)
@@ -315,10 +333,17 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     override fun onTapLockedNode(node: PuzzleNode) {
         Log.i(TAG, "onTapLockedNode $node")
 
-        viewModel.selectedInventory?.let {
-            node.unlock(it.unlockName)
+        selectionTracker?.takeIf {
+            it.hasSelection()
+        }?.getSelection()?.let { selection ->
+            val inventory = selection.iterator().next()
+            node.unlock(inventory.unlockName)
         }
-        viewModel.informNodeUnlock(node.isLocked, node.name)
+        viewModel.informNodeUnlock(
+            node.isLocked,
+            node.name,
+            node.unlockInventoryName
+        )
     }
 
     //todo chest bounding box!
