@@ -7,8 +7,30 @@
     "localPosition": {
       "x": "0",
       "y": "0",
-      "z": "-1.4"
-    }
+      "z": "-1.3"
+    },
+    "childrenModels": [
+      {
+        "type": "NORMAL",
+        "modelName": "room_wall_front"
+      },
+      {
+        "type": "NORMAL",
+        "modelName": "room_wall_left"
+      },
+      {
+        "type": "NORMAL",
+        "modelName": "room_wall_right"
+      },
+      {
+        "type": "NORMAL",
+        "modelName": "room_wall_back"
+      },
+      {
+        "type": "NORMAL",
+        "modelName": "room_ceiling"
+      }
+    ]
   },
   "doorModel": {
     "type": "NORMAL",
@@ -16,7 +38,7 @@
     "localPosition": {
       "x": "0",
       "y": "0",
-      "z": "1.4"
+      "z": "1.3"
     },
     "animationType": {
       "type": "FILAMENT"
@@ -27,9 +49,9 @@
       "type": "NORMAL",
       "modelName": "desk_main",
       "localPosition": {
-        "x": "-0.95",
+        "x": "-0.85",
         "y": "0.0",
-        "z": "-0.7"
+        "z": "-0.55"
       },
       "localRotation": {
         "x": "0",
