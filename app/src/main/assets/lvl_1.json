@@ -11,7 +11,11 @@
     },
     "isCollisionShapeEnabled": false,
     "childrenModels": [
-
+      {
+        "type": "NORMAL",
+        "modelName": "room_walls",
+        "isCollisionShapeEnabled": false
+      }
     ]
   },
   "doorModel": {
