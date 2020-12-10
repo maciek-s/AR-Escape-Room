@@ -21,6 +21,8 @@ private interface Model {
 interface RenderableModel {
     val modelName: String
     val animationType: AnimationType?
+    val isCollisionShapeEnabled: Boolean?
+    val boundingBox: BoundingBox?
 }
 
 sealed class GameNodeModel(
@@ -43,6 +45,8 @@ data class NormalModel(
     override val isClickable: Boolean?,
     override val localPosition: Vector3?,
     override val localRotation: Quaternion?,
+    override val isCollisionShapeEnabled: Boolean?,
+    override val boundingBox: BoundingBox?,
     override val childrenModels: List<GameNodeModel>?,
     override val modelName: String,
     override val animationType: AnimationType?,
@@ -54,6 +58,8 @@ data class InventoryModel(
     override val isClickable: Boolean?,
     override val localPosition: Vector3?,
     override val localRotation: Quaternion?,
+    override val isCollisionShapeEnabled: Boolean?,
+    override val boundingBox: BoundingBox?,
     override val childrenModels: List<GameNodeModel>?,
     override val modelName: String,
     override val animationType: AnimationType?,
@@ -68,6 +74,8 @@ data class PuzzleModel(
     override val isClickable: Boolean?,
     override val localPosition: Vector3?,
     override val localRotation: Quaternion?,
+    override val isCollisionShapeEnabled: Boolean?,
+    override val boundingBox: BoundingBox?,
     override val childrenModels: List<GameNodeModel>?,
     override val modelName: String,
     override val animationType: AnimationType?,

@@ -23,3 +23,6 @@ fun GameNode.showBoundingBox(
         }
     }
 }
+
+val GameNode.boxShape: Box?
+    get() = collisionShape as? Box

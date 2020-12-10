@@ -9,26 +9,32 @@
       "y": "0",
       "z": "-1.3"
     },
+    "isCollisionShapeEnabled": false,
     "childrenModels": [
       {
         "type": "NORMAL",
-        "modelName": "room_wall_front"
+        "modelName": "room_wall_front",
+        "isCollisionShapeEnabled": false
       },
       {
         "type": "NORMAL",
-        "modelName": "room_wall_left"
+        "modelName": "room_wall_left",
+        "isCollisionShapeEnabled": false
       },
       {
         "type": "NORMAL",
-        "modelName": "room_wall_right"
+        "modelName": "room_wall_right",
+        "isCollisionShapeEnabled": false
       },
       {
         "type": "NORMAL",
-        "modelName": "room_wall_back"
+        "modelName": "room_wall_back",
+        "isCollisionShapeEnabled": false
       },
       {
         "type": "NORMAL",
-        "modelName": "room_ceiling"
+        "modelName": "room_ceiling",
+        "isCollisionShapeEnabled": false
       }
     ]
   },
@@ -59,6 +65,7 @@
         "z": "0",
         "w": "90"
       },
+      "isCollisionShapeEnabled": false,
       "childrenModels": [
         {
           "type": "PUZZLE",
@@ -77,6 +84,18 @@
             }
           },
           "isLocked": false,
+          "boundingBox": {
+            "centerTransform": {
+              "x": "0",
+              "y": "0",
+              "z": "0.27"
+            },
+            "sizeScale": {
+              "x": "0.3",
+              "y": "1",
+              "z": "0.1"
+            }
+          },
           "childrenModels": [
             {
               "type": "INVENTORY",
@@ -96,12 +115,7 @@
                 "w": "17"
               },
               "unlockName": "card_hearts_2",
-              "drawableNameId": "card_hearts_2",
-              "visibleAdditionalSize": {
-                "x": "0.02",
-                "y": "0.08",
-                "z": "0.02"
-              }
+              "drawableNameId": "card_hearts_2"
             }
           ]
         },
@@ -122,6 +136,18 @@
             }
           },
           "isLocked": false,
+          "boundingBox": {
+            "centerTransform": {
+              "x": "0",
+              "y": "0",
+              "z": "0.27"
+            },
+            "sizeScale": {
+              "x": "0.3",
+              "y": "1",
+              "z": "0.1"
+            }
+          },
           "childrenModels": [
             {
               "type": "INVENTORY",
@@ -141,12 +167,7 @@
                 "w": "40"
               },
               "unlockName": "gold_key",
-              "drawableNameId": "gold_key",
-              "visibleAdditionalSize": {
-                "x": "0.02",
-                "y": "0.08",
-                "z": "0.02"
-              }
+              "drawableNameId": "gold_key"
             }
           ]
         }

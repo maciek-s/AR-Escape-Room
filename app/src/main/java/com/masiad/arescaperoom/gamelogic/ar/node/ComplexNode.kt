@@ -2,6 +2,7 @@ package com.masiad.arescaperoom.gamelogic.ar.node
 
 import com.google.ar.sceneform.collision.Box
 import com.google.ar.sceneform.math.Vector3
+import com.masiad.arescaperoom.util.extenstion.boxShape
 
 /**
  * Node that contains multiple logic connected nodes
@@ -22,7 +23,7 @@ open class ComplexNode : GameNode() {
 }
 
 private fun GameNode.setCollisionShapeSize(additionalSize: Vector3) {
-    collisionShape = (collisionShape as? Box)?.let { box ->
+    collisionShape = boxShape?.let { box ->
         if (isVisible) {
             box.addVectorSize(additionalSize)
         } else {

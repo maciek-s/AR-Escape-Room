@@ -2,6 +2,7 @@ package com.masiad.arescaperoom.gamelogic.ar.node.factory
 
 import androidx.fragment.app.Fragment
 import com.google.ar.sceneform.Node
+import com.google.ar.sceneform.collision.Box
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.gamelogic.Inventory
@@ -13,6 +14,8 @@ import com.masiad.arescaperoom.gamelogic.ar.node.PuzzleNode
 import com.masiad.arescaperoom.gamelogic.ar.node.model.*
 import com.masiad.arescaperoom.helper.DrawableHelper
 import com.masiad.arescaperoom.helper.StringHelper
+import com.masiad.arescaperoom.util.extenstion.boxShape
+import com.masiad.arescaperoom.util.extenstion.scaledBy
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
@@ -85,7 +88,17 @@ class GameNodeFactory @Inject constructor(
                 model.animationType?.let {
                     nodeAnimation = nodeAnimationFactory.createAnimation(it, this)
                 }
+                if (model.isCollisionShapeEnabled == false) {
+                    collisionShape = Box(Vector3.zero())
+                }
+                model.boundingBox?.let { boundingBox ->
+                    collisionShape = boxShape?.apply {
+                        center = Vector3.add(center, boundingBox.centerTransform)
+                        size = size.scaledBy(boundingBox.sizeScale)
+                    }
+                }
             }
+            //node.showBoundingBox(fragment.requireContext())
         }
         return node
     }
