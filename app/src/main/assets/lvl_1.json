@@ -11,31 +11,7 @@
     },
     "isCollisionShapeEnabled": false,
     "childrenModels": [
-      {
-        "type": "NORMAL",
-        "modelName": "room_wall_front",
-        "isCollisionShapeEnabled": false
-      },
-      {
-        "type": "NORMAL",
-        "modelName": "room_wall_left",
-        "isCollisionShapeEnabled": false
-      },
-      {
-        "type": "NORMAL",
-        "modelName": "room_wall_right",
-        "isCollisionShapeEnabled": false
-      },
-      {
-        "type": "NORMAL",
-        "modelName": "room_wall_back",
-        "isCollisionShapeEnabled": false
-      },
-      {
-        "type": "NORMAL",
-        "modelName": "room_ceiling",
-        "isCollisionShapeEnabled": false
-      }
+
     ]
   },
   "doorModel": {
@@ -189,6 +165,18 @@
         "z": "0",
         "w": "-90"
       },
+      "boundingBox": {
+        "centerTransform": {
+          "x": "0",
+          "y": "0.07",
+          "z": "0.18"
+        },
+        "sizeScale": {
+          "x": "0.1",
+          "y": "0.1",
+          "z": "0.1"
+        }
+      },
       "animationType": {
         "type": "FILAMENT"
       },
@@ -202,7 +190,7 @@
           "isVisible": false,
           "localPosition": {
             "x": "0.0",
-            "y": "0.04",
+            "y": "0.03",
             "z": "0.0"
           },
           "localRotation": {
@@ -212,12 +200,7 @@
             "w": "180"
           },
           "unlockName": "card_tiles_8",
-          "drawableNameId": "card_tiles_8",
-          "visibleAdditionalSize": {
-            "x": "0.2",
-            "y": "1.0",
-            "z": "0.2"
-          }
+          "drawableNameId": "card_tiles_8"
         }
       ]
     },

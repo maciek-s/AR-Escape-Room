@@ -29,7 +29,7 @@ class PuzzleNode : ComplexNode() {
     fun unlock(unlockName: String) {
         if (unlockName == unlockInventoryName) {
             isLocked = false
-            isOpen = false
+            isOpen = true
         }
     }
 

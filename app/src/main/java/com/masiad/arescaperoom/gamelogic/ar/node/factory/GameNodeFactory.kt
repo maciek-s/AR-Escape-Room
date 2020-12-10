@@ -37,9 +37,6 @@ class GameNodeFactory @Inject constructor(
 
             }
             is InventoryModel -> InventoryNode().apply {
-                model.visibleAdditionalSize?.let {
-                    visibleAdditionalSize = it
-                }
                 requireNotNull(model.nodeNameId) { "nodeNameId is null but inventory should be created" }
                 val name = stringHelper.resolveNodeName(model.nodeNameId!!)
                 val drawableResId = drawableHelper.resolveDrawableResId(model.drawableNameId)

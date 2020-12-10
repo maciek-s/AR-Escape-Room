@@ -65,7 +65,6 @@ data class InventoryModel(
     override val animationType: AnimationType?,
     val unlockName: String,
     val drawableNameId: String,
-    val visibleAdditionalSize: Vector3?
 ) : GameNodeModel(Type.INVENTORY.name), RenderableModel
 
 data class PuzzleModel(
