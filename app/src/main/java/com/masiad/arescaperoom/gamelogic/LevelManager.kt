@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.masiad.arescaperoom.gamelogic.ar.animation.AnimationType
+import com.masiad.arescaperoom.gamelogic.ar.animation.property.PropertyAnimationModel
 import com.masiad.arescaperoom.gamelogic.ar.node.model.GameNodeModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityRetainedScoped
@@ -27,6 +28,7 @@ class LevelManager @Inject constructor(
         GsonBuilder()
             .registerTypeAdapterFactory(AnimationType.runtimeAdapterFactory)
             .registerTypeAdapterFactory(GameNodeModel.runtimeAdapterFactory)
+            .registerTypeAdapterFactory(PropertyAnimationModel.runtimeAdapterFactory)
             .create()
     }
 

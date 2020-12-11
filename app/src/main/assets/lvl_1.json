@@ -54,6 +54,7 @@
           "animationType": {
             "type": "PROPERTY",
             "propertyAnimationModel": {
+              "type": "POSITION",
               "propertyName": "localPosition",
               "animationVector": {
                 "x": "0",
@@ -106,6 +107,7 @@
           "animationType": {
             "type": "PROPERTY",
             "propertyAnimationModel": {
+              "type": "POSITION",
               "propertyName": "localPosition",
               "animationVector": {
                 "x": "0",
@@ -238,14 +240,51 @@
       "isCollisionShapeEnabled": false
     },
     {
+      "type": "PUZZLE",
+      "isClickable": true,
+      "modelName": "painting",
+      "localPosition": {
+        "x": "-1.18",
+        "y": "1.5",
+        "z": "0.0"
+      },
+      "localRotation": {
+        "x": "0",
+        "y": "1",
+        "z": "0",
+        "w": "90"
+      },
+      "animationType": {
+        "type": "PROPERTY",
+        "propertyAnimationModel": {
+          "type": "ROTATION",
+          "propertyName": "localRotation",
+          "animationQuaternion": {
+            "x": "0",
+            "y": "0",
+            "z": "1",
+            "w": "5"
+          },
+          "duration": 400
+        }
+      },
+      "isLocked": false
+    },
+    {
       "type": "INVENTORY",
       "nodeNameId": "card_pikes_6",
       "isClickable": true,
       "modelName": "card_pikes_6",
       "localPosition": {
-        "x": "0.0",
-        "y": "0.0",
-        "z": "0.2"
+        "x": "-1.179",
+        "y": "1.26",
+        "z": "0.35"
+      },
+      "localRotation": {
+        "x": "0",
+        "y": "0",
+        "z": "1",
+        "w": "90"
       },
       "unlockName": "card_pikes_6",
       "drawableNameId": "card_pikes_6"
