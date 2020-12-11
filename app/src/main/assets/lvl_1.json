@@ -216,17 +216,26 @@
         "y": "0.0",
         "z": "-0.9"
       },
-      "localRotation": {
-        "x": "0",
-        "y": "1",
-        "z": "0",
-        "w": "-135"
-      },
       "childrenModels": [
         {
-          "type": "LIGHT"
+          "type": "LIGHT",
+          "localPosition": {
+            "x": "0.0",
+            "y": "1.6",
+            "z": "0.0"
+          }
         }
       ]
+    },
+    {
+      "type": "NORMAL",
+      "modelName": "floor_plant",
+      "localPosition": {
+        "x": "-0.85",
+        "y": "0.0",
+        "z": "0.8"
+      },
+      "isCollisionShapeEnabled": false
     },
     {
       "type": "INVENTORY",
