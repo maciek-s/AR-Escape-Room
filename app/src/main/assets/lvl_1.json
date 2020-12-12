@@ -161,9 +161,9 @@
       "isClickable": true,
       "modelName": "chest",
       "localPosition": {
-        "x": "0.9",
+        "x": "0.8",
         "y": "0.0",
-        "z": "0.0"
+        "z": "-0.3"
       },
       "localRotation": {
         "x": "0",
@@ -189,24 +189,40 @@
       "unlockInventoryName": "gold_key",
       "childrenModels": [
         {
-          "type": "INVENTORY",
-          "nodeNameId": "card_tiles_8",
+          "type": "PUZZLE",
+          "nodeNameId": "safe",
           "isClickable": true,
-          "modelName": "card_tiles_8",
+          "modelName": "safe",
           "isVisible": false,
           "localPosition": {
             "x": "0.0",
-            "y": "0.03",
-            "z": "0.0"
+            "y": "0.0",
+            "z": "0.15"
           },
           "localRotation": {
-            "x": "0",
+            "x": "1",
             "y": "0",
-            "z": "1",
-            "w": "180"
+            "z": "0",
+            "w": "-90"
           },
-          "unlockName": "card_tiles_8",
-          "drawableNameId": "card_tiles_8"
+          "boundingBox": {
+            "centerTransform": {
+              "x": "0.0",
+              "y": "0.0",
+              "z": "0.0"
+            },
+            "sizeScale": {
+              "x": "1.0",
+              "y": "1.0",
+              "z": "1.0"
+            }
+          },
+          "animationType": {
+            "type": "FILAMENT"
+          },
+          "unlockInventoryName": "2865",
+          "childrenModels": [
+          ]
         }
       ]
     },
@@ -301,6 +317,26 @@
       },
       "unlockName": "card_clovers_5",
       "drawableNameId": "card_clovers_5"
+    },
+    {
+      "type": "INVENTORY",
+      "nodeNameId": "card_tiles_8",
+      "isClickable": true,
+      "modelName": "card_tiles_8",
+      "isVisible": false,
+      "localPosition": {
+        "x": "0.0",
+        "y": "0.03",
+        "z": "0.0"
+      },
+      "localRotation": {
+        "x": "0",
+        "y": "0",
+        "z": "1",
+        "w": "180"
+      },
+      "unlockName": "card_tiles_8",
+      "drawableNameId": "card_tiles_8"
     }
   ]
 }

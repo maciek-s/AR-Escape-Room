@@ -6,7 +6,7 @@ package com.masiad.arescaperoom.gamelogic.ar.node
 open class ComplexNode : GameNode() {
 
     protected fun setChildrenVisible(isVisible: Boolean) {
-        children.filterIsInstance<InventoryNode>()
+        children.filterIsInstance<GameNode>()
             .forEach { node ->
                 node.isVisible = isVisible
             }
