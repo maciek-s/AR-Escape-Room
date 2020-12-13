@@ -8,7 +8,7 @@ open class PuzzleNode : GameNode() {
     /**
      * When node need to be unlock before tap action
      */
-    var isLocked = false
+    var isLocked = true
 
     /**
      * User see puzzle node content eg. drawer is open

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.AREscapeRoom.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="android:layout_margin">0dp</item>
+        <item name="animationMode">slide</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
+    </style>
+
+    <style name="Widget.AREscapeRoom.Snackbar.TextView" parent="Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textAppearance">
+            @style/TextAppearance.MaterialComponents.Headline6
+        </item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+</resources>

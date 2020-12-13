@@ -25,9 +25,7 @@ import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Inventory
 import com.masiad.arescaperoom.gamelogic.Level
-import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
-import com.masiad.arescaperoom.gamelogic.ar.node.InventoryNode
-import com.masiad.arescaperoom.gamelogic.ar.node.PuzzleNode
+import com.masiad.arescaperoom.gamelogic.ar.node.*
 import com.masiad.arescaperoom.gamelogic.ar.node.factory.GameNodeFactory
 import com.masiad.arescaperoom.helper.StringHelper
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
@@ -333,21 +331,25 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     override fun onTapLockedNode(node: PuzzleNode) {
         Log.i(TAG, "onTapLockedNode $node")
-
-//        selectionTracker?.takeIf {
-//            it.hasSelection()
-//        }?.selection?.let { selection ->
-//            val inventory = selection.iterator().next()
-//            node.unlock(inventory.unlockName)
-//        }
-//        viewModel.informNodeUnlock(
-//            node.isLocked,
-//            node.name,
-//            node.unlockInventoryName
-//        )
+        when (node) {
+            is InventoryLockedNode -> {
+                selectionTracker?.takeIf {
+                    it.hasSelection()
+                }?.selection?.let { selection ->
+                    val inventory = selection.iterator().next()
+                    node.unlock(inventory.unlockName)
+                }
+                viewModel.informNodeInventoryUnlock(
+                    node.isLocked,
+                    node.name,
+                    node.unlockName
+                )
+            }
+            is PinLockedNode -> {
+                viewModel.informNodePinUnlock(node.unlockPin) {
+                    node.unlock()
+                }
+            }
+        }
     }
-
-    //todo chest bounding box!
-
-    //todo key drawable bake
 }

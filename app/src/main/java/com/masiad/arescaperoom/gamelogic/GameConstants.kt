@@ -7,7 +7,7 @@ object GameConstants {
     const val showRoomAnimationStartScale = 0.5f
     const val showRoomAnimationDurationMs = 500L
 
-    const val startPointXOffset = 1f
-    const val startPointZOffset = 0.5f
+    const val startPointXOffset = 0.7f
+    const val startPointZOffset = 0.3f
     const val startGameDistanceThreshold = 0.1f
 }

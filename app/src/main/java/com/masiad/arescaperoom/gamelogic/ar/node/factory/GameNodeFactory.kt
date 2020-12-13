@@ -28,7 +28,6 @@ class GameNodeFactory @Inject constructor(
 ) {
 
     suspend fun createNode(parent: Node?, model: GameNodeModel): GameNode {
-        // todo specifics properties
         val node = when (model) {
             is NormalModel -> GameNode()
             is InventoryModel -> InventoryNode().apply {
@@ -61,7 +60,6 @@ class GameNodeFactory @Inject constructor(
                 setOnTapListener { _, _ ->
                     onTap()
                 }
-                //todo delete on delegate tap to fragment
                 if (fragment is GameNode.OnTapListener) {
                     setOnTapListener(fragment)
                 }
@@ -88,6 +86,11 @@ class GameNodeFactory @Inject constructor(
                         center = Vector3.add(center, boundingBox.centerTransform)
                         size = size.scaledBy(boundingBox.sizeScale)
                     }
+                }
+            }
+            if (model is Puzzle) {
+                model.isLocked?.let {
+                    (this as? PuzzleNode)?.isLocked = it
                 }
             }
             //node.showBoundingBox(fragment.requireContext())

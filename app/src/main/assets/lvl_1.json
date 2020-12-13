@@ -80,6 +80,7 @@
               "duration": 500
             }
           },
+          "isLocked": false,
           "boundingBox": {
             "centerTransform": {
               "x": "0",
@@ -132,6 +133,7 @@
               "duration": 500
             }
           },
+          "isLocked": false,
           "boundingBox": {
             "centerTransform": {
               "x": "0",
@@ -317,7 +319,8 @@
           },
           "duration": 400
         }
-      }
+      },
+      "isLocked": false
     },
     {
       "type": "INVENTORY",
@@ -356,7 +359,6 @@
       "nodeNameId": "card_tiles_8",
       "isClickable": true,
       "modelName": "card_tiles_8",
-      "isVisible": false,
       "localPosition": {
         "x": "0.0",
         "y": "0.03",

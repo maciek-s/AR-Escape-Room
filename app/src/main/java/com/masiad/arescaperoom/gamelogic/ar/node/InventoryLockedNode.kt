@@ -2,10 +2,6 @@ package com.masiad.arescaperoom.gamelogic.ar.node
 
 class InventoryLockedNode : PuzzleNode() {
 
-    init {
-        isLocked = true
-    }
-
     /**
      * Inventory node name with unlock
      */

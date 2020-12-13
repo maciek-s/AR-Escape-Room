@@ -53,6 +53,7 @@
                 clickListener="@{() -> pinModel.onKeyClick(`1`)}"
                 key="@{`1`}"
                 layout="@layout/pin_key"
+                android:layout_marginTop="@dimen/margin_small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toStartOf="@id/key_2"

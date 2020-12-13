@@ -10,9 +10,10 @@ class PinModel(
 
     fun onKeyClick(key: String) {
         pin.value?.let {
-            pin.value = it.plus(key)
-            if (it.length == correctPin.length) {
-                checkPin(it)
+            val input = it.plus(key)
+            pin.value = input
+            if (input.length == correctPin.length) {
+                checkPin(input)
             }
         }
     }

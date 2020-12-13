@@ -17,6 +17,10 @@ class StringHelper @Inject constructor(
         private const val NODE_NAME_PREFIX = "node_name_"
     }
 
+    val incorrectPin: String by lazy {
+        context.getString(R.string.incorrect_pin_message)
+    }
+
     fun resolveInstruction(levelNumber: Int): String {
         return resolveString("$INSTRUCTION_PREFIX$levelNumber")
     }

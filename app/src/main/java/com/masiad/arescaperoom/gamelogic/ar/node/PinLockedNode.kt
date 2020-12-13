@@ -2,10 +2,6 @@ package com.masiad.arescaperoom.gamelogic.ar.node
 
 class PinLockedNode : PuzzleNode() {
 
-    init {
-        isLocked = true
-    }
-
     /**
      * Unlock PIN combination
      */

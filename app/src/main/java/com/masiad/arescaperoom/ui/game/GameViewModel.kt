@@ -57,7 +57,7 @@ class GameViewModel @ViewModelInject constructor(
     val inventoryList: LiveData<List<Inventory>>
         get() = _inventoryList
 
-    val pinModel: PinModel? = null
+    val pinModel by lazy { MutableLiveData<PinModel?>() }
 
     fun informPostOnViewCreated() {
         // Hide after correctly laid on view
@@ -118,7 +118,7 @@ class GameViewModel @ViewModelInject constructor(
         _inventoryList.value = updated.toList()
     }
 
-    fun informNodeUnlock(
+    fun informNodeInventoryUnlock(
         isLocked: Boolean,
         name: String,
         unlockInventoryName: String?
@@ -132,6 +132,24 @@ class GameViewModel @ViewModelInject constructor(
                 removeIf { it.unlockName == unlockInventoryName }
             }
             _inventoryList.value = updated?.toList()
+        }
+    }
+
+    fun informNodePinUnlock(
+        unlockPin: String,
+        onSuccess: () -> Unit
+    ) {
+        pinModel.value = PinModel(unlockPin) { isCorrect ->
+            viewModelScope.launch {
+                if (isCorrect) {
+                    onSuccess()
+                } else {
+                    val message = stringHelper.incorrectPin
+                    _showSnackbarEvent.value = message
+                }
+                delay(50)
+                pinModel.value = null
+            }
         }
     }
 }

@@ -11,4 +11,5 @@
     <string name="instruction_placing">There should be at least 2x2m of space around you.\nSlowly move the device to scan the environment.\nTouch the door preview to place it in the current position and start the game!</string>
 
     <string name="node_locked_message">Can\'t open. %s is locked!</string>
+    <string name="incorrect_pin_message">Incorrect PIN!</string>
 </resources>

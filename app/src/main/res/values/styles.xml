@@ -8,6 +8,9 @@
         <!-- Custom Button-->
         <item name="materialButtonStyle">@style/Widget.AREscapeRoom.Button</item>
         <item name="imageButtonStyle">@style/Widget.AREscapeRoom.ImageButton</item>
+        <!-- Custom Snackbar -->
+        <item name="snackbarStyle">@style/Widget.AREscapeRoom.Snackbar</item>
+        <item name="snackbarTextViewStyle">@style/Widget.AREscapeRoom.Snackbar.TextView</item>
     </style>
 
     <!-- MaterialCardView Alert style -->

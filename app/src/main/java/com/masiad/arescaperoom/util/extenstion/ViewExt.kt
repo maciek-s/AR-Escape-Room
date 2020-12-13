@@ -6,9 +6,11 @@ import androidx.lifecycle.LiveData
 import com.google.android.material.snackbar.Snackbar
 
 fun View.showSnackbar(snackbarText: String, timeLength: Int = Snackbar.LENGTH_SHORT) {
-    Snackbar.make(this, snackbarText, timeLength).apply {
-        animationMode = Snackbar.ANIMATION_MODE_SLIDE
-    }.show()
+    Snackbar.make(
+        this,
+        snackbarText,
+        timeLength
+    ).show()
 }
 
 fun View.setupSnackbar(
