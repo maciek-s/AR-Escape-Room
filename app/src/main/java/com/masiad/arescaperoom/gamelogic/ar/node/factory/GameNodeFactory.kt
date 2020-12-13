@@ -7,10 +7,7 @@ import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.gamelogic.Inventory
 import com.masiad.arescaperoom.gamelogic.ar.animation.NodeAnimationFactory
-import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
-import com.masiad.arescaperoom.gamelogic.ar.node.InventoryNode
-import com.masiad.arescaperoom.gamelogic.ar.node.LightNode
-import com.masiad.arescaperoom.gamelogic.ar.node.PuzzleNode
+import com.masiad.arescaperoom.gamelogic.ar.node.*
 import com.masiad.arescaperoom.gamelogic.ar.node.model.*
 import com.masiad.arescaperoom.helper.DrawableHelper
 import com.masiad.arescaperoom.helper.StringHelper
@@ -33,22 +30,20 @@ class GameNodeFactory @Inject constructor(
     suspend fun createNode(parent: Node?, model: GameNodeModel): GameNode {
         // todo specifics properties
         val node = when (model) {
-            is NormalModel -> GameNode().apply {
-
-            }
+            is NormalModel -> GameNode()
             is InventoryModel -> InventoryNode().apply {
                 requireNotNull(model.nodeNameId) { "nodeNameId is null but inventory should be created" }
                 val name = stringHelper.resolveNodeName(model.nodeNameId!!)
                 val drawableResId = drawableHelper.resolveDrawableResId(model.drawableNameId)
                 inventory = Inventory(name, model.unlockName, drawableResId)
             }
-            is PuzzleModel -> PuzzleNode().apply {
-                model.isLocked?.let {
-                    isLocked = it
-                }
-                model.unlockInventoryName?.let {
-                    unlockInventoryName = it
-                }
+            is PuzzleModel -> PuzzleNode()
+            is InventoryLockedModel -> InventoryLockedNode().apply {
+                unlockName = model.unlockInventoryName
+            }
+            is PinLockedModel -> PinLockedNode().apply {
+                unlockPin = model.unlockPin
+
             }
             is LightNodeModel -> LightNode().apply {
 

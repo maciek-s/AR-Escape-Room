@@ -1,37 +1,25 @@
 package com.masiad.arescaperoom.gamelogic.ar.node
 
 /**
- * Puzzle node that need to be solved to open
+ * Puzzle node that need to be solved to open if locked
  */
-class PuzzleNode : ComplexNode() {
+open class PuzzleNode : GameNode() {
 
     /**
      * When node need to be unlock before tap action
      */
-    var isLocked = true
+    var isLocked = false
 
     /**
      * User see puzzle node content eg. drawer is open
      * show proper animation and set children visibility
      */
-    private var isOpen = false
+    protected var isOpen = false
         set(value) {
             field = value
             animate()
             setChildrenVisible(value)
         }
-
-    /**
-     * Node name witch unlock
-     */
-    var unlockInventoryName: String? = null
-
-    fun unlock(unlockName: String) {
-        if (unlockName == unlockInventoryName) {
-            isLocked = false
-            isOpen = true
-        }
-    }
 
     /**
      * Open if not locked on tap
@@ -42,5 +30,12 @@ class PuzzleNode : ComplexNode() {
         } else {
             isOpen = !isOpen
         }
+    }
+
+    private fun setChildrenVisible(isVisible: Boolean) {
+        children.filterIsInstance<GameNode>()
+            .forEach { node ->
+                node.isVisible = isVisible
+            }
     }
 }

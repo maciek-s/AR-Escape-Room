@@ -334,17 +334,17 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     override fun onTapLockedNode(node: PuzzleNode) {
         Log.i(TAG, "onTapLockedNode $node")
 
-        selectionTracker?.takeIf {
-            it.hasSelection()
-        }?.selection?.let { selection ->
-            val inventory = selection.iterator().next()
-            node.unlock(inventory.unlockName)
-        }
-        viewModel.informNodeUnlock(
-            node.isLocked,
-            node.name,
-            node.unlockInventoryName
-        )
+//        selectionTracker?.takeIf {
+//            it.hasSelection()
+//        }?.selection?.let { selection ->
+//            val inventory = selection.iterator().next()
+//            node.unlock(inventory.unlockName)
+//        }
+//        viewModel.informNodeUnlock(
+//            node.isLocked,
+//            node.name,
+//            node.unlockInventoryName
+//        )
     }
 
     //todo chest bounding box!

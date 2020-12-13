@@ -19,7 +19,7 @@
     ]
   },
   "doorModel": {
-    "type": "PUZZLE",
+    "type": "INVENTORY_LOCKED",
     "nodeNameId": "door",
     "isClickable": true,
     "modelName": "door",
@@ -80,7 +80,6 @@
               "duration": 500
             }
           },
-          "isLocked": false,
           "boundingBox": {
             "centerTransform": {
               "x": "0",
@@ -133,7 +132,6 @@
               "duration": 500
             }
           },
-          "isLocked": false,
           "boundingBox": {
             "centerTransform": {
               "x": "0",
@@ -172,7 +170,7 @@
       ]
     },
     {
-      "type": "PUZZLE",
+      "type": "INVENTORY_LOCKED",
       "nodeNameId": "chest",
       "isClickable": true,
       "modelName": "chest",
@@ -205,7 +203,7 @@
       "unlockInventoryName": "gold_key",
       "childrenModels": [
         {
-          "type": "PUZZLE",
+          "type": "PIN_LOCKED",
           "nodeNameId": "safe",
           "isClickable": true,
           "modelName": "safe",
@@ -236,7 +234,7 @@
           "animationType": {
             "type": "FILAMENT"
           },
-          "unlockInventoryName": "2865",
+          "unlockPin": "2865",
           "childrenModels": [
             {
               "type": "INVENTORY",
@@ -319,8 +317,7 @@
           },
           "duration": 400
         }
-      },
-      "isLocked": false
+      }
     },
     {
       "type": "INVENTORY",

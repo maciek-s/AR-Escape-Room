@@ -6,7 +6,7 @@ import com.google.gson.typeadapters.RuntimeTypeAdapterFactory
 import com.masiad.arescaperoom.gamelogic.ar.animation.AnimationType
 
 private enum class Type {
-    NORMAL, INVENTORY, PUZZLE, LIGHT
+    NORMAL, INVENTORY, PUZZLE, INVENTORY_LOCKED, PIN_LOCKED, LIGHT
 }
 
 private interface Model {
@@ -25,6 +25,10 @@ interface RenderableModel {
     val boundingBox: BoundingBox?
 }
 
+interface Puzzle {
+    val isLocked: Boolean?
+}
+
 sealed class GameNodeModel(
     val type: String
 ) : Model {
@@ -34,6 +38,8 @@ sealed class GameNodeModel(
                 .registerSubtype(NormalModel::class.java, Type.NORMAL.name)
                 .registerSubtype(InventoryModel::class.java, Type.INVENTORY.name)
                 .registerSubtype(PuzzleModel::class.java, Type.PUZZLE.name)
+                .registerSubtype(InventoryLockedModel::class.java, Type.INVENTORY_LOCKED.name)
+                .registerSubtype(PinLockedModel::class.java, Type.PIN_LOCKED.name)
                 .registerSubtype(LightNodeModel::class.java, Type.LIGHT.name)
         }
     }
@@ -78,9 +84,38 @@ data class PuzzleModel(
     override val childrenModels: List<GameNodeModel>?,
     override val modelName: String,
     override val animationType: AnimationType?,
-    val isLocked: Boolean?,
-    val unlockInventoryName: String?
-) : GameNodeModel(Type.PUZZLE.name), RenderableModel
+    override val isLocked: Boolean?,
+) : GameNodeModel(Type.PUZZLE.name), RenderableModel, Puzzle
+
+data class InventoryLockedModel(
+    override val nodeNameId: String?,
+    override val isVisible: Boolean?,
+    override val isClickable: Boolean?,
+    override val localPosition: Vector3?,
+    override val localRotation: Quaternion?,
+    override val isCollisionShapeEnabled: Boolean?,
+    override val boundingBox: BoundingBox?,
+    override val childrenModels: List<GameNodeModel>?,
+    override val modelName: String,
+    override val animationType: AnimationType?,
+    override val isLocked: Boolean?,
+    val unlockInventoryName: String
+) : GameNodeModel(Type.INVENTORY_LOCKED.name), RenderableModel, Puzzle
+
+data class PinLockedModel(
+    override val nodeNameId: String?,
+    override val isVisible: Boolean?,
+    override val isClickable: Boolean?,
+    override val localPosition: Vector3?,
+    override val localRotation: Quaternion?,
+    override val isCollisionShapeEnabled: Boolean?,
+    override val boundingBox: BoundingBox?,
+    override val childrenModels: List<GameNodeModel>?,
+    override val modelName: String,
+    override val animationType: AnimationType?,
+    override val isLocked: Boolean?,
+    val unlockPin: String
+) : GameNodeModel(Type.PIN_LOCKED.name), RenderableModel, Puzzle
 
 data class LightNodeModel(
     override val nodeNameId: String?,
