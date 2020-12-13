@@ -15,12 +15,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.material.progressindicator.ProgressIndicator
+        <com.google.android.material.progressindicator.LinearProgressIndicator
             animateProgress="@{progress}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:indicatorCornerRadius="8dp"
-            app:indicatorSize="@dimen/progress_layout_height"
+            app:trackCornerRadius="8dp"
+            app:trackThickness="@dimen/progress_layout_height"
             tools:progress="20" />
 
         <TextView

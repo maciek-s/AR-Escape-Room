@@ -19,16 +19,32 @@
     ]
   },
   "doorModel": {
-    "type": "NORMAL",
+    "type": "PUZZLE",
+    "nodeNameId": "door",
+    "isClickable": true,
     "modelName": "door",
+    "isVisible": false,
     "localPosition": {
       "x": "0",
       "y": "0",
       "z": "1.3"
     },
+    "boundingBox": {
+      "centerTransform": {
+        "x": "-0.34",
+        "y": "-0.17",
+        "z": "0.0"
+      },
+      "sizeScale": {
+        "x": "0.11",
+        "y": "0.06",
+        "z": "1.0"
+      }
+    },
     "animationType": {
       "type": "FILAMENT"
-    }
+    },
+    "unlockInventoryName": "door_key"
   },
   "insideModels": [
     {
@@ -196,8 +212,8 @@
           "isVisible": false,
           "localPosition": {
             "x": "0.0",
-            "y": "0.0",
-            "z": "0.15"
+            "y": "0.18",
+            "z": "0.135"
           },
           "localRotation": {
             "x": "1",
@@ -207,14 +223,14 @@
           },
           "boundingBox": {
             "centerTransform": {
-              "x": "0.0",
+              "x": "0.06",
               "y": "0.0",
-              "z": "0.0"
+              "z": "0.16"
             },
             "sizeScale": {
-              "x": "1.0",
-              "y": "1.0",
-              "z": "1.0"
+              "x": "0.35",
+              "y": "0.4",
+              "z": "0.06"
             }
           },
           "animationType": {
@@ -222,6 +238,26 @@
           },
           "unlockInventoryName": "2865",
           "childrenModels": [
+            {
+              "type": "INVENTORY",
+              "nodeNameId": "door_key",
+              "isClickable": true,
+              "modelName": "door_key",
+              "isVisible": false,
+              "localPosition": {
+                "x": "-0.02",
+                "y": "0.1",
+                "z": "-0.14"
+              },
+              "localRotation": {
+                "x": "1",
+                "y": "0",
+                "z": "0",
+                "w": "90"
+              },
+              "unlockName": "door_key",
+              "drawableNameId": "door_key"
+            }
           ]
         }
       ]
@@ -337,6 +373,22 @@
       },
       "unlockName": "card_tiles_8",
       "drawableNameId": "card_tiles_8"
+    },
+    {
+      "type": "NORMAL",
+      "modelName": "office_chair",
+      "localPosition": {
+        "x": "-0.15",
+        "y": "0.0",
+        "z": "-0.725"
+      },
+      "localRotation": {
+        "x": "0",
+        "y": "-1",
+        "z": "0",
+        "w": "65"
+      },
+      "isCollisionShapeEnabled": false
     }
   ]
 }

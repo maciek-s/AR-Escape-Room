@@ -4,8 +4,10 @@
     <string name="instruction_level_1">Oh, no! Someone lock the door. Search clues and find key to escape.</string>
 
     <string name="node_name_gold_key">Key</string>
+    <string name="node_name_door_key">Key</string>
     <string name="node_name_chest">Chest</string>
     <string name="node_name_safe">Safe</string>
+    <string name="node_name_door">Door</string>
     <string name="node_name_card_hearts_2">Two Hearts</string>
     <string name="node_name_card_tiles_8">Eight Tiles</string>
     <string name="node_name_card_pikes_6">Six Pikes</string>

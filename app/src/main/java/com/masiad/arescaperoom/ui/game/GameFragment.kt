@@ -13,21 +13,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
-import com.masiad.arescaperoom.gamelogic.Inventory
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
 import com.google.ar.sceneform.collision.Ray
 import com.google.ar.sceneform.math.Vector3
 import com.masiad.arescaperoom.R
-import com.masiad.arescaperoom.adapter.inventory.InventoryAdapter
-import com.masiad.arescaperoom.adapter.inventory.InventoryKeyProvider
-import com.masiad.arescaperoom.adapter.inventory.SelectionChecker
-import com.masiad.arescaperoom.adapter.inventory.InventorySelectionPredicate
-import com.masiad.arescaperoom.adapter.inventory.InventoryDetailsLookup
+import com.masiad.arescaperoom.adapter.inventory.*
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
 import com.masiad.arescaperoom.gamelogic.GameConstants
 import com.masiad.arescaperoom.gamelogic.GamePhase
+import com.masiad.arescaperoom.gamelogic.Inventory
 import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.ar.node.GameNode
 import com.masiad.arescaperoom.gamelogic.ar.node.InventoryNode
@@ -35,16 +31,13 @@ import com.masiad.arescaperoom.gamelogic.ar.node.PuzzleNode
 import com.masiad.arescaperoom.gamelogic.ar.node.factory.GameNodeFactory
 import com.masiad.arescaperoom.helper.StringHelper
 import com.masiad.arescaperoom.ui.ar.ArCoreFragment
-import com.masiad.arescaperoom.util.extenstion.TAG
-import com.masiad.arescaperoom.util.extenstion.hasAnchor
-import com.masiad.arescaperoom.util.extenstion.horizontalVector
+import com.masiad.arescaperoom.util.extenstion.*
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import com.masiad.arescaperoom.util.extenstion.setupSnackbar
 
 /**
  * Main AR game fragment
@@ -227,7 +220,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     private fun setupPlacing() {
         placingNode.setParent(rootAnchorNode)
-        placingNode.setOnTapListener { hitTestResult, motionEvent ->
+        placingNode.setOnTapListener { _, _ ->
             viewModel.informOnSceneClicked(rootAnchorNode.hasAnchor())
         }
         arSceneView.updateSceneOnUpdateListener {
@@ -280,15 +273,23 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         }.start()
 
         arSceneView.updateSceneOnUpdateListener {
-            val ray = Ray(cameraNode.worldPosition, cameraNode.forward)
-            val hit = arSceneView.scene.hitTest(ray)
-            binding.logs.text = hit.distance.toString()
-            hit.node?.let { node ->
-                if (node == doorNode && hit.distance < GameConstants.startGameDistanceThreshold) {
-                    arSceneView.removeSceneOnUpdateListener()
-                    doorNode.animate()
-                    showGameStartedInstruction()
+            val point1 = Vector3.add(
+                doorNode.worldPosition,
+                Vector3(-GameConstants.startPointXOffset, 0f, -GameConstants.startPointZOffset)
+            )
+            val point2 = Vector3.add(
+                doorNode.worldPosition,
+                Vector3(GameConstants.startPointXOffset, 0f, -GameConstants.startPointZOffset)
+            )
+            val distance = cameraNode.worldPosition.shortDistanceToLineBetween(point1, point2)
+            binding.logs.text = distance.toString()
+            if (distance < GameConstants.startGameDistanceThreshold) {
+                arSceneView.removeSceneOnUpdateListener()
+                doorNode.apply {
+                    isVisible = true
+                    animate()
                 }
+                showGameStartedInstruction()
             }
         }
     }
@@ -335,7 +336,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
         selectionTracker?.takeIf {
             it.hasSelection()
-        }?.getSelection()?.let { selection ->
+        }?.selection?.let { selection ->
             val inventory = selection.iterator().next()
             node.unlock(inventory.unlockName)
         }
