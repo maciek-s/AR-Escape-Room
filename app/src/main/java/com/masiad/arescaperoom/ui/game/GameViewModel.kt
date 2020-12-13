@@ -2,11 +2,12 @@ package com.masiad.arescaperoom.ui.game
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.masiad.arescaperoom.helper.StringHelper
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Inventory
 import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.LevelManager
+import com.masiad.arescaperoom.helper.StringHelper
+import com.masiad.arescaperoom.model.PinModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -55,6 +56,8 @@ class GameViewModel @ViewModelInject constructor(
     private val _inventoryList by lazy { MutableLiveData<List<Inventory>>() }
     val inventoryList: LiveData<List<Inventory>>
         get() = _inventoryList
+
+    val pinModel: PinModel? = null
 
     fun informPostOnViewCreated() {
         // Hide after correctly laid on view
