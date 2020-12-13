@@ -10,8 +10,6 @@ class FilamentAnimation(
     renderableInstance: RenderableInstance?
 ) : NodeAnimation {
 
-    // TODO temporary only 0 index and recerse on second click
-
     companion object {
         private const val ONE_FRAME = 1f / 24
     }

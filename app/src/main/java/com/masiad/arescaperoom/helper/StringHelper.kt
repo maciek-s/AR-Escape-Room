@@ -33,6 +33,10 @@ class StringHelper @Inject constructor(
         return context.getString(R.string.node_locked_message, nodeName)
     }
 
+    fun resolveNodePickUpMessage(nodeName: String): String {
+        return context.getString(R.string.node_pick_up_message, nodeName)
+    }
+
     private fun resolveString(identifierName: String): String {
         val resId = context.resources.getIdentifier(
             identifierName,

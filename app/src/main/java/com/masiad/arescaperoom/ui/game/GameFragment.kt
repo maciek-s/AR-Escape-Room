@@ -10,6 +10,7 @@ import androidx.core.animation.doOnEnd
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
@@ -139,7 +140,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     private fun setupMoveButton() {
-        // todo continuous move?
+        // TODO [Feature] Continuous move?
         binding.moveButton.setOnClickListener {
             lifecycleScope.launch {
                 relocateRoom()
@@ -189,8 +190,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
                 GamePhase.PLACING -> setupPlacing()
                 GamePhase.PLACED -> showEscapeRoom()
                 GamePhase.GAME_STARTED -> setupGameStartedUpdateListener()
-                GamePhase.ESCAPING -> TODO()
-                GamePhase.ESCAPED -> TODO()
+                GamePhase.ESCAPED -> setupEscapedUpdateListener()
             }
         })
     }
@@ -273,15 +273,13 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         arSceneView.updateSceneOnUpdateListener {
             val point1 = Vector3.add(
                 doorNode.worldPosition,
-                Vector3(-GameConstants.startPointXOffset, 0f, -GameConstants.startPointZOffset)
+                Vector3(-GameConstants.doorPointXOffset, 0f, -GameConstants.doorPointZOffset)
             )
             val point2 = Vector3.add(
                 doorNode.worldPosition,
-                Vector3(GameConstants.startPointXOffset, 0f, -GameConstants.startPointZOffset)
+                Vector3(GameConstants.doorPointXOffset, 0f, -GameConstants.doorPointZOffset)
             )
-            val distance = cameraNode.worldPosition.shortDistanceToLineBetween(point1, point2)
-            binding.logs.text = distance.toString()
-            if (distance < GameConstants.startGameDistanceThreshold) {
+            checkCameraDistance(point1, point2, GameConstants.doorDistanceThreshold) {
                 arSceneView.removeSceneOnUpdateListener()
                 doorNode.apply {
                     isVisible = true
@@ -292,8 +290,23 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         }
     }
 
+    private fun checkCameraDistance(
+        point1: Vector3,
+        point2: Vector3,
+        threshold: Float,
+        reachedCallback: () -> Unit
+    ) {
+        if (!isTrackingState) {
+            return
+        }
+        val distance = cameraNode.worldPosition.shortDistanceToLineBetween(point1, point2)
+        binding.logs.text = distance.toString()
+        if (distance < threshold) {
+            reachedCallback()
+        }
+    }
+
     private fun showGameStartedInstruction() {
-        //todo message resolver enter type + level number
         val instruction = stringHelper.resolveInstruction(viewModel.levelNumber)
         binding.alert.infoText = instruction
         binding.alert.clickListener = View.OnClickListener {
@@ -303,9 +316,32 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     private fun setupGameStartedUpdateListener() {
-//        arSceneView.updateSceneOnUpdateListener {
-//            // TODO detect outside the room? / tracking list? global tracking lost? // move camera on button tap?
-//        }
+        // TODO [Feature] Detect user outside the room. Detect tracking lost
+    }
+
+    private fun setupEscapedUpdateListener() {
+        doorNode.isVisible = false
+        arSceneView.updateSceneOnUpdateListener {
+            val point1 = Vector3.add(
+                doorNode.worldPosition,
+                Vector3(-GameConstants.doorPointXOffset, 0f, 0f)
+            )
+            val point2 = Vector3.add(
+                doorNode.worldPosition,
+                Vector3(GameConstants.doorPointXOffset, 0f, 0f)
+            )
+            checkCameraDistance(point1, point2, GameConstants.doorDistanceThreshold) {
+                arSceneView.removeSceneOnUpdateListener()
+                showEndGameInfo()
+            }
+        }
+    }
+
+    private fun showEndGameInfo() {
+        binding.alert.infoText = getString(R.string.end_game_info)
+        binding.alert.clickListener = View.OnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     private inline fun ArSceneView.updateSceneOnUpdateListener(crossinline updateAction: (frameTime: FrameTime?) -> Unit) {
@@ -325,7 +361,6 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     override fun onInventoryPickUp(node: InventoryNode) {
         Log.i(TAG, "onInventoryPickUp $node")
-        //todo show pick up snackbar
         viewModel.informInventoryPickUp(node.inventory)
     }
 
@@ -342,7 +377,8 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
                 viewModel.informNodeInventoryUnlock(
                     node.isLocked,
                     node.name,
-                    node.unlockName
+                    node.unlockName,
+                    node == doorNode
                 )
             }
             is PinLockedNode -> {

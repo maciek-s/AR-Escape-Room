@@ -108,9 +108,10 @@ class GameViewModel @ViewModelInject constructor(
 
     fun informInventoryPickUp(inventory: Inventory) {
         addInventoryToList(inventory)
+        val message = stringHelper.resolveNodePickUpMessage(inventory.name)
+        _showSnackbarEvent.value = message
     }
 
-    //todo update list
     private fun addInventoryToList(inventory: Inventory) {
         val updated = (inventoryList.value?.toMutableList() ?: mutableListOf()).apply {
             add(inventory)
@@ -121,7 +122,8 @@ class GameViewModel @ViewModelInject constructor(
     fun informNodeInventoryUnlock(
         isLocked: Boolean,
         name: String,
-        unlockInventoryName: String?
+        unlockInventoryName: String?,
+        isDoorNode: Boolean
     ) {
         if (isLocked) {
             val message = stringHelper.resolveNodeLockedMessage(name)
@@ -132,6 +134,9 @@ class GameViewModel @ViewModelInject constructor(
                 removeIf { it.unlockName == unlockInventoryName }
             }
             _inventoryList.value = updated?.toList()
+            if (isDoorNode) {
+                switchPhase(GamePhase.ESCAPED)
+            }
         }
     }
 

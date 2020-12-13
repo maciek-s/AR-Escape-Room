@@ -6,6 +6,5 @@ enum class GamePhase {
     PLACING,
     PLACED,
     GAME_STARTED,
-    ESCAPING,
     ESCAPED
 }

@@ -40,7 +40,8 @@ class MainFragment : Fragment(R.layout.main_fragment) {
 
     private fun setupListeners() {
         binding.play.setOnClickListener {
-            // TODO: Implement level chooser, temporary always start firs
+            // TODO [Feature] Implement level chooser, temporary always start first
+            // TODO [Feature] Web loading?
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToGameFragment(1))
         }
         binding.info.setOnClickListener {
