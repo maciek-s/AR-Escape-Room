@@ -9,7 +9,7 @@
     <string name="node_name_safe">Safe</string>
     <string name="node_name_door">Door</string>
     <string name="node_name_card_hearts_2">Two Hearts</string>
-    <string name="node_name_card_tiles_8">Eight Tiles</string>
-    <string name="node_name_card_pikes_6">Six Pikes</string>
-    <string name="node_name_card_clovers_5">Five Clovers</string>
+    <string name="node_name_card_diamonds_8">Eight Diamonds</string>
+    <string name="node_name_card_spades_6">Six Spades</string>
+    <string name="node_name_card_clubs_5">Five Clubs</string>
 </resources>

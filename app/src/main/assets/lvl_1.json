@@ -236,7 +236,7 @@
           "animationType": {
             "type": "FILAMENT"
           },
-          "unlockPin": "2865",
+          "unlockPin": "2856",
           "childrenModels": [
             {
               "type": "INVENTORY",
@@ -324,9 +324,9 @@
     },
     {
       "type": "INVENTORY",
-      "nodeNameId": "card_pikes_6",
+      "nodeNameId": "card_spades_6",
       "isClickable": true,
-      "modelName": "card_pikes_6",
+      "modelName": "card_spades_6",
       "localPosition": {
         "x": "-1.179",
         "y": "1.26",
@@ -338,27 +338,27 @@
         "z": "1",
         "w": "90"
       },
-      "unlockName": "card_pikes_6",
-      "drawableNameId": "card_pikes_6"
+      "unlockName": "card_spades_6",
+      "drawableNameId": "card_spades_6"
     },
     {
       "type": "INVENTORY",
-      "nodeNameId": "card_clovers_5",
+      "nodeNameId": "card_clubs_5",
       "isClickable": true,
-      "modelName": "card_clovers_5",
+      "modelName": "card_clubs_5",
       "localPosition": {
         "x": "-0.2",
         "y": "0.0",
         "z": "0.2"
       },
-      "unlockName": "card_clovers_5",
-      "drawableNameId": "card_clovers_5"
+      "unlockName": "card_clubs_5",
+      "drawableNameId": "card_clubs_5"
     },
     {
       "type": "INVENTORY",
-      "nodeNameId": "card_tiles_8",
+      "nodeNameId": "card_diamonds_8",
       "isClickable": true,
-      "modelName": "card_tiles_8",
+      "modelName": "card_diamonds_8",
       "localPosition": {
         "x": "0.0",
         "y": "0.03",
@@ -370,8 +370,8 @@
         "z": "1",
         "w": "180"
       },
-      "unlockName": "card_tiles_8",
-      "drawableNameId": "card_tiles_8"
+      "unlockName": "card_diamonds_8",
+      "drawableNameId": "card_diamonds_8"
     },
     {
       "type": "NORMAL",
@@ -386,6 +386,32 @@
         "y": "-1",
         "z": "0",
         "w": "65"
+      },
+      "isCollisionShapeEnabled": false
+    },
+    {
+      "type": "NORMAL",
+      "modelName": "book_shelf",
+      "localPosition": {
+        "x": "1.0",
+        "y": "0.0",
+        "z": "0.65"
+      },
+      "localRotation": {
+        "x": "0",
+        "y": "-1",
+        "z": "0",
+        "w": "90"
+      },
+      "isCollisionShapeEnabled": false
+    },
+    {
+      "type": "NORMAL",
+      "modelName": "bin",
+      "localPosition": {
+        "x": "-1.05",
+        "y": "0.0",
+        "z": "0.23"
       },
       "isCollisionShapeEnabled": false
     }
