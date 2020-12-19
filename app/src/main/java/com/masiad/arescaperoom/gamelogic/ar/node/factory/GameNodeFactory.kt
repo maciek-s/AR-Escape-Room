@@ -44,8 +44,8 @@ class GameNodeFactory @Inject constructor(
                 unlockPin = model.unlockPin
 
             }
-            is LightNodeModel -> LightNode().apply {
-
+            is LightNodeModel -> LightNode(model.lightModel).apply {
+                collisionShape = Box(model.collisionShapeSize)
             }
         }
         with(node) {

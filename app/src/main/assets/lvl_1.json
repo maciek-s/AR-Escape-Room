@@ -270,13 +270,27 @@
         "y": "0.0",
         "z": "-0.9"
       },
+      "isCollisionShapeEnabled": false,
       "childrenModels": [
         {
           "type": "LIGHT",
+          "isClickable": true,
           "localPosition": {
             "x": "0.0",
-            "y": "1.6",
+            "y": "1.65",
             "z": "0.0"
+          },
+          "lightModel": {
+            "type": "POINT",
+            "shadowCastingEnabled": true,
+            "temperature": 3000.0,
+            "intensity": 10.0,
+            "falloffRadius": 3.0
+          },
+          "collisionShapeSize": {
+            "x": "0.2",
+            "y": "0.2",
+            "z": "0.2"
           }
         }
       ]

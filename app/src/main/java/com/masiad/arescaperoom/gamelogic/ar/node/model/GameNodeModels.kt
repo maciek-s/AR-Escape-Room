@@ -124,4 +124,6 @@ data class LightNodeModel(
     override val localPosition: Vector3?,
     override val localRotation: Quaternion?,
     override val childrenModels: List<GameNodeModel>?,
+    val lightModel: LightModel,
+    val collisionShapeSize: Vector3
 ) : GameNodeModel(Type.LIGHT.name)
