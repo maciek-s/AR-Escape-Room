@@ -39,7 +39,6 @@ class MainFragment : Fragment(R.layout.main_fragment) {
     }
 
     // todo fix loading progress more models on desk?
-    // todo blender fix lamp after adding light
     // todo smoe loading optimization and memory
 
     private fun setupListeners() {
