@@ -22,7 +22,7 @@ class GameViewModel @ViewModelInject constructor(
 
     val loadingProgress = MutableLiveData(0)
     fun setLoadingProgress(progress: Int) {
-        loadingProgress.value = progress
+        loadingProgress.postValue(progress)
     }
 
     private var _showSnackbarEvent = MutableLiveData<String>()
@@ -74,8 +74,9 @@ class GameViewModel @ViewModelInject constructor(
 
     fun loadLevel(levelNumber: Int) {
         viewModelScope.launch {
-            setLoadingProgress(50)
+            setLoadingProgress(10)
             _level.value = levelManager.loadLevel(levelNumber)
+            setLoadingProgress(20)
         }
     }
 

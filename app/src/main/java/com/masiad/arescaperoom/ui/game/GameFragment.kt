@@ -241,17 +241,31 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     private suspend fun prepareEscapeRoom(level: Level) {
-        placingNode.renderable = modelLoader.load(level.placingModelName)
-
-        // Room node
-        roomNode = gameNodeFactory.createNode(null, level.roomModel)
-
-        // Door node
-        doorNode = gameNodeFactory.createNode(roomNode, level.doorModel)
-
-        // Room inside
-        level.insideModels.forEach { model ->
-            gameNodeFactory.createNode(roomNode, model)
+        withContext(Dispatchers.Main) {
+            placingNode.renderable = modelLoader.load(level.placingModelName)
+            withContext(Dispatchers.IO) {
+                viewModel.setLoadingProgress(30)
+            }
+            // Room node
+            roomNode = gameNodeFactory.createNode(null, level.roomModel)
+            withContext(Dispatchers.IO) {
+                viewModel.setLoadingProgress(40)
+            }
+            // Door node
+            doorNode = gameNodeFactory.createNode(roomNode, level.doorModel)
+            withContext(Dispatchers.IO) {
+                viewModel.setLoadingProgress(50)
+            }
+            // Room inside
+            val progressStep = 45 / level.insideModels.size
+            level.insideModels.forEachIndexed { index, model ->
+                gameNodeFactory.createNode(roomNode, model)
+                withContext(Dispatchers.IO) {
+                    val progress = 55 + index * progressStep
+                    Log.i(TAG, "Progress $progress")
+                    viewModel.setLoadingProgress(progress)
+                }
+            }
         }
     }
 
