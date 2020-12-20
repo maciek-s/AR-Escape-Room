@@ -38,13 +38,12 @@ class MainFragment : Fragment(R.layout.main_fragment) {
         _binding = null
     }
 
-    // todo fix loading progress more models on desk?
-    // todo smoe loading optimization and memory
-
     private fun setupListeners() {
         binding.play.setOnClickListener {
             // TODO [Feature] Implement level chooser, temporary always start first
             // TODO [Feature] Web loading?
+            // TODO MEMORY OPTIMIZE
+            // TODO LOGO
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToGameFragment(1))
         }
         binding.info.setOnClickListener {
