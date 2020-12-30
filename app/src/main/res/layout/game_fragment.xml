@@ -92,6 +92,7 @@
             android:id="@+id/logs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             tools:text="LOGS" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
