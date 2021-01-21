@@ -124,19 +124,20 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     // PRIVATE
     private fun bindData() {
         binding.viewModel = viewModel
-        setupSnackbar()
+        setupAlertViewEvent()
         setupMoveButton()
         setupInventory()
         observeGamePhase()
         observeLevel()
     }
 
-    private fun setupSnackbar() {
-        binding.root.setupSnackbar(
-            viewLifecycleOwner,
-            viewModel.showSnackBarEvent,
-            viewModel::doneShowingSnackbar
-        )
+    private fun setupAlertViewEvent() {
+        viewModel.showAlertViewEvent.observe(viewLifecycleOwner, {
+            if (it.isNotBlank()) {
+                viewModel.doneShowingAlertView()
+                showAlertView(it)
+            }
+        })
     }
 
     private fun setupMoveButton() {
@@ -209,11 +210,8 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     private fun showInstruction() {
-        binding.alert.infoText = getString(R.string.instruction_placing)
-        binding.alert.clickListener = View.OnClickListener {
-            binding.alert.infoText = null
-            viewModel.informInstructionAlertClosed()
-        }
+        val text = getString(R.string.instruction_placing)
+        showAlertView(text, viewModel::informInstructionAlertClosed)
     }
 
     private fun setupPlacing() {
@@ -322,11 +320,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
 
     private fun showGameStartedInstruction() {
         val instruction = stringHelper.resolveInstruction(viewModel.levelNumber)
-        binding.alert.infoText = instruction
-        binding.alert.clickListener = View.OnClickListener {
-            binding.alert.infoText = null
-            viewModel.informGameStarted()
-        }
+        showAlertView(instruction, viewModel::informGameStarted)
     }
 
     private fun setupGameStartedUpdateListener() {
@@ -352,9 +346,15 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     private fun showEndGameInfo() {
-        binding.alert.infoText = getString(R.string.end_game_info)
-        binding.alert.clickListener = View.OnClickListener {
-            findNavController().navigateUp()
+        val text = getString(R.string.end_game_info)
+        showAlertView(text, findNavController()::navigateUp)
+    }
+
+    private fun showAlertView(text: String, closeAction: (() -> Unit)? = null) {
+        binding.alert.infoText = text
+        binding.alert.setClickListener {
+            binding.alert.infoText = null
+            closeAction?.invoke()
         }
     }
 

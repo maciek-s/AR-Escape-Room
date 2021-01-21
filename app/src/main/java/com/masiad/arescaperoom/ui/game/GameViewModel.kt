@@ -25,12 +25,12 @@ class GameViewModel @ViewModelInject constructor(
         loadingProgress.postValue(progress)
     }
 
-    private var _showSnackbarEvent = MutableLiveData<String>()
-    val showSnackBarEvent: LiveData<String>
-        get() = _showSnackbarEvent
+    private var _showAlertViewEvent = MutableLiveData<String>()
+    val showAlertViewEvent: LiveData<String>
+        get() = _showAlertViewEvent
 
-    fun doneShowingSnackbar() {
-        _showSnackbarEvent.value = ""
+    fun doneShowingAlertView() {
+        _showAlertViewEvent.value = ""
     }
 
     private val _level by lazy { MutableLiveData<Level>() }
@@ -110,7 +110,7 @@ class GameViewModel @ViewModelInject constructor(
     fun informInventoryPickUp(inventory: Inventory) {
         addInventoryToList(inventory)
         val message = stringHelper.resolveNodePickUpMessage(inventory.name)
-        _showSnackbarEvent.value = message
+        _showAlertViewEvent.value = message
     }
 
     private fun addInventoryToList(inventory: Inventory) {
@@ -128,7 +128,7 @@ class GameViewModel @ViewModelInject constructor(
     ) {
         if (isLocked) {
             val message = stringHelper.resolveNodeLockedMessage(name)
-            _showSnackbarEvent.value = message
+            _showAlertViewEvent.value = message
         } else {
             requireNotNull(inventoryList.value) { "informNodeUnlock() was called by inventory list is null" }
             val updated = inventoryList.value?.toMutableList()?.apply {
@@ -151,7 +151,7 @@ class GameViewModel @ViewModelInject constructor(
                     onSuccess()
                 } else {
                     val message = stringHelper.incorrectPin
-                    _showSnackbarEvent.value = message
+                    _showAlertViewEvent.value = message
                 }
                 delay(50)
                 pinModel.value = null

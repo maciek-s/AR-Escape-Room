@@ -19,6 +19,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
         tools:context=".ui.game.GameFragment">
 
         <androidx.fragment.app.FragmentContainerView
@@ -86,7 +87,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginEnd="@dimen/margin_normal" />
+            android:layout_marginEnd="@dimen/margin_normal"
+            tools:visibility="invisible" />
 
         <TextView
             android:id="@+id/logs"
