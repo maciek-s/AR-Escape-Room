@@ -41,41 +41,20 @@
         <include
             android:id="@+id/inventory"
             layout="@layout/inventory_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
             app:isToggle="@{viewModel.isInventoryLayoutToggle}"
             app:isVisible="@{viewModel.isInventoryLayoutVisible}"
             app:toggleClickListener="@{inventoryToggleClickListener}" />
-
-        <View
-            android:id="@+id/overlay"
-            visibility="@{viewModel.loadingProgress &lt; 100}"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/door_background"
-            tools:visibility="invisible" />
 
         <include
             android:id="@+id/loading_progress"
             layout="@layout/progress_layout"
             visibility="@{viewModel.gamePhase == GamePhase.LOADING}"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginEnd="@dimen/margin_normal"
             app:progress="@{viewModel.loadingProgress}"
             tools:visibility="invisible" />
 
         <include
             android:id="@+id/alert"
             layout="@layout/alert_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginEnd="@dimen/margin_normal"
             tools:visibility="invisible" />
 
         <include
@@ -83,11 +62,14 @@
             layout="@layout/pin_layout"
             pinModel="@{viewModel.pinModel}"
             visibility="@{viewModel.pinModel != null}"
+            tools:visibility="invisible" />
+
+        <View
+            android:id="@+id/overlay"
+            visibility="@{viewModel.loadingProgress &lt; 100}"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginEnd="@dimen/margin_normal"
+            android:layout_height="match_parent"
+            android:background="@drawable/door_background"
             tools:visibility="invisible" />
 
         <TextView

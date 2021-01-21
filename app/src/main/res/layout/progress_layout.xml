@@ -10,30 +10,35 @@
             type="Integer" />
     </data>
 
-    <com.google.android.material.card.MaterialCardView
-        style="@style/Widget.AREscapeRoom.CardView.Alert"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <merge>
 
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            animateProgress="@{progress}"
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.AREscapeRoom.CardView.Alert"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:trackCornerRadius="8dp"
-            app:trackThickness="@dimen/progress_layout_height"
-            tools:progress="20" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/progress_layout_height"
             android:layout_gravity="center"
-            android:autoSizeTextType="uniform"
-            android:padding="@dimen/margin_small"
-            android:text="@{@string/loading(progress)}"
-            android:textAlignment="center"
-            android:textColor="?attr/colorOnPrimary"
-            android:textStyle="bold"
-            tools:text="Loading… 20%" />
+            android:layout_marginHorizontal="@dimen/margin_normal">
 
-    </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                animateProgress="@{progress}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:trackCornerRadius="8dp"
+                app:trackThickness="@dimen/progress_layout_height"
+                tools:progress="20" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/progress_layout_height"
+                android:layout_gravity="center"
+                android:autoSizeTextType="uniform"
+                android:padding="@dimen/margin_small"
+                android:text="@{@string/loading(progress)}"
+                android:textAlignment="center"
+                android:textColor="?attr/colorOnPrimary"
+                android:textStyle="bold"
+                tools:text="Loading… 20%" />
+
+        </com.google.android.material.card.MaterialCardView>
+    </merge>
 </layout>
