@@ -31,8 +31,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver.OnWindowFocusChangeListener;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -40,7 +38,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.Config;
@@ -73,9 +70,6 @@ public abstract class BaseArFragment extends Fragment
         implements Scene.OnPeekTouchListener, Scene.OnUpdateListener {
   private static final String TAG = BaseArFragment.class.getSimpleName();
 
-  @SuppressWarnings({"initialization"})
-  private final OnWindowFocusChangeListener onFocusListener =
-          (hasFocus -> onWindowFocusChanged(hasFocus));
   @Nullable
   private OnSessionInitializationListener onSessionInitializationListener;
 
@@ -86,7 +80,6 @@ public abstract class BaseArFragment extends Fragment
   private PlaneDiscoveryController planeDiscoveryController;
   private TransformationSystem transformationSystem;
   private GestureDetector gestureDetector;
-  private FrameLayout frameLayout;
   private boolean isStarted;
   private boolean canRequestDangerousPermissions = true;
   @Nullable
@@ -113,8 +106,7 @@ public abstract class BaseArFragment extends Fragment
   // Suppress @UnderInitialization warning.
   public View onCreateView(
           LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-    frameLayout =
-            (FrameLayout) inflater.inflate(R.layout.sceneform_ux_fragment_layout, container, false);
+    FrameLayout frameLayout = (FrameLayout) inflater.inflate(R.layout.sceneform_ux_fragment_layout, container, false);
     arSceneView = (ArSceneView) frameLayout.findViewById(R.id.sceneform_ar_scene_view);
 
     // Setup the instructions view.
@@ -155,8 +147,6 @@ public abstract class BaseArFragment extends Fragment
       requestDangerousPermissions();
     }
 
-    // Make the app immersive and don't turn off the display.
-    arSceneView.getViewTreeObserver().addOnWindowFocusChangeListener(onFocusListener);
     return frameLayout;
   }
 
@@ -274,12 +264,6 @@ public abstract class BaseArFragment extends Fragment
                       }
                     })
             .show();
-  }
-
-  @Override
-  public void onDestroyView() {
-    super.onDestroyView();
-    arSceneView.getViewTreeObserver().removeOnWindowFocusChangeListener(onFocusListener);
   }
 
   /**
@@ -452,24 +436,6 @@ public abstract class BaseArFragment extends Fragment
    */
 
   protected abstract Set<Session.Feature> getSessionFeatures();
-
-  protected void onWindowFocusChanged(boolean hasFocus) {
-    FragmentActivity activity = getActivity();
-    if (hasFocus && activity != null) {
-      // Standard Android full-screen functionality.
-      activity
-              .getWindow()
-              .getDecorView()
-              .setSystemUiVisibility(
-                      View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                              | View.SYSTEM_UI_FLAG_FULLSCREEN
-                              | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-      activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-  }
 
   protected abstract void handleSessionException(UnavailableException sessionException);
 

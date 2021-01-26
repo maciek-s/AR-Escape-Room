@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.ar.sceneform.rendering.ResourceManager
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.databinding.MainFragmentBinding
 
@@ -47,6 +48,8 @@ class MainFragment : Fragment(R.layout.main_fragment) {
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToGameFragment(1))
         }
         binding.info.setOnClickListener {
+            ResourceManager.getInstance().destroyAllResources()
+
             val uriString = "https://maciek-s.github.io/"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString))
             startActivity(intent)

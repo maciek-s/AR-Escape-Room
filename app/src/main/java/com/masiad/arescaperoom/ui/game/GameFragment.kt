@@ -19,6 +19,7 @@ import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
 import com.google.ar.sceneform.collision.Ray
 import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.rendering.*
 import com.masiad.arescaperoom.R
 import com.masiad.arescaperoom.adapter.inventory.*
 import com.masiad.arescaperoom.databinding.GameFragmentBinding
@@ -33,9 +34,7 @@ import com.masiad.arescaperoom.ui.ar.ArCoreFragment
 import com.masiad.arescaperoom.util.extenstion.*
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 /**
@@ -117,8 +116,34 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     override fun onDestroyView() {
-        arSceneView.scene.removeOnUpdateListener(sceneUpdateListener)
+        sceneUpdateListener?.let {
+            arSceneView.scene.removeOnUpdateListener(it)
+        }
         super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        clear(roomNode)
+
+        super.onDestroy()
+    }
+
+    fun clear(node: Node) {
+        val children = node.children
+        if (children.size > 0) {
+            children.forEach {
+                clear(it)
+            }
+        } else {
+            node.setOnTapListener(null)
+            (node as? GameNode)?.apply {
+                nodeAnimation = null
+            }
+            node.renderable = null
+            //todo show renderable
+            //todo show regisry map
+            //todo clear bytes clear registrt?
+        }
     }
 
     // PRIVATE
@@ -239,30 +264,28 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     private suspend fun prepareEscapeRoom(level: Level) {
-        withContext(Dispatchers.Main) {
-            placingNode.renderable = modelLoader.load(level.placingModelName)
-            withContext(Dispatchers.IO) {
-                viewModel.setLoadingProgress(30)
+        withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                val placingRenderable = modelLoader.load(level.placingModelName)
+                placingNode.renderable = placingRenderable
             }
+            viewModel.setLoadingProgress(30)
+
             // Room node
             roomNode = gameNodeFactory.createNode(null, level.roomModel)
-            withContext(Dispatchers.IO) {
-                viewModel.setLoadingProgress(40)
-            }
+            viewModel.setLoadingProgress(40)
+
             // Door node
             doorNode = gameNodeFactory.createNode(roomNode, level.doorModel)
-            withContext(Dispatchers.IO) {
-                viewModel.setLoadingProgress(50)
-            }
+            viewModel.setLoadingProgress(50)
+
             // Room inside
             val progressStep = 45 / level.insideModels.size
             level.insideModels.forEachIndexed { index, model ->
                 gameNodeFactory.createNode(roomNode, model)
-                withContext(Dispatchers.IO) {
-                    val progress = 55 + index * progressStep
-                    Log.i(TAG, "Progress $progress")
-                    viewModel.setLoadingProgress(progress)
-                }
+                val progress = 55 + index * progressStep
+                Log.i(TAG, "Progress $progress")
+                viewModel.setLoadingProgress(progress)
             }
         }
     }

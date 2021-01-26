@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.AREscapeRoom" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Full screen -->
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">never</item>
         <!-- Custom Button-->
         <item name="materialButtonStyle">@style/Widget.AREscapeRoom.Button</item>
         <item name="imageButtonStyle">@style/Widget.AREscapeRoom.ImageButton</item>

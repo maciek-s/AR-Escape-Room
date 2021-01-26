@@ -15,6 +15,8 @@ import com.masiad.arescaperoom.util.extenstion.boxShape
 import com.masiad.arescaperoom.util.extenstion.scaledBy
 import com.masiad.arescaperoom.util.model.ModelLoader
 import dagger.hilt.android.scopes.FragmentScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -28,28 +30,35 @@ class GameNodeFactory @Inject constructor(
 ) {
 
     suspend fun createNode(parent: Node?, model: GameNodeModel): GameNode {
-        val node = when (model) {
-            is NormalModel -> GameNode()
-            is InventoryModel -> InventoryNode().apply {
-                requireNotNull(model.nodeNameId) { "nodeNameId is null but inventory should be created" }
-                val name = stringHelper.resolveNodeName(model.nodeNameId!!)
-                val drawableResId = drawableHelper.resolveDrawableResId(model.drawableNameId)
-                inventory = Inventory(name, model.unlockName, drawableResId)
-            }
-            is PuzzleModel -> PuzzleNode()
-            is InventoryLockedModel -> InventoryLockedNode().apply {
-                unlockName = model.unlockInventoryName
-            }
-            is PinLockedModel -> PinLockedNode().apply {
-                unlockPin = model.unlockPin
+        val node = withContext(Dispatchers.Main) {
+            when (model) {
+                is NormalModel -> GameNode()
+                is InventoryModel -> InventoryNode().apply {
+                    withContext(Dispatchers.IO) {
+                        requireNotNull(model.nodeNameId) { "nodeNameId is null but inventory should be created" }
+                        val name = stringHelper.resolveNodeName(model.nodeNameId!!)
+                        val drawableResId =
+                            drawableHelper.resolveDrawableResId(model.drawableNameId)
+                        inventory = Inventory(name, model.unlockName, drawableResId)
+                    }
+                }
+                is PuzzleModel -> PuzzleNode()
+                is InventoryLockedModel -> InventoryLockedNode().apply {
+                    unlockName = model.unlockInventoryName
+                }
+                is PinLockedModel -> PinLockedNode().apply {
+                    unlockPin = model.unlockPin
 
-            }
-            is LightNodeModel -> LightNode(model.lightModel).apply {
-                collisionShape = Box(model.collisionShapeSize)
+                }
+                is LightNodeModel -> LightNode(model.lightModel).apply {
+                    collisionShape = Box(model.collisionShapeSize)
+                }
             }
         }
         with(node) {
-            setParent(parent)
+            withContext(Dispatchers.Main) {
+                setParent(parent)
+            }
             model.nodeNameId?.let {
                 name = stringHelper.resolveNodeName(it)
             }
@@ -74,17 +83,25 @@ class GameNodeFactory @Inject constructor(
                 createNode(this, it)
             }
             if (model is RenderableModel) {
-                renderable = modelLoader.load(model.modelName)
+                withContext(Dispatchers.Main) {
+                    val modelRenderable = modelLoader.load(model.modelName)
+                    renderable = modelRenderable
+                }
                 model.animationType?.let {
                     nodeAnimation = nodeAnimationFactory.createAnimation(it, this)
                 }
                 if (model.isCollisionShapeEnabled == false) {
-                    collisionShape = Box(Vector3.zero())
+                    withContext(Dispatchers.Main) {
+                        collisionShape = Box(Vector3.zero())
+                    }
                 }
                 model.boundingBox?.let { boundingBox ->
-                    collisionShape = boxShape?.apply {
+                    val shape = boxShape?.apply {
                         center = Vector3.add(center, boundingBox.centerTransform)
                         size = size.scaledBy(boundingBox.sizeScale)
+                    }
+                    withContext(Dispatchers.Main) {
+                        collisionShape = shape
                     }
                 }
             }
