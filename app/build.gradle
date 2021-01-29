@@ -38,9 +38,6 @@ android {
 }
 
 dependencies {
-    // Use the Sceneform UX Package built from the source files included in the sceneformux folder.
-    api project(":sceneformux")
-
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
     kapt "androidx.hilt:hilt-compiler:$hilt_viewmodel_version"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
@@ -61,6 +58,7 @@ dependencies {
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hilt_viewmodel_version"
     implementation "com.google.code.gson:gson:$gson_version"
     implementation "org.danilopianini:gson-extras:$gson_extras_version"
+    implementation "com.gorisse.thomas.sceneform:sceneform:$sceneformVersion"
 
     // Testing dependencies
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
