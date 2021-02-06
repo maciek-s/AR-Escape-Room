@@ -14,6 +14,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
+import com.google.android.filament.EntityManager
+import com.google.android.filament.gltfio.AssetLoader
+import com.google.android.filament.gltfio.MaterialProvider
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
@@ -93,6 +96,22 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         )
     }
 
+    private val engine by lazy {
+        EngineInstance.getEngine().filamentEngine
+    }
+
+    private val materialProvider by lazy {
+        MaterialProvider(engine)
+    }
+
+    private val assetLoader by lazy {
+        AssetLoader(
+            engine,
+            materialProvider,
+            EntityManager.get()
+        )
+    }
+
     private var sceneUpdateListener: Scene.OnUpdateListener? = null
 
     private var selectionTracker: SelectionTracker<Inventory>? = null
@@ -119,16 +138,16 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         sceneUpdateListener?.let {
             arSceneView.scene.removeOnUpdateListener(it)
         }
+        clear(roomNode)
         super.onDestroyView()
     }
 
     override fun onDestroy() {
-        clear(roomNode)
-
         super.onDestroy()
+        assetLoader.destroy()
     }
 
-    fun clear(node: Node) {
+    private fun clear(node: Node) {
         val children = node.children
         if (children.size > 0) {
             children.forEach {
@@ -139,10 +158,13 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
             (node as? GameNode)?.apply {
                 nodeAnimation = null
             }
+            node.renderableInstance?.filamentAsset?.run {
+                (arSceneView.renderer.callPrivateFunc("getFilamentScene") as? com.google.android.filament.Scene)?.let { filamentScene ->
+                    filamentScene.removeEntities(entities)
+                }
+                assetLoader.destroyAsset(this)
+            }
             node.renderable = null
-            //todo show renderable
-            //todo show regisry map
-            //todo clear bytes clear registrt?
         }
     }
 

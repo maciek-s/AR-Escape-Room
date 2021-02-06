@@ -60,6 +60,7 @@ dependencies {
     implementation "org.danilopianini:gson-extras:$gson_extras_version"
     implementation "com.gorisse.thomas.sceneform:sceneform:$sceneformVersion"
     implementation "com.squareup.picasso:picasso:$picassoVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     // Testing dependencies
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
