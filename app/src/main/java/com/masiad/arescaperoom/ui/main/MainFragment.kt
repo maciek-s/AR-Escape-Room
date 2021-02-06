@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.ar.sceneform.rendering.ResourceManager
 import com.masiad.arescaperoom.R
+import com.masiad.arescaperoom.adapter.bindingadapter.bindImageRes
 import com.masiad.arescaperoom.databinding.MainFragmentBinding
 
 /**
@@ -28,8 +29,9 @@ class MainFragment : Fragment(R.layout.main_fragment) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = MainFragmentBinding.inflate(inflater, container, false)
+        bindImageRes(binding.background, R.drawable.door_background)
         setupListeners()
         return binding.root
     }

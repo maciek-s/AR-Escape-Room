@@ -1,6 +1,5 @@
 package com.masiad.arescaperoom.ui.game
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.masiad.arescaperoom.gamelogic.GamePhase
 import com.masiad.arescaperoom.gamelogic.Inventory
@@ -8,10 +7,13 @@ import com.masiad.arescaperoom.gamelogic.Level
 import com.masiad.arescaperoom.gamelogic.LevelManager
 import com.masiad.arescaperoom.helper.StringHelper
 import com.masiad.arescaperoom.model.PinModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GameViewModel @ViewModelInject constructor(
+@HiltViewModel
+class GameViewModel @Inject constructor(
     private val levelManager: LevelManager,
     private val stringHelper: StringHelper,
 ) : ViewModel() {

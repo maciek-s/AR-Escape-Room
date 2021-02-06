@@ -4,8 +4,8 @@
     <style name="Base.Theme.AREscapeRoom" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Full screen -->
         <item name="android:windowFullscreen">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">never</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
+        </item>
         <!-- Custom Button-->
         <item name="materialButtonStyle">@style/Widget.AREscapeRoom.Button</item>
         <item name="imageButtonStyle">@style/Widget.AREscapeRoom.ImageButton</item>

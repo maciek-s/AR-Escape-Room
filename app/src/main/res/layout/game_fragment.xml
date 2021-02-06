@@ -14,6 +14,8 @@
             type="android.view.View.OnClickListener" />
 
         <import type="com.masiad.arescaperoom.gamelogic.GamePhase" />
+
+        <import type="com.masiad.arescaperoom.R" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -64,12 +66,13 @@
             visibility="@{viewModel.pinModel != null}"
             tools:visibility="invisible" />
 
-        <View
+        <ImageView
             android:id="@+id/overlay"
+            imageRes="@{R.drawable.door_background}"
             visibility="@{viewModel.loadingProgress &lt; 100}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/door_background"
+            android:scaleType="fitXY"
             tools:visibility="invisible" />
 
         <TextView
