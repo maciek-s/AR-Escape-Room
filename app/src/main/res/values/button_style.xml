@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material Button -->
+    <style name="Widget.AREscapeRoom.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAppearance">@style/TextAppearance.AREscapeRoom.Button</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.AREscapeRoom.SmallComponent</item>
+
+        <item name="autoSizeTextType">uniform</item>
+
+        <item name="strokeColor">?attr/colorSecondary</item>
+        <item name="strokeWidth">@dimen/stroke_width</item>
+    </style>
+
+    <style name="TextAppearance.AREscapeRoom.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">@font/baloo_thambi</item>
+    </style>
+
+    <style name="ShapeAppearance.AREscapeRoom.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">6dp</item>
+    </style>
+
+    <style name="Widget.AREscapeRoom.Button.Big" parent="Widget.AREscapeRoom.Button">
+        <item name="minHeight">@dimen/button_big_min_height</item>
+    </style>
+
+    <!-- Image Button -->
+    <style name="Widget.AREscapeRoom.ImageButton" parent="Widget.AppCompat.ImageButton">
+        <item name="tint">?attr/colorPrimary</item>
+        <item name="backgroundColor">@color/white</item>
+    </style>
+</resources>

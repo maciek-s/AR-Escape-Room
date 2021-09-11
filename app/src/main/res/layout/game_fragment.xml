@@ -9,49 +9,78 @@
             name="viewModel"
             type="com.masiad.arescaperoom.ui.game.GameViewModel" />
 
+        <variable
+            name="inventoryToggleClickListener"
+            type="android.view.View.OnClickListener" />
+
         <import type="com.masiad.arescaperoom.gamelogic.GamePhase" />
+
+        <import type="com.masiad.arescaperoom.R" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
         tools:context=".ui.game.GameFragment">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/ar_core_fragment"
             android:name="com.masiad.arescaperoom.ui.ar.ArCoreFragment"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/move_button"
+            visibility="@{viewModel.isMoveButtonVisible}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:layout_marginBottom="@dimen/margin_large"
+            android:src="@drawable/ic_round_arrow_upward"
+            app:maxImageSize="48dp" />
+
+        <include
+            android:id="@+id/inventory"
+            layout="@layout/inventory_layout"
+            app:isToggle="@{viewModel.isInventoryLayoutToggle}"
+            app:isVisible="@{viewModel.isInventoryLayoutVisible}"
+            app:toggleClickListener="@{inventoryToggleClickListener}" />
 
         <include
             android:id="@+id/loading_progress"
             layout="@layout/progress_layout"
             visibility="@{viewModel.gamePhase == GamePhase.LOADING}"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginEnd="@dimen/margin_normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:progress="@{viewModel.loadingProgress}" />
+            app:progress="@{viewModel.loadingProgress}"
+            tools:visibility="invisible" />
 
         <include
             android:id="@+id/alert"
             layout="@layout/alert_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginEnd="@dimen/margin_normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            tools:visibility="invisible" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <include
+            android:id="@+id/pin_layout"
+            layout="@layout/pin_layout"
+            pinModel="@{viewModel.pinModel}"
+            visibility="@{viewModel.pinModel != null}"
+            tools:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/overlay"
+            imageRes="@{R.drawable.door_background}"
+            visibility="@{viewModel.loadingProgress &lt; 100}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            tools:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/logs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:text="LOGS" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

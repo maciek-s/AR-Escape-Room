@@ -1,10 +1,18 @@
 <resources>
-    <string name="app_name">AR Escape Room</string>
-    <string name="start">Start</string>
-    <string name="loading">Loading… %d%%</string>
+    <!-- Common -->
     <string name="ok">OK</string>
+    <string name="play">Play</string>
+    <string name="info">Info</string>
 
-    <string name="instruction_placing">Move device to scan room. Then tap screen to place model in visible position and start game!</string>
+    <!-- Game-->
+    <string name="loading">Loading… %d%%</string>
+    <string name="inventory">Inventory</string>
 
-    <string name="instruction_level_1">TODO</string>
+    <string name="instruction_placing">There should be at least 2x2m of space around you.\nSlowly move the device to scan the environment.\nTouch the door preview to place it in the current position and start the game!</string>
+
+    <string name="node_locked_message">Can\'t open. %s is locked!</string>
+    <string name="node_pick_up_message">Pick up %s!</string>
+    <string name="incorrect_pin_message">Incorrect PIN!</string>
+
+    <string name="end_game_info">Hurray. You managed to escape!</string>
 </resources>

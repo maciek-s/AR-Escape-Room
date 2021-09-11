@@ -1,12 +1,16 @@
 package com.masiad.arescaperoom.ui.main
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.google.ar.sceneform.rendering.ResourceManager
 import com.masiad.arescaperoom.R
+import com.masiad.arescaperoom.adapter.bindingadapter.bindImageRes
 import com.masiad.arescaperoom.databinding.MainFragmentBinding
 
 /**
@@ -25,8 +29,9 @@ class MainFragment : Fragment(R.layout.main_fragment) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = MainFragmentBinding.inflate(inflater, container, false)
+        bindImageRes(binding.background, R.drawable.door_background)
         setupListeners()
         return binding.root
     }
@@ -37,9 +42,19 @@ class MainFragment : Fragment(R.layout.main_fragment) {
     }
 
     private fun setupListeners() {
-        binding.button.setOnClickListener {
-            // TODO: Implement level chooser, temporary always start firs
+        binding.play.setOnClickListener {
+            // TODO [Feature] Implement level chooser, temporary always start first
+            // TODO [Feature] Web loading?
+            // TODO MEMORY OPTIMIZE
+            // TODO LOGO
             findNavController().navigate(MainFragmentDirections.actionMainFragmentToGameFragment(1))
+        }
+        binding.info.setOnClickListener {
+            ResourceManager.getInstance().destroyAllResources()
+
+            val uriString = "https://maciek-s.github.io/"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uriString))
+            startActivity(intent)
         }
     }
 }
