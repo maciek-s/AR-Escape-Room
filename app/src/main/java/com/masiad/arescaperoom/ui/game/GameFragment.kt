@@ -17,6 +17,7 @@ import androidx.recyclerview.selection.StorageStrategy
 import com.google.android.filament.EntityManager
 import com.google.android.filament.gltfio.AssetLoader
 import com.google.android.filament.gltfio.MaterialProvider
+import com.google.android.filament.gltfio.UbershaderLoader
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.*
@@ -101,7 +102,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     private val materialProvider by lazy {
-        MaterialProvider(engine)
+        UbershaderLoader(engine)
     }
 
     private val assetLoader by lazy {
@@ -120,7 +121,7 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = GameFragmentBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         bindData()
