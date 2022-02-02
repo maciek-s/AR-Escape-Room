@@ -180,12 +180,12 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
     }
 
     private fun setupAlertViewEvent() {
-        viewModel.showAlertViewEvent.observe(viewLifecycleOwner, {
+        viewModel.showAlertViewEvent.observe(viewLifecycleOwner) {
             if (it.isNotBlank()) {
                 viewModel.doneShowingAlertView()
                 showAlertView(it)
             }
-        })
+        }
     }
 
     private fun setupMoveButton() {
@@ -223,16 +223,16 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
         inventoryAdapter.selectionChecker = SelectionChecker {
             selectionTracker?.isSelected(it) ?: false
         }
-        viewModel.inventoryList.observe(viewLifecycleOwner, {
+        viewModel.inventoryList.observe(viewLifecycleOwner) {
             inventoryAdapter.submitList(it)
-        })
+        }
         binding.inventoryToggleClickListener = View.OnClickListener {
             viewModel.informInventoryToggle()
         }
     }
 
     private fun observeGamePhase() {
-        viewModel.gamePhase.observe(viewLifecycleOwner, { gamePhase: GamePhase? ->
+        viewModel.gamePhase.observe(viewLifecycleOwner) { gamePhase: GamePhase? ->
             when (gamePhase) {
                 GamePhase.LOADING -> prepareGame()
                 GamePhase.GAME_LOADED -> showInstruction()
@@ -240,17 +240,18 @@ class GameFragment : Fragment(R.layout.game_fragment), GameNode.OnTapListener {
                 GamePhase.PLACED -> showEscapeRoom()
                 GamePhase.GAME_STARTED -> setupGameStartedUpdateListener()
                 GamePhase.ESCAPED -> setupEscapedUpdateListener()
+                else -> {}
             }
-        })
+        }
     }
 
     private fun observeLevel() {
-        viewModel.level.observe(viewLifecycleOwner, { level ->
+        viewModel.level.observe(viewLifecycleOwner) { level ->
             lifecycleScope.launch {
                 prepareEscapeRoom(level)
                 viewModel.informPreparingEnded()
             }
-        })
+        }
     }
 
     private fun prepareGame() {

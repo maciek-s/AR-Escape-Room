@@ -13,7 +13,7 @@ class ArCoreFragment : ArFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        arSceneView.scene.sunlight?.isEnabled = false
+//        arSceneView.scene.sunlight?.isEnabled = false
     }
 
     override fun onResume() {
