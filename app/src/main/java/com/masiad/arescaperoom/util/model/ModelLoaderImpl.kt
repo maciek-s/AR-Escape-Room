@@ -2,8 +2,8 @@ package com.masiad.arescaperoom.util.model
 
 import android.content.Context
 import com.google.ar.sceneform.rendering.ModelRenderable
+import com.gorisse.thomas.sceneform.scene.await
 import dagger.hilt.android.scopes.FragmentScoped
-import kotlinx.coroutines.future.await
 
 @FragmentScoped
 class ModelLoaderImpl(
@@ -19,7 +19,6 @@ class ModelLoaderImpl(
         return ModelRenderable.builder()
             .setSource(context, resId)
             .setIsFilamentGltf(true)
-            .build()
             .await()
     }
 }
